@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -19,7 +19,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object PestSpawnTimer {
 
-    private val config get() = PestAPI.config.pestTimer
+    private val config get() = PestApi.config.pestTimer
 
     private val patternGroup = RepoPattern.group("garden.pests")
 
@@ -85,7 +85,7 @@ object PestSpawnTimer {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand()) return
+        if (config.onlyWithVacuum && !PestApi.hasVacuumInHand()) return
 
         val display = drawDisplay()
 
@@ -126,5 +126,5 @@ object PestSpawnTimer {
         add(Renderable.string(pestCooldown))
     }
 
-    fun isEnabled() = GardenAPI.inGarden() && config.enabled
+    fun isEnabled() = GardenApi.inGarden() && config.enabled
 }

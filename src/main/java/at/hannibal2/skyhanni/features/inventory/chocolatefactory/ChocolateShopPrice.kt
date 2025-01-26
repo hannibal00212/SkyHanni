@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.loreCosts
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.million
@@ -30,16 +30,15 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ChocolateShopPrice {
-    private val config get() = ChocolateFactoryAPI.config.chocolateShopPrice
+    private val config get() = ChocolateFactoryApi.config.chocolateShopPrice
 
     private var display = emptyList<Renderable>()
     private var products = emptyList<Product>()
 
-    val menuNamePattern by ChocolateFactoryAPI.patternGroup.pattern(
+    val menuNamePattern by ChocolateFactoryApi.patternGroup.pattern(
         "shop.title",
         "Chocolate Shop",
     )
@@ -48,7 +47,7 @@ object ChocolateShopPrice {
      * REGEX-TEST: §aYou bought §r§aSupreme Chocolate Bar§r§a!
      * REGEX-TEST: §aYou bought §r§aSupreme Chocolate Bar§r§8 x5§r§a!
      */
-    private val itemBoughtPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    private val itemBoughtPattern by ChocolateFactoryApi.patternGroup.pattern(
         "shop.bought",
         "§aYou bought §r§.(?<item>[\\w ]+)§r(?:§8 x(?<amount>\\d+)§r)?§a!",
     )
@@ -56,7 +55,7 @@ object ChocolateShopPrice {
     /**
      * REGEX-TEST: §7Chocolate Spent: §60
      */
-    private val chocolateSpentPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    private val chocolateSpentPattern by ChocolateFactoryApi.patternGroup.pattern(
         "shop.spent",
         "§7Chocolate Spent: §6(?<amount>[\\d,]+)",
     )
@@ -105,7 +104,7 @@ object ChocolateShopPrice {
                 }
             }
 
-            val chocolate = ChocolateFactoryAPI.getChocolateBuyCost(lore) ?: continue
+            val chocolate = ChocolateFactoryApi.getChocolateBuyCost(lore) ?: continue
             val internalName = item.getInternalName()
             val itemPrice = internalName.getPriceOrNull() ?: continue
             val otherItemsPrice = item.loreCosts().sumOf { it.getPrice() }.takeIf { it != 0.0 }
@@ -190,9 +189,8 @@ object ChocolateShopPrice {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
         if (!inInventory) return
         itemBoughtPattern.matchMatcher(event.message) {
             val item = group("item")
@@ -209,7 +207,7 @@ object ChocolateShopPrice {
     private data class Product(
         var slot: Int?,
         val name: String,
-        val item: NEUInternalName,
+        val item: NeuInternalName,
         val chocolate: Long,
         val itemPrice: Double,
         val otherItemPrice: Double?,

@@ -25,6 +25,12 @@ ImportRules:
     CustomImportOrdering:
         active: true
 
+SkyHanniStyle:
+    InSkyBlockEarlyReturn:
+        active: true
+    IsInIslandEarlyReturn:
+        active: true
+
 style:
     MagicNumber: # I, Linnea Gräf, of sound mind and body, disagree with disabling this rule
         active: false
@@ -102,10 +108,6 @@ complexity:
     CyclomaticComplexMethod: # default threshold of 15, caught almost every complex method
         active: true
         threshold: 25
-        ignoreAnnotated:
-            - 'SubscribeEvent'
-            - 'HandleEvent'
-            - 'Mod.EventHandler'
     LongParameterList: # too aggressive, classes can need a lot of params
         active: false
     NestedBlockDepth: # too aggressive
@@ -125,10 +127,6 @@ complexity:
     LongMethod: # default max length of 60, caught way too much
         active: true
         threshold: 100
-        ignoreAnnotated:
-            - 'SubscribeEvent'
-            - 'HandleEvent'
-            - 'Mod.EventHandler'
 
 exceptions:
     SwallowedException: # there are valid reasons to do this
@@ -149,3 +147,5 @@ potential-bugs:
         active: false
     HasPlatformType: # false positives on config get() methods
         active: false
+    StorageNeedsExpose:
+        active: true

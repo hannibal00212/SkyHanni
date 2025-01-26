@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -43,9 +42,8 @@ object RngMeterInventory {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.LOW)
+    @HandleEvent(priority = HandleEvent.LOW, onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyBlock) return
 
         val chestName = InventoryUtils.openInventoryName()
         if (config.noDrop && chestName == "Catacombs RNG Meter") {

@@ -4,13 +4,15 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -46,7 +48,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         val config get() = SkyHanniMod.feature.misc.tracker
         private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
 
-        fun getPricePer(name: NEUInternalName) = name.getPrice(config.priceSource)
+        fun getPricePer(name: NeuInternalName) = name.getPrice(config.priceSource)
     }
 
     fun isInventoryOpen() = inventoryOpen
@@ -76,9 +78,9 @@ open class SkyHanniTracker<Data : TrackerData>(
     fun renderDisplay(position: Position) {
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
-        val currentlyOpen = Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } ?: false
-        if (!currentlyOpen && config.hideItemTrackersOutsideInventory && this is SkyHanniItemTracker) {
-            return
+        var currentlyOpen = Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } ?: false
+        if (RenderData.outsideInventory) {
+            currentlyOpen = false
         }
         if (inventoryOpen != currentlyOpen) {
             inventoryOpen = currentlyOpen
@@ -177,6 +179,17 @@ open class SkyHanniTracker<Data : TrackerData>(
         if (display.isEmpty()) {
             update()
         }
+    }
+
+    fun initRenderer(position: Position, condition: () -> Boolean) {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = condition,
+            onRender = {
+                renderDisplay(position)
+            },
+        )
     }
 
     inner class SharedTracker<Data : TrackerData>(

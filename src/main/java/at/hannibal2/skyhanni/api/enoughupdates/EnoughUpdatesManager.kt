@@ -12,7 +12,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getStringList
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
@@ -30,6 +31,7 @@ import net.minecraft.nbt.NBTException
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
+import net.minecraftforge.common.util.Constants
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
@@ -48,7 +50,7 @@ object EnoughUpdatesManager {
     private val itemStackCache = mutableMapOf<String, ItemStack>()
     private val displayNameCache = mutableMapOf<String, String>()
     private val recipes = mutableSetOf<PrimitiveRecipe>()
-    private val recipesMap = mutableMapOf<NEUInternalName, MutableSet<PrimitiveRecipe>>()
+    private val recipesMap = mutableMapOf<NeuInternalName, MutableSet<PrimitiveRecipe>>()
 
     private var neuPetsJson: NeuPetsJson? = null
     private var neuPetNums: JsonObject? = null
@@ -83,7 +85,7 @@ object EnoughUpdatesManager {
         }
     }
 
-    fun getRecipesFor(internalName: NEUInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
+    fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
 
     private fun loadItemMap(tempItemMap: TreeMap<String, JsonObject>) {
         val itemDir = File(repoLocation, "items")
@@ -147,16 +149,9 @@ object EnoughUpdatesManager {
     fun stackToJson(stack: ItemStack): JsonObject {
         val tag = stack.tagCompound ?: NBTTagCompound()
 
-        val lore = mutableListOf<String>()
-        if (tag.hasKey("display", 10)) {
-            val display = tag.getCompoundTag("display")
-            if (display.hasKey("Lore", 9)) {
-                val loreList = display.getTagList("Lore", 8)
-                for (i in 0 until loreList.tagCount()) {
-                    lore.add(loreList.getStringTagAt(i))
-                }
-            }
-        }
+        val lore = if (tag.hasKey("display", Constants.NBT.TAG_COMPOUND)) {
+            tag.getCompoundTag("display").getStringList("Lore")
+        } else emptyList()
 
         val json = JsonObject()
         json.addProperty("itemid", stack.item.registryName.toString())

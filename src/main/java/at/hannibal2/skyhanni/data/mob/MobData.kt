@@ -20,7 +20,7 @@ object MobData {
     }
 
     val players = MobSet()
-    val displayNPCs = MobSet()
+    val displayNpcs = MobSet()
     val skyblockMobs = MobSet()
     val summoningMobs = MobSet()
     val special = MobSet()
@@ -134,13 +134,13 @@ object MobData {
     }
 
     @HandleEvent
-    fun onDisplayNPCSpawnEvent(event: MobEvent.Spawn.DisplayNPC) {
-        displayNPCs.add(event.mob)
+    fun onDisplayNpcSpawnEvent(event: MobEvent.Spawn.DisplayNpc) {
+        displayNpcs.add(event.mob)
     }
 
     @HandleEvent
-    fun onDisplayNPCDeSpawnEvent(event: MobEvent.DeSpawn.DisplayNPC) {
-        displayNPCs.remove(event.mob)
+    fun onDisplayNpcDeSpawnEvent(event: MobEvent.DeSpawn.DisplayNpc) {
+        displayNpcs.remove(event.mob)
     }
 
     @HandleEvent

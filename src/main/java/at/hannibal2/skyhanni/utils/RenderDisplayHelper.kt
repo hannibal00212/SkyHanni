@@ -1,14 +1,12 @@
-
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
  * RenderDisplayHelper determines when to render displays based on
@@ -34,14 +32,18 @@ class RenderDisplayHelper(
         allDisplays.add(this)
     }
 
+    private fun renderIn(inOwnInventory: Boolean): Boolean {
+        return (this.inOwnInventory && inOwnInventory) || inventory.isInside()
+    }
+
     @SkyHanniModule
     companion object {
         private val noInventory = InventoryDetector { false }
         private val allDisplays = mutableListOf<RenderDisplayHelper>()
         private var currentlyVisibleDisplays = emptyList<RenderDisplayHelper>()
 
-        @SubscribeEvent
-        fun onTick(event: LorenzTickEvent) {
+        @HandleEvent
+        fun onTick(event: SkyHanniTickEvent) {
             currentlyVisibleDisplays = allDisplays.filter { it.checkCondition() }
         }
 
@@ -49,7 +51,7 @@ class RenderDisplayHelper(
         fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
             val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
             for (display in currentlyVisibleDisplays) {
-                if ((display.inOwnInventory && isInOwnInventory) || display.inventory.isInside()) {
+                if (display.renderIn(isInOwnInventory)) {
                     display.render()
                 }
             }
@@ -57,8 +59,9 @@ class RenderDisplayHelper(
 
         @HandleEvent
         fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+            val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
             for (display in currentlyVisibleDisplays) {
-                if (display.outsideInventory) {
+                if (display.outsideInventory && !display.renderIn(isInOwnInventory)) {
                     display.render()
                 }
             }

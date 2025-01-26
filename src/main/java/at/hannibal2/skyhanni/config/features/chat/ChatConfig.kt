@@ -36,7 +36,7 @@ class ChatConfig {
     @Expose
     @ConfigOption(name = "Dungeon Filters", desc = "Hide specific message types in Dungeons.")
     @ConfigEditorDraggableList
-    var dungeonFilteredMessageTypes: List<DungeonMessageTypes> = ArrayList()
+    var dungeonFilteredMessageTypes: List<DungeonMessageTypes> = mutableListOf()
 
 
     enum class DungeonMessageTypes(private val displayName: String) {
@@ -115,6 +115,14 @@ class ChatConfig {
     @FeatureToggle
     var hideSacksChange: Boolean = false
 
+    @Expose
+    @ConfigOption(
+        name = "Only Hide on Garden",
+        desc = "Only hide the sack change message in the Garden.",
+    )
+    @ConfigEditorBoolean
+    var onlyHideSacksChangeOnGarden: Boolean = false
+
     @Category(name = "Translator", desc = "Chat translator settings.")
     @Expose
     var translator: TranslatorConfig = TranslatorConfig()
@@ -149,4 +157,14 @@ class ChatConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var petRarityDropMessage: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Shorten Coin Amounts",
+        desc = "Replace coin amounts in chat messages with their shortened version.\n" +
+            "e.g. §65,100,000 Coins §7-> §65.1M Coins"
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var shortenCoinAmounts: Boolean = false
 }

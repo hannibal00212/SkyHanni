@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object DungeonBossMessages {
@@ -44,12 +44,12 @@ object DungeonBossMessages {
         " Necron§r§c: Before I have to deal with you myself."
     )
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!DungeonAPI.inDungeon()) return
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
+        if (!DungeonApi.inDungeon()) return
         if (!isBoss(event.message)) return
 
-        DungeonAPI.handleBossMessage(event.message)
+        DungeonApi.handleBossMessage(event.message)
 
         if (config.dungeonBossMessages) {
             event.blockedReason = "dungeon_boss"
