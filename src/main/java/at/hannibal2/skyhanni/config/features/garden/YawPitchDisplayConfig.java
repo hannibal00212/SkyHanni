@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class YawPitchDisplayConfig {
 
     @Expose
-    @ConfigOption(name = "Enable", desc = "Displays yaw and pitch while holding a farming tool. Automatically fades out if there is no movement.")
+    @ConfigOption(name = "Enable", desc = "Display yaw and pitch while holding a farming tool. Automatically fades out if there is no movement.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;

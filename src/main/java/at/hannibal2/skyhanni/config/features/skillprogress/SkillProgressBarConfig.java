@@ -14,7 +14,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 public class SkillProgressBarConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Enable/Disable the progress bar.")
+    @ConfigOption(name = "Enabled", desc = "Enable or disable the progress bar.")
     @ConfigEditorBoolean
     @FeatureToggle
     public Property<Boolean> enabled = Property.of(false);
@@ -55,11 +55,11 @@ public class SkillProgressBarConfig {
             CUSTOM_5("Texture 5", SkyHanniMod.MODID + ":bars/5.png"),
             ;
 
-            private final String str;
+            private final String displayName;
             private final String path;
 
-            UsedTexture(String str, String path) {
-                this.str = str;
+            UsedTexture(String displayName, String path) {
+                this.displayName = displayName;
                 this.path = path;
             }
 
@@ -69,7 +69,7 @@ public class SkillProgressBarConfig {
 
             @Override
             public String toString() {
-                return str;
+                return displayName;
             }
         }
 

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.stranded
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -13,24 +14,33 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object HighlightPlaceableNpcs {
 
     private val config get() = SkyHanniMod.feature.misc.stranded
 
-    private val locationPattern by RepoPattern.pattern(
-        "stranded.highlightplacement.location",
-        "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]"
+    private val patternGroup = RepoPattern.group("stranded.highlightplacement")
+
+    // TODO Please add regex tests
+    private val locationPattern by patternGroup.pattern(
+        "location",
+        "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]",
+    )
+    private val clickToSetPattern by RepoPattern.pattern(
+        "clicktoset",
+        "§7§eClick to set the location of this NPC!",
+    )
+    private val clickToSpawnPattern by RepoPattern.pattern(
+        "clicktospawn",
+        "§elocation!",
     )
 
     private var inInventory = false
     private var highlightedItems = emptyList<Int>()
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inInventory = false
         if (!isEnabled()) return
 
@@ -46,13 +56,13 @@ object HighlightPlaceableNpcs {
         this.highlightedItems = highlightedItems
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         highlightedItems = emptyList()
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @HandleEvent(priority = HandleEvent.LOW)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled() || !inInventory) return
         for (slot in InventoryUtils.getItemsInOpenChest()) {
@@ -62,14 +72,14 @@ object HighlightPlaceableNpcs {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "stranded", "misc.stranded")
     }
 
     private fun isPlaceableNpc(lore: List<String>): Boolean {
         // Checking if NPC & placeable
-        if (lore.isEmpty() || !(lore.last() == "§ethis NPC!" || lore.last() == "§eyour location!")) {
+        if (lore.isEmpty() || !(clickToSetPattern.matches(lore.last()) || clickToSpawnPattern.matches(lore.last()))) {
             return false
         }
 

@@ -1,16 +1,24 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.chat.ChatFilter.messagesMap
+import at.hannibal2.skyhanni.features.chat.PowderMiningChatFilter.genericMiningRewardMessage
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraft.util.ChatComponentText
 import java.util.regex.Pattern
 
 @SkyHanniModule
@@ -20,8 +28,9 @@ object ChatFilter {
     private val config get() = SkyHanniMod.feature.chat.filterType
     private val dungeonConfig get() = SkyHanniMod.feature.dungeon.messageFilter
 
-    /// <editor-fold desc="Regex Patterns & Messages">
+    // <editor-fold desc="Regex Patterns & Messages">
     // Lobby Messages
+    @Suppress("MaxLineLength")
     private val lobbyPatterns = listOf(
         // player join
         "(?: §b>§c>§a>§r §r)?.* §6(?:joined|(?:spooked|slid) into) the lobby!(?:§r §a<§c<§b<)?".toPattern(),
@@ -45,7 +54,7 @@ object ChatFilter {
 
     private val lobbyMessages = listOf(
         // prototype
-        "  §r§f§l➤ §r§6You have reached your Hype limit! Add Hype to Prototype Lobby minigames by right-clicking with the Hype Diamond!"
+        "  §r§f§l➤ §r§6You have reached your Hype limit! Add Hype to Prototype Lobby minigames by right-clicking with the Hype Diamond!",
     )
     private val lobbyMessagesContains = listOf(
         // prototype
@@ -57,7 +66,7 @@ object ChatFilter {
         "§r§e§6§lHYPIXEL§e is hosting a §b§lTNT RUN§e tournament!",
 
         // other
-        "§aYou are still radiating with §bGenerosity§r§a!"
+        "§aYou are still radiating with §bGenerosity§r§a!",
     )
 
     // Warping
@@ -67,40 +76,44 @@ object ChatFilter {
         "§7Request join for Dungeon Hub #(.*)\\.\\.\\.".toPattern(),
         // warp portals on public islands
         // (canvas room – flower house, election room – community center, void sepulchre – the end)
-        "§dWarped to (.*)§r§d!".toPattern()
+        "§dWarped to (.*)§r§d!".toPattern(),
     )
     private val warpingMessages = listOf(
         "§7Warping...", "§7Warping you to your SkyBlock island...", "§7Warping using transfer token...",
 
         // visiting other players
-        "§7Finding player...", "§7Sending a visit request..."
+        "§7Finding player...", "§7Sending a visit request...",
     )
 
     // Welcome
     private val welcomeMessages = listOf(
-        "§eWelcome to §r§aHypixel SkyBlock§r§e!"
+        "§eWelcome to §r§aHypixel SkyBlock§r§e!",
     )
 
     // Guild EXP
+    /**
+     * REGEX-TEST: §aYou earned §r§22 GEXP §r§afrom playing SkyBlock!
+     * REGEX-TEST: §aYou earned §r§22 GEXP §r§a+ §r§c210 Event EXP §r§afrom playing SkyBlock!
+     */
     private val guildExpPatterns = listOf(
-        // §aYou earned §r§22 GEXP §r§afrom playing SkyBlock!
-        // §aYou earned §r§22 GEXP §r§a+ §r§c210 Event EXP §r§afrom playing SkyBlock!
-        "§aYou earned §r§2.* GEXP (§r§a\\+ §r§.* Event EXP )?§r§afrom playing SkyBlock!".toPattern()
+        "§aYou earned §r§2.* GEXP (§r§a\\+ §r§.* Event EXP )?§r§afrom playing SkyBlock!".toPattern(),
     )
 
     // Kill Combo
+    /**
+     * REGEX-TEST: §a§l+5 Kill Combo §r§8+§r§b3% §r§b? Magic Find
+     */
     private val killComboPatterns = listOf(
-        //§a§l+5 Kill Combo §r§8+§r§b3% §r§b? Magic Find
         "§.§l\\+(.*) Kill Combo (.*)".toPattern(),
-        "§cYour Kill Combo has expired! You reached a (.*) Kill Combo!".toPattern()
+        "§cYour Kill Combo has expired! You reached a (.*) Kill Combo!".toPattern(),
     )
     private val killComboMessages = listOf(
-        "§6§l+50 Kill Combo"
+        "§6§l+50 Kill Combo",
     )
 
     // Profile Join
     private val profileJoinMessageStartsWith = listOf(
-        "§aYou are playing on profile: §e", "§8Profile ID: "
+        "§aYou are playing on profile: §e", "§8Profile ID: ",
     )
 
     // OTHERS
@@ -126,7 +139,7 @@ object ChatFilter {
 
         // Bank
         "§8Depositing coins...",
-        "§8Withdrawing coins..."
+        "§8Withdrawing coins...",
     )
 
     // Slayer
@@ -138,18 +151,21 @@ object ChatFilter {
         // end
         " {2}§r§a§lSLAYER QUEST COMPLETE!".toPattern(),
         " {3}§r§e(.*)Slayer LVL 9 §r§5- §r§a§lLVL MAXED OUT!".toPattern(),
-        " {3}§r§5§l» §r§7Talk to Maddox to claim your (.*) Slayer XP!".toPattern()
+        " {3}§r§5§l» §r§7Talk to Maddox to claim your (.*) Slayer XP!".toPattern(),
     )
     private val slayerMessages = listOf(
-        "  §r§6§lNICE! SLAYER BOSS SLAIN!", "§eYou received kill credit for assisting on a slayer miniboss!"
+        "  §r§6§lNICE! SLAYER BOSS SLAIN!", "§eYou received kill credit for assisting on a slayer miniboss!",
     )
     private val slayerMessageStartWith = listOf(
-        "§e✆ RING... "
+        "§e✆ RING... ",
     )
 
     // Slayer Drop
+    @Suppress("MaxLineLength")
     private val slayerDropPatterns = listOf(
         // Zombie
+        // TODO merge patterns together. Just because old ones are designed poorly doesnt mean new ones need to be poor as well
+        "§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§9Revenant Viscera§r§7\\) (.*)".toPattern(),
         "§b§lRARE DROP! §r§7\\(§r§f§r§9Revenant Viscera§r§7\\) (.*)".toPattern(),
         "§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§9Foul Flesh§r§7\\) (.*)".toPattern(),
         "§b§lRARE DROP! §r§7\\(§r§f§r§9Foul Flesh§r§7\\) (.*)".toPattern(),
@@ -182,7 +198,7 @@ object ChatFilter {
         // Blaze
         "§9§lVERY RARE DROP! {2}§r§7\\(§r§f§r§fWisp's Ice-Flavored Water I Splash Potion§r§7\\) (.*)".toPattern(),
         "§b§lRARE DROP! §r§7\\(§r§f§r§5Bundle of Magma Arrows§r§7\\) (.*)".toPattern(),
-        "§9§lVERY RARE DROP! {2}§r§7\\(§r§f§r§7\\d+x §r§f§r§9(Glowstone|Blaze Rod|Magma Cream|Nether Wart) Distillate§r§7\\) (.*)".toPattern()
+        "§9§lVERY RARE DROP! {2}§r§7\\(§r§f§r§7\\d+x §r§f§r§9(Glowstone|Blaze Rod|Magma Cream|Nether Wart) Distillate§r§7\\) (.*)".toPattern(),
     )
 
     // Useless Drop
@@ -192,7 +208,7 @@ object ChatFilter {
         "§6§lRARE DROP! §r§fPotato (.*)".toPattern(),
         "§6§lRARE DROP! §r§9Machine Gun Bow (.*)".toPattern(),
         "§6§lRARE DROP! §r§5Earth Shard (.*)".toPattern(),
-        "§6§lRARE DROP! §r§5Zombie Lord Chestplate (.*)".toPattern()
+        "§6§lRARE DROP! §r§5Zombie Lord Chestplate (.*)".toPattern(),
     )
     private val uselessDropMessages = listOf(
         "§6§lRARE DROP! §r§aEnchanted Ender Pearl",
@@ -202,7 +218,7 @@ object ChatFilter {
 
     // Useless Notification
     private val uselessNotificationPatterns = listOf(
-        "§aYou tipped \\d+ players? in \\d+(?: different)? games?!".toPattern()
+        "§aYou tipped \\d+ players? in \\d+(?: different)? games?!".toPattern(),
     )
     private val uselessNotificationMessages = listOf(
         "§eYour previous §r§6Plasmaflux Power Orb §r§ewas removed!",
@@ -252,10 +268,12 @@ object ChatFilter {
     )
 
     // Annoying Spam
+    @Suppress("MaxLineLength")
     private val annoyingSpamPatterns = listOf(
         "§7Your Implosion hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
         "§7Your Molten Wave hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
-        "§cYou need a tool with a §r§aBreaking Power §r§cof §r§6(\\d)§r§c to mine (.*)§r§c! Speak to §r§dFragilis §r§cby the entrance to the Crystal Hollows to learn more!".toPattern()
+        "§7Your Spirit Sceptre hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
+        "§cYou need a tool with a §r§aBreaking Power §r§cof §r§6(\\d)§r§c to mine (.*)§r§c! Speak to §r§dFragilis §r§cby the entrance to the Crystal Hollows to learn more!".toPattern(),
     )
     private val annoyingSpamMessages = listOf(
         "§cThere are blocks in the way!",
@@ -270,6 +288,7 @@ object ChatFilter {
         "§6§lGOOD CATCH! §r§bYou found a §r§fSpooky Bait§r§b.",
         "§e[NPC] Jacob§f: §rMy contest has started!",
         "§eObtain a §r§6Booster Cookie §r§efrom the community shop in the hub!",
+        "Unknown command. Type \"/help\" for help. ('uhfdsolguhkjdjfhgkjhdfdlgkjhldkjhlkjhsldkjfhldshkjf')",
     )
 
     private val skymallMessages = listOf(
@@ -282,12 +301,15 @@ object ChatFilter {
      */
     private val anitaFortunePattern by RepoPattern.pattern(
         "chat.jacobevent.accessory",
-        "§e\\[NPC] Jacob§f: §rYour §9Anita's \\w+ §fis giving you §6\\+\\d{1,2}☘ .+ Fortune §fduring the contest!"
+        "§e\\[NPC] Jacob§f: §rYour §9Anita's \\w+ §fis giving you §6\\+\\d{1,2}☘ .+ Fortune §fduring the contest!",
     )
 
+    /**
+     * REGEX-TEST: §eNew buff§r§r§r: §r§fGain §r§6+50☘ Mining Fortune§r§f.
+     */
     private val skymallPerkPattern by RepoPattern.pattern(
         "chat.skymall.perk",
-        "§eNew buff§r§r§r:(.*)"
+        "§eNew buff§r§r§r:.*",
     )
 
     // Winter Gift
@@ -323,23 +345,9 @@ object ChatFilter {
         "§cThis gift is for §r.*§r§c, sorry!".toPattern(),
     )
 
-    // Powder Mining
-    private val powderMiningPatterns = listOf(
-        "§cYou need a stronger tool to mine (Amethyst|Ruby|Jade|Amber|Sapphire|Topaz) Gemstone Block§r§c.".toPattern(),
-        "§aYou received §r§f\\d* §r§f[❤❈☘⸕✎✧] Rough (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a\\.".toPattern(),
-        "§aYou received §r§f\\d §r§a[❤❈☘⸕✎✧] Flawed (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a\\.".toPattern(),
-
-        // Jungle
-        "§aYou received §r§f\\d* §r§aSludge Juice§r§a\\.".toPattern(),
-
-        // Useful, maybe in another chat
-        "§aYou received §r§b\\+\\d{1,3} §r§a(Mithril|Gemstone) Powder.".toPattern(),
-        "§aYou received §r(§6|§b)\\+[1-2] (Diamond|Gold) Essence§r§a.".toPattern(),
-    )
-
     private val fireSalePattern by RepoPattern.pattern(
         "chat.firesale",
-        "§6§k§lA§r §c§lFIRE SALE §r§6§k§lA(?:\\n|.)*"
+        "§6§k§lA§r §c§lFIRE SALE §r§6§k§lA(?:\\n|.)*",
     )
     private val fireSalePatterns = listOf(
         "§c♨ §eFire Sales for .* §eare starting soon!".toPattern(),
@@ -360,13 +368,14 @@ object ChatFilter {
         "§7You will now produce §r§6.* Chocolate §r§7per click!".toPattern(),
         "§7You upgraded to §r§d.*?§r§7!".toPattern(),
     )
+
     /**
      * REGEX-TEST: §c§lSACRIFICE! §r§6[MVP§r§d++§r§6] Mikecraft1224§r§f §r§eturned §r§6Young Dragon Boots §r§einto §r§d40 Dragon Essence§r§e!
      * REGEX-TEST: §c§lBONUS LOOT! §r§eThey also received §r§5Ritual Residue §r§efrom their sacrifice!
      */
     private val sacrificePatterns = listOf(
         "§c§lSACRIFICE! (.*) §r§eturned (.*) §r§einto (.*) Dragon Essence§r§e!".toPattern(),
-        "§c§lBONUS LOOT! §r§eThey also received (.*) §r§efrom their sacrifice!".toPattern()
+        "§c§lBONUS LOOT! §r§eThey also received (.*) §r§efrom their sacrifice!".toPattern(),
     )
     private val powderMiningMessages = listOf(
         "§aYou uncovered a treasure chest!",
@@ -389,23 +398,66 @@ object ChatFilter {
      * REGEX-TEST: §6§lRARE REWARD! §r§bLeebys §r§efound a §r§6Recombobulator 3000 §r§ein their Obsidian Chest§r§e!
      */
     private val rareDropsMessages = listOf(
-        "§6§lRARE REWARD! (.*) §r§efound a (.*) §r§ein their (.*) Chest§r§e!".toPattern()
+        "§6§lRARE REWARD! (.*) §r§efound a (.*) §r§ein their (.*) Chest§r§e!".toPattern(),
     )
 
     // &r&6Your &r&aMage &r&6stats are doubled because you are the only player using this class!&r
     private val soloClassPatterns = listOf(
-        "§6Your §r§a(Healer|Mage|Berserk|Archer|Tank) §r§6stats are doubled because you are the only player using this class!".toPattern()
+        "§6Your §r§a(Healer|Mage|Berserk|Archer|Tank) §r§6stats are doubled because you are the only player using this class!".toPattern(),
     )
 
     private val soloStatsPatterns = listOf(
-        "§a\\[(Healer|Mage|Berserk|Archer|Tank)].*".toPattern()
+        "§a\\[(Healer|Mage|Berserk|Archer|Tank)].*".toPattern(),
     )
 
     // &r&dGenevieve the Fairy&r&f: You killed me! Take this &r&6Revive Stone &r&fso that my death is not in vain!&r
     private val fairyPatterns = listOf(
         "§d[\\w']+ the Fairy§r§f: You killed me! Take this §r§6Revive Stone §r§fso that my death is not in vain!".toPattern(),
         "§d[\\w']+ the Fairy§r§f: You killed me! I'll revive you so that my death is not in vain!".toPattern(),
-        "§d[\\w']+ the Fairy§r§f: Have a great life!".toPattern()
+        "§d[\\w']+ the Fairy§r§f: Have a great life!".toPattern(),
+    )
+
+    // §e§ka§a>>   §aAchievement Unlocked: §6§r§6Agile§r§a   <<§e§ka
+    private val achievementGetPatterns = listOf(
+        "§e§k.§a>> {3}§aAchievement Unlocked: .* {3}<<§e§k.".toPattern(),
+    )
+
+    /**
+     * REGEX-TEST: §aStarted parkour cocoa!
+     * REGEX-TEST: §aFinished parkour cocoa in 12:34.567!
+     * REGEX-TEST: §aReached checkpoint #4 for parkour cocoa!
+     * REGEX-TEST: §4Wrong checkpoint for parkour cocoa!
+     * REGEX-TEST: §4You haven't reached all checkpoints for parkour cocoa!
+     */
+    private val parkourPatterns = listOf(
+        "§aStarted parkour (.*)!".toPattern(),
+        "§aFinished parkour (.*) in (.*)!".toPattern(),
+        "§aReached checkpoint #(.*) for parkour (.*)!".toPattern(),
+        "§4Wrong checkpoint for parkour (.*)!".toPattern(),
+        "§4You haven't reached all checkpoints for parkour (.*)!".toPattern(),
+    )
+
+    /**
+     * REGEX-TEST: §4Cancelled parkour! You cannot fly.
+     * REGEX-TEST: §4Cancelled parkour! You cannot use item abilities.
+     * REGEX-TEST: §4Cancelled parkour!
+     */
+    private val parkourCancelMessages = listOf(
+        "§4Cancelled parkour! You cannot fly.",
+        "§4Cancelled parkour! You cannot use item abilities.",
+        "§4Cancelled parkour!",
+    )
+
+    /**
+     ** REGEX-TEST: §r§aWarped from the tpPadOne §r§ato the tpPadTwo§r§a!
+     */
+    private val teleportPadPatterns = listOf(
+        "§aWarped from the (.*) §r§ato the (.*)§r§a!".toPattern(),
+    )
+
+    // §r§4This Teleport Pad does not have a destination set!
+    private val teleportPadMessages = listOf(
+        "§4This Teleport Pad does not have a destination set!",
     )
 
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
@@ -421,7 +473,6 @@ object ChatFilter {
         "winter_island" to winterIslandPatterns,
         "annoying_spam" to annoyingSpamPatterns,
         "winter_gift" to winterGiftPatterns,
-        "powder_mining" to powderMiningPatterns,
         "fire_sale" to fireSalePatterns,
         "event" to eventPatterns,
         "factory_upgrade" to factoryUpgradePatterns,
@@ -430,6 +481,9 @@ object ChatFilter {
         "solo_class" to soloClassPatterns,
         "solo_stats" to soloStatsPatterns,
         "fairy" to fairyPatterns,
+        "achievement_get" to achievementGetPatterns,
+        "parkour" to parkourPatterns,
+        "teleport_pads" to teleportPadPatterns,
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -449,22 +503,27 @@ object ChatFilter {
         "fire_sale" to fireSaleMessages,
         "event" to eventMessage,
         "skymall" to skymallMessages,
+        "parkour" to parkourCancelMessages,
+        "teleport_pads" to teleportPadMessages,
     )
+
     private val messagesContainsMap: Map<String, List<String>> = mapOf(
         "lobby" to lobbyMessagesContains,
     )
+
     private val messagesStartsWithMap: Map<String, List<String>> = mapOf(
         "slayer" to slayerMessageStartWith,
         "profile_join" to profileJoinMessageStartsWith,
     )
-    /// </editor-fold>
+    // </editor-fold>
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        val blockReason = block(event.message)
-        if (blockReason == "") return
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
+        var blockReason = block(event.message)
+        if (blockReason == null && config.powderMining.enabled) blockReason = powderMiningBlock(event)
+        if (blockReason == null && config.crystalNucleus.enabled) blockReason = crystalNucleusBlock(event)
 
-        event.blockedReason = blockReason
+        event.blockedReason = blockReason ?: return
     }
 
     /**
@@ -472,7 +531,8 @@ object ChatFilter {
      * @param message The message to check
      * @return The reason why the message was blocked, empty if not blocked
      */
-    private fun block(message: String): String = when {
+    @Suppress("CyclomaticComplexMethod", "MaxLineLength")
+    private fun block(message: String): String? = when {
         config.hypixelHub && message.isPresent("lobby") -> "lobby"
         config.empty && StringUtils.isEmpty(message) -> "empty"
         config.warping && message.isPresent("warping") -> "warping"
@@ -480,26 +540,69 @@ object ChatFilter {
         config.guildExp && message.isPresent("guild_exp") -> "guild_exp"
         config.killCombo && message.isPresent("kill_combo") -> "kill_combo"
         config.profileJoin && message.isPresent("profile_join") -> "profile_join"
+        config.parkour && message.isPresent("parkour") -> "parkour"
+        config.teleportPads && message.isPresent("teleport_pads") -> "teleport_pads"
+
+        config.hideAlphaAchievements && HypixelData.hypixelAlpha && message.isPresent("achievement_get") -> "achievement_get"
 
         config.others && isOthers(message) -> othersMsg
 
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
-        config.powderMining && message.isPresent("powder_mining") -> "powder_mining"
-        config.eventLevelUp && (message.isPresent("event") || StringUtils.isEmpty(message)) -> "event"
+
+        // TODO need proper solution to hide empty messages in event text
+        config.eventLevelUp && (message.isPresent("event")) -> "event"
+
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
         config.sacrifice && message.isPresent("sacrifice") -> "sacrifice"
-        generalConfig.hideJacob && !GardenAPI.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
+        generalConfig.hideJacob && !GardenApi.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
         generalConfig.hideSkyMall && !LorenzUtils.inMiningIsland() && (skymallPerkPattern.matches(message) || message.isPresent("skymall")) -> "skymall"
         dungeonConfig.rareDrops && message.isPresent("rare_drops") -> "rare_drops"
-        dungeonConfig.soloClass && DungeonAPI.inDungeon() && message.isPresent("solo_class") -> "solo_class"
-        dungeonConfig.soloStats && DungeonAPI.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
-        dungeonConfig.fairy && DungeonAPI.inDungeon() && message.isPresent("fairy") -> "fairy"
+        dungeonConfig.soloClass && DungeonApi.inDungeon() && message.isPresent("solo_class") -> "solo_class"
+        dungeonConfig.soloStats && DungeonApi.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
+        dungeonConfig.fairy && DungeonApi.inDungeon() && message.isPresent("fairy") -> "fairy"
+        config.gardenNoPest && GardenApi.inGarden() && PestApi.noPestsChatPattern.matches(message) -> "garden_pest"
 
-        else -> ""
+        else -> null
     }
 
-    private var othersMsg = ""
+    /**
+     * Checks if the message is a blocked powder mining message, as defined in PowderMiningChatFilter.
+     * Will modify un-filtered Mining rewards, or return a resultant blocking code
+     * @param event The event to check
+     * @return Block reason if applicable
+     * @see block
+     */
+    private fun powderMiningBlock(event: SkyHanniChatEvent): String? {
+        val powderMiningMatchResult = PowderMiningChatFilter.block(event.message)
+        if (powderMiningMatchResult == "no_filter") {
+            genericMiningRewardMessage.matchMatcher(event.message) {
+                val reward = groupOrEmpty("reward")
+                val amountFormat = groupOrNull("amount")?.let {
+                    "§a+ §b$it§r"
+                } ?: "§a+§r"
+                event.chatComponent = ChatComponentText("$amountFormat $reward")
+            }
+            return null
+        }
+        return powderMiningMatchResult
+    }
+
+    /**
+     * Checks if the message is a blocked Crystal Nucleus Run message, as defined in CrystalNucleusChatFilter.
+     * Will conditionally modify/compact messages in some cases, or return a blocking code
+     * @param event The event to check
+     * @return Block reason if applicable
+     * @see block
+     */
+    private fun crystalNucleusBlock(event: SkyHanniChatEvent): String? {
+        val (blockCode, newMessage) = CrystalNucleusChatFilter.block(event.message)?.getPair() ?: Pair(null, null)
+        newMessage?.let { event.chatComponent = ChatComponentText(it) }
+        blockCode?.let { return it }
+        return null
+    }
+
+    private var othersMsg: String? = null
 
     /**
      * Checks if the message is an "other" message.
@@ -522,9 +625,9 @@ object ChatFilter {
             message.isPresent("winter_island") -> "winter_island"
             message.isPresent("useless_warning") -> "useless_warning"
             message.isPresent("annoying_spam") -> "annoying_spam"
-            else -> ""
+            else -> null
         }
-        return othersMsg != ""
+        return othersMsg != null
     }
 
     /**
@@ -538,12 +641,12 @@ object ChatFilter {
      * @see messagesContainsMap
      * @see messagesStartsWithMap
      */
-    private fun String.isPresent(key: String) = this in (messagesMap[key] ?: emptyList()) ||
-        (patternsMap[key] ?: emptyList()).any { it.matches(this) } ||
-        (messagesContainsMap[key] ?: emptyList()).any { this.contains(it) } ||
-        (messagesStartsWithMap[key] ?: emptyList()).any { this.startsWith(it) }
+    private fun String.isPresent(key: String) = this in (messagesMap[key].orEmpty()) ||
+        (patternsMap[key].orEmpty()).any { it.matches(this) } ||
+        (messagesContainsMap[key].orEmpty()).any { this.contains(it) } ||
+        (messagesStartsWithMap[key].orEmpty()).any { this.startsWith(it) }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "chat.hypixelHub", "chat.filterType.hypixelHub")
         event.move(3, "chat.empty", "chat.filterType.empty")
@@ -555,5 +658,15 @@ object ChatFilter {
         event.move(3, "chat.killCombo", "chat.filterType.killCombo")
         event.move(3, "chat.profileJoin", "chat.filterType.profileJoin")
         event.move(3, "chat.others", "chat.filterType.others")
+        event.move(52, "chat.filterType.powderMining", "chat.filterType.powderMiningFilter.enabled")
+        event.transform(53, "chat.filterType.powderMiningFilter.gemstoneFilterConfig") { element ->
+            element.asJsonObject.apply {
+                entrySet().forEach { (key, value) ->
+                    if (value.asString == "FINE_ONLY") addProperty(key, "FINE_UP")
+                }
+            }
+        }
+        event.move(61, "chat.filterType.powderMiningFilter", "chat.filterType.powderMining")
+        event.move(61, "chat.filterType.gemstoneFilterConfig", "chat.filterType.powderMining.gemstone")
     }
 }

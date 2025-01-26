@@ -31,14 +31,19 @@ public class PetConfig {
     public PetExperienceToolTipConfig petExperienceToolTip = new PetExperienceToolTipConfig();
 
     @Expose
-    @ConfigOption(name = "Hide Autopet Messages", desc = "Hides the autopet messages from chat. §eRequires the " +
-        "display to be enabled.")
+    @ConfigOption(name = "Pet Nametag", desc = "")
+    @Accordion
+    public PetNametagConfig nametag = new PetNametagConfig();
+
+    @Expose
+    @ConfigOption(name = "Hide Autopet Messages", desc = "Hide the autopet messages from chat.\n" +
+        "§eRequires the display to be enabled.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideAutopet = false;
 
     @Expose
-    @ConfigOption(name = "Show Pet Item", desc = "Specifies the pet items for which icons should be displayed next to pets.")
+    @ConfigOption(name = "Show Pet Item", desc = "Specify the pet items for which icons should be displayed next to pets.")
     @ConfigEditorDraggableList
     public List<PetItemsDisplay> petItemDisplay = new ArrayList<>(Arrays.asList(
         PetItemsDisplay.XP_SHARE,
@@ -55,19 +60,19 @@ public class PetConfig {
         XP_SHARE("§5⚘", "Exp Share", "PET_ITEM_EXP_SHARE"),
         TIER_BOOST("§c●", "Tier Boost", "PET_ITEM_TIER_BOOST"),
         ;
-        private final String str;
+        private final String displayName;
         public final String icon;
         public final String item;
 
         PetItemsDisplay(String icon, String name, String item) {
             this.icon = icon;
             this.item = item;
-            this.str = icon + " §ffor " + name;
+            this.displayName = icon + " §ffor " + name;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 }

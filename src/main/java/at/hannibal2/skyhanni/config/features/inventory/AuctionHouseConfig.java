@@ -45,19 +45,19 @@ public class AuctionHouseConfig {
     @Expose
     @ConfigOption(
         name = "Copy Underbid Keybind",
-        desc = "Copies the price of the hovered item in Auction House minus 1 coin into the clipboard for easier under-bidding."
+        desc = "Copy the price of the hovered item in Auction House minus 1 coin into the clipboard for easier under-bidding."
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int copyUnderbidKeybind = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Price Website", desc = "Adds a button to the Auction House that will open the item page in §csky.coflnet.com§7.")
+    @ConfigOption(name = "Price Website", desc = "Add a button to the Auction House that will open the item page in §csky.coflnet.com§7.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean openPriceWebsite = false;
 
     @Expose
-    @ConfigOption(name = "Outbid alert", desc = "Sends a warning when you're outbid on an auction.")
+    @ConfigOption(name = "Outbid alert", desc = "Send a warning when you're outbid on an auction.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean auctionOutbid = false;

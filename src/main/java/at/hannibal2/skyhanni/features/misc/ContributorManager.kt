@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorJsonEntry
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorsJson
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
@@ -9,26 +10,30 @@ import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.ChatComponentText
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ContributorManager {
     private val config get() = SkyHanniMod.feature.dev
 
+    // Key is the lowercase contributor name
     private var contributors: Map<String, ContributorJsonEntry> = emptyMap()
 
-    @SubscribeEvent
+    // Just the names of the contributors including their proper case
+    var contributorNames = emptyList<String>()
+        private set
+
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        contributors = event.getConstant<ContributorsJson>("Contributors").contributors.mapKeys { it.key.lowercase() }
+        val map = event.getConstant<ContributorsJson>("Contributors").contributors
+        contributors = map.mapKeys { it.key.lowercase() }
+        contributorNames = map.map { it.key }
     }
 
-    @SubscribeEvent
-    fun onRenderNametag(event: EntityDisplayNameEvent) {
+    @HandleEvent
+    fun onRenderNametag(event: EntityDisplayNameEvent<EntityPlayer>) {
         if (!config.contributorNametags) return
-        (event.entity as? EntityPlayer)?.let { player ->
-            if (player.isRealPlayer()) getSuffix(event.entity.name)?.let {
-                event.chatComponent.appendSibling(ChatComponentText(" $it"))
-            }
+        if (event.entity.isRealPlayer()) getSuffix(event.entity.name)?.let {
+            event.chatComponent.appendSibling(ChatComponentText(" $it"))
         }
     }
 

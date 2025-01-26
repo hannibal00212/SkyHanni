@@ -38,6 +38,12 @@ public class VisitorConfig {
     public boolean notificationChat = true;
 
     @Expose
+    @ConfigOption(name = "Compact Chat", desc = "Compact reward summary messages when you accept an offer.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean compactRewardChat = false;
+
+    @Expose
     @ConfigOption(name = "Notification Title", desc = "Show a title when a new visitor is visiting your island.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -53,17 +59,17 @@ public class VisitorConfig {
         NAME("Name Only", 1),
         BOTH("Both", 2),
         DISABLED("Disabled", 3);
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        HighlightMode(String str, int legacyId) {
-            this.str = str;
+        HighlightMode(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        HighlightMode(String str) {
-            this(str, -1);
+        HighlightMode(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -73,7 +79,7 @@ public class VisitorConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -84,7 +90,7 @@ public class VisitorConfig {
     public boolean hypixelArrivedMessage = true;
 
     @Expose
-    @ConfigOption(name = "Hide Chat", desc = "Hide chat messages from the visitors in the garden. (Except Beth and Spaceman)")
+    @ConfigOption(name = "Hide Chat", desc = "Hide chat messages from the visitors in the garden. (Except Beth, Maeve, and Spaceman)")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideChat = true;
@@ -97,7 +103,7 @@ public class VisitorConfig {
     @Expose
     @ConfigOption(
         name = "Accept Hotkey",
-        desc = "Accept a visitor when you press this keybind while in the visitor GUI. " +
+        desc = "Accept a visitor when you press this keybind while in the visitor GUI.\n" +
             "§eUseful for getting Ephemeral Gratitudes during the 2023 Halloween event."
     )
     @ConfigEditorKeybind(
@@ -109,7 +115,7 @@ public class VisitorConfig {
     @Expose
     @ConfigOption(
         name = "Highlight Visitors in SkyBlock",
-        desc = "Highlights Visitors outside of the Garden"
+        desc = "Highlight visitors outside of the Garden."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -118,7 +124,7 @@ public class VisitorConfig {
     @Expose
     @ConfigOption(
         name = "Block Interacting with Visitors",
-        desc = "Blocks you from interacting with / unlocking Visitors to allow for Dedication Cycling"
+        desc = "Prevent interacting with / unlocking Visitors to allow for Dedication Cycling."
     )
     @ConfigEditorDropdown
     public VisitorBlockBehaviour blockInteracting = VisitorBlockBehaviour.DONT;
@@ -126,15 +132,15 @@ public class VisitorConfig {
     public enum VisitorBlockBehaviour {
         DONT("Don't"), ALWAYS("Always"), ONLY_ON_BINGO("Only on Bingo");
 
-        final String str;
+        final String displayName;
 
-        VisitorBlockBehaviour(String str) {
-            this.str = str;
+        VisitorBlockBehaviour(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

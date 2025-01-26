@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.garden.composter;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.utils.ItemPriceSource;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -21,40 +22,12 @@ public class ComposterConfig {
     public boolean overlay = true;
 
     @Expose
-    @ConfigOption(name = "Overlay Price", desc = "Toggle for Bazaar 'buy order' vs 'instant buy' price in composter overlay.")
+    @ConfigOption(name = "Change Price Source", desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC.")
     @ConfigEditorDropdown
-    public OverlayPriceTypeEntry overlayPriceType = OverlayPriceTypeEntry.INSTANT_BUY;
-
-    public enum OverlayPriceTypeEntry implements HasLegacyId {
-        INSTANT_BUY("Instant Buy", 0),
-        BUY_ORDER("Buy Order", 1),
-        ;
-        private final String str;
-        private final int legacyId;
-
-        OverlayPriceTypeEntry(String str, int legacyId) {
-            this.str = str;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
-        OverlayPriceTypeEntry(String str) {
-            this(str, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-    }
+    public ItemPriceSource priceSource = ItemPriceSource.BAZAAR_INSTANT_BUY;
 
     @Expose
-    @ConfigOption(name = "Retrieve From", desc = "Change where to retrieve the materials from in the composter overlay: The Bazaar or Sacks.")
+    @ConfigOption(name = "Retrieve From", desc = "Change where to retrieve the materials from in the composter overlay: Bazaar or Sacks.")
     @ConfigEditorDropdown
     public RetrieveFromEntry retrieveFrom = RetrieveFromEntry.SACKS;
 
@@ -62,17 +35,17 @@ public class ComposterConfig {
         BAZAAR("Bazaar", 0),
         SACKS("Sacks", 1),
         ;
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        RetrieveFromEntry(String str, int legacyId) {
-            this.str = str;
+        RetrieveFromEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        RetrieveFromEntry(String str) {
-            this(str, -1);
+        RetrieveFromEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -82,7 +55,7 @@ public class ComposterConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -97,7 +70,7 @@ public class ComposterConfig {
     @Expose
     @ConfigOption(
         name = "Composter Display",
-        desc = "Displays the Composter data from the tab list as GUI element."
+        desc = "Display the Composter data from the tab list as GUI element."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -118,6 +91,7 @@ public class ComposterConfig {
         desc = "Warn when the Composter gets close to empty, even outside Garden."
     )
     @ConfigEditorBoolean
+    // TODO rename to warnAlmostEmpty
     public boolean warnAlmostClose = false;
 
     @Expose
@@ -132,7 +106,7 @@ public class ComposterConfig {
     @Expose
     @ConfigOption(
         name = "Round Amount Needed",
-        desc = "Rounds the amount needed to fill your Composter down so that you don't overspend."
+        desc = "Round the amount needed to fill your Composter down so that you don't overspend."
     )
     @ConfigEditorBoolean
     public boolean roundDown = true;
@@ -140,7 +114,7 @@ public class ComposterConfig {
     @Expose
     @ConfigOption(
         name = "Highlight Upgrade",
-        desc = "Highlight Upgrades that can be bought right now."
+        desc = "Highlight upgrades that can be bought right now."
     )
     @ConfigEditorBoolean
     @FeatureToggle

@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class FireVeilWandConfig {
     @Expose
-    @ConfigOption(name = "Fire Veil Design", desc = "Changes the flame particles of the Fire Veil Wand ability.")
+    @ConfigOption(name = "Fire Veil Design", desc = "Change the flame particles of the Fire Veil Wand ability.")
     @ConfigEditorDropdown
     public DisplayEntry display = DisplayEntry.PARTICLES;
 
@@ -17,17 +17,17 @@ public class FireVeilWandConfig {
         LINE("Line", 1),
         OFF("Off", 2),
         ;
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        DisplayEntry(String str, int legacyId) {
-            this.str = str;
+        DisplayEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        DisplayEntry(String str) {
-            this(str, -1);
+        DisplayEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -37,14 +37,14 @@ public class FireVeilWandConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
     @Expose
     @ConfigOption(
         name = "Line Color",
-        desc = "Changes the color of the Fire Veil Wand line."
+        desc = "Change the color of the Fire Veil Wand line."
     )
     @ConfigEditorColour
     public String displayColor = "0:245:255:85:85";

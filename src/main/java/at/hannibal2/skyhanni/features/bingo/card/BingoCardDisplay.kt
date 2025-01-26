@@ -1,15 +1,20 @@
 package at.hannibal2.skyhanni.features.bingo.card
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.bingo.BingoCardUpdateEvent
-import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -24,52 +29,48 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.days
 
-class BingoCardDisplay {
+@SkyHanniModule
+object BingoCardDisplay {
 
     private var display = emptyList<Renderable>()
 
     private var hasHiddenPersonalGoals = false
 
-    companion object {
+    private const val MAX_PERSONAL_GOALS = 20
 
-        private const val MAX_PERSONAL_GOALS = 20
-        private const val MAX_COMMUNITY_GOALS = 5
+    private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
+    private var displayMode = 0
 
-        private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
-        private var displayMode = 0
+    fun command() {
+        reload()
+    }
 
-        fun command() {
-            reload()
+    private fun reload() {
+        BingoApi.bingoGoals.clear()
+    }
+
+    private fun toggleCommand() {
+        if (!LorenzUtils.isBingoProfile) {
+            ChatUtils.userError("This command only works on a bingo profile!")
+            return
         }
-
-        private fun reload() {
-            BingoAPI.bingoGoals.clear()
+        if (!config.enabled) {
+            ChatUtils.userError("Bingo Card is disabled in the config!")
+            return
         }
+        toggleMode()
+    }
 
-        fun toggleCommand() {
-            if (!LorenzUtils.isBingoProfile) {
-                ChatUtils.userError("This command only works on a bingo profile!")
-                return
-            }
-            if (!config.enabled) {
-                ChatUtils.userError("Bingo Card is disabled in the config!")
-                return
-            }
-            toggleMode()
-        }
-
-        private fun toggleMode() {
-            displayMode++
-            if (displayMode == 3) {
-                displayMode = 0
-            }
+    private fun toggleMode() {
+        displayMode++
+        if (displayMode == 3) {
+            displayMode = 0
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (hasHiddenPersonalGoals) {
             update()
@@ -83,14 +84,17 @@ class BingoCardDisplay {
     private fun drawDisplay(): MutableList<Renderable> {
         val newList = mutableListOf<Renderable>()
 
-        if (BingoAPI.bingoGoals.isEmpty()) {
+        if (BingoApi.bingoGoals.isEmpty()) {
             newList.add(Renderable.string("§6Bingo Goals:"))
-            newList.add(Renderable.clickAndHover("§cOpen the §e/bingo §ccard.",
-                listOf("Click to run §e/bingo"),
-                onClick = {
-                    HypixelCommands.bingo()
-                }
-            ))
+            newList.add(
+                Renderable.clickAndHover(
+                    "§cOpen the §e/bingo §ccard.",
+                    listOf("Click to run §e/bingo"),
+                    onClick = {
+                        HypixelCommands.bingo()
+                    }
+                )
+            )
         } else {
             if (!config.hideCommunityGoals.get()) {
                 newList.addCommunityGoals()
@@ -102,7 +106,7 @@ class BingoCardDisplay {
 
     private fun MutableList<Renderable>.addCommunityGoals() {
         add(Renderable.string("§6Community Goals:"))
-        val goals = BingoAPI.communityGoals.toMutableList()
+        val goals = BingoApi.communityGoals.toMutableList()
         var hiddenGoals = 0
         for (goal in goals.toList()) {
             if (goal.hiddenGoalData.unknownTip) {
@@ -121,15 +125,15 @@ class BingoCardDisplay {
             val name = StringUtils.pluralize(hiddenGoals, "goal")
             add(Renderable.string("§7+ $hiddenGoals more §cunknown §7community $name."))
         }
-        add(Renderable.string(" "))
+        addString(" ")
     }
 
     private fun percentageFormat(it: BingoGoal) = it.communtyGoalPercentage?.let {
-        " " + BingoAPI.getCommunityPercentageColor(it)
-    } ?: ""
+        " " + BingoApi.getCommunityPercentageColor(it)
+    }.orEmpty()
 
     private fun MutableList<Renderable>.addPersonalGoals() {
-        val todo = BingoAPI.personalGoals.filter { !it.done }.toMutableList()
+        val todo = BingoApi.personalGoals.filter { !it.done }.toMutableList()
         val done = MAX_PERSONAL_GOALS - todo.size
         add(Renderable.string("§6Personal Goals: ($done/$MAX_PERSONAL_GOALS done)"))
 
@@ -156,7 +160,7 @@ class BingoCardDisplay {
         }
         hasHiddenPersonalGoals = config.nextTipDuration.get() && nextTip != 14.days
         if (hasHiddenPersonalGoals) {
-            val nextTipTime = BingoAPI.lastBingoCardOpenTime + nextTip
+            val nextTipTime = BingoApi.lastBingoCardOpenTime + nextTip
             if (nextTipTime.isInPast()) {
                 add(Renderable.string("§eThe next hint got unlocked already!"))
                 add(Renderable.string("§eOpen the bingo card to update!"))
@@ -212,7 +216,7 @@ class BingoCardDisplay {
     private var lastSneak = false
     private var inventoryOpen = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return
@@ -247,22 +251,31 @@ class BingoCardDisplay {
     private fun canEditDisplay() =
         Minecraft.getMinecraft().currentScreen is GuiInventory || InventoryUtils.openInventoryName() == "Bingo Card"
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBingoCardUpdate(event: BingoCardUpdateEvent) {
         if (!config.enabled) return
         if (!LorenzUtils.isBingoProfile) return
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.hideCommunityGoals.onToggle { update() }
         config.nextTipDuration.onToggle { update() }
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "bingo", "event.bingo")
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shbingotoggle") {
+            description = "Toggle the bingo card display mode"
+            category = CommandCategory.USERS_ACTIVE
+            callback { toggleCommand() }
+        }
     }
 }

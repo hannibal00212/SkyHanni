@@ -10,13 +10,13 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class BingoCardConfig {
     @Expose
-    @ConfigOption(name = "Enable", desc = "Displays the Bingo Card.")
+    @ConfigOption(name = "Enable", desc = "Display the Bingo Card.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
 
     @Expose
-    @ConfigOption(name = "Quick Toggle", desc = "Quickly toggle the Bingo Card or the step helper by sneaking with SkyBlock Menu in hand.")
+    @ConfigOption(name = "Quick Toggle", desc = "Quickly show/hide the Bingo Card (when enabled above) or the step helper by sneaking with SkyBlock Menu in hand.")
     @ConfigEditorBoolean
     public boolean quickToggle = true;
 
@@ -35,7 +35,7 @@ public class BingoCardConfig {
     @ConfigOption(
         name = "Show Guide",
         desc = "Show tips and difficulty for bingo goals inside the Bingo Card inventory.\n" +
-            "These tips are made from inspirations and guides from the community,\n" +
+            "These tips are made from inspirations and guides from the community, " +
             "aiming to help you to complete the bingo card."
     )
     @ConfigEditorBoolean

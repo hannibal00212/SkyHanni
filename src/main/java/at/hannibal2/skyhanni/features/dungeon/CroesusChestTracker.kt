@@ -1,16 +1,18 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.DungeonStorage.DungeonRunInfo
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
-import at.hannibal2.skyhanni.events.DungeonCompleteEvent
+import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.DungeonChest
+import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi.DungeonChest
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -18,8 +20,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -28,10 +29,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class CroesusChestTracker {
+@SkyHanniModule
+object CroesusChestTracker {
 
     private val config get() = SkyHanniMod.feature.dungeon.chest
 
@@ -49,12 +49,13 @@ class CroesusChestTracker {
     private val openedPattern by patternGroup.pattern("chest.state.opened", "§8Opened Chest:.*")
     private val unopenedPattern by patternGroup.pattern("chest.state.unopened", "§8No Chests Opened!")
 
-    private val kismetSlotId = 50
-    private val emptySlotId = 22
-    private val frontArrowSlotId = 53
-    private val backArrowSlotId = 45
+    private const val KISMET_SLOT = 50
+    private const val EMPTY_SLOT = 22
+    private const val FRONT_ARROW_SLOT = 53
+    private const val BACK_ARROW_SLOT = 45
+    private const val MAX_CHESTS = 60
 
-    private val kismetInternalName = "KISMET_FEATHER".asInternalName()
+    private val kismetInternalName = "KISMET_FEATHER".toInternalName()
 
     private var inCroesusInventory = false
     private var croesusEmpty = false
@@ -67,9 +68,10 @@ class CroesusChestTracker {
 
     private var kismetAmountCache = 0
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    private val croesusChests get() = ProfileStorageData.profileSpecific?.dungeons?.runs
+
+    @HandleEvent(priority = HandleEvent.LOW, onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker) return
 
         if (inCroesusInventory && !croesusEmpty) {
@@ -88,18 +90,15 @@ class CroesusChestTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if ((SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker || config.showUsedKismets) &&
             croesusPattern.matches(event.inventoryName)
         ) {
             pageSetup(event)
 
             if (croesusEmpty) {
-                croesusChests?.forEach {
-                    it.setValuesNull()
-                }
+                croesusChests?.forEach { it.setValuesNull() }
                 return
             }
 
@@ -119,7 +118,7 @@ class CroesusChestTracker {
             kismetAmountCache = getKismetAmount()
         }
         if (config.showUsedKismets) {
-            val kismetItem = event.inventoryItems[kismetSlotId] ?: return
+            val kismetItem = event.inventoryItems[KISMET_SLOT] ?: return
             if (config.showUsedKismets && kismetUsedPattern.matches(kismetItem.getLore().lastOrNull()))
                 setKismetUsed()
         }
@@ -135,16 +134,18 @@ class CroesusChestTracker {
             val lore = item.getLore()
 
             if (run.floor == null) run.floor =
-                (if (masterPattern.matches(item.name)) "M" else "F") + (lore.firstNotNullOfOrNull {
-                    floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
-                } ?: "0")
+                (if (masterPattern.matches(item.name)) "M" else "F") + (
+                    lore.firstNotNullOfOrNull {
+                        floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
+                    } ?: "0"
+                    )
             run.openState = when {
                 keyUsedPattern.anyMatches(lore) -> OpenedState.KEY_USED
                 openedPattern.anyMatches(lore) -> OpenedState.OPENED
                 unopenedPattern.anyMatches(lore) -> OpenedState.UNOPENED
                 else -> ErrorManager.logErrorStateWithData(
                     "Croesus Chest couldn't be read correctly.",
-                    "Openstate check failed for chest.",
+                    "Open state check failed for chest.",
                     "run" to run,
                     "lore" to lore
                 ).run { null }
@@ -155,8 +156,8 @@ class CroesusChestTracker {
     private fun pageSetup(event: InventoryFullyOpenedEvent) {
         inCroesusInventory = true
         pageSwitchable = true
-        croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[emptySlotId]?.name)
-        if (event.inventoryItems[backArrowSlotId]?.item != Items.arrow) {
+        croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[EMPTY_SLOT]?.name)
+        if (event.inventoryItems[BACK_ARROW_SLOT]?.item != Items.arrow) {
             currentPage = 0
         }
     }
@@ -167,29 +168,28 @@ class CroesusChestTracker {
         kismetUsed = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inCroesusInventory = false
         chestInventory = null
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.showUsedKismets) return
-        if (chestInventory != null && event.slotId == kismetSlotId) {
+        if (chestInventory != null && event.slotId == KISMET_SLOT) {
             setKismetUsed()
             return
         }
         if (inCroesusInventory && !croesusEmpty) {
             if (event.slot == null) return
             when (event.slotId) {
-                frontArrowSlotId -> if (pageSwitchable && event.slot.stack.isArrow()) {
+                FRONT_ARROW_SLOT -> if (pageSwitchable && event.slot.stack.isArrow()) {
                     pageSwitchable = false
                     currentPage++
                 }
 
-                backArrowSlotId -> if (pageSwitchable && event.slot.stack.isArrow()) {
+                BACK_ARROW_SLOT -> if (pageSwitchable && event.slot.stack.isArrow()) {
                     pageSwitchable = false
                     currentPage--
                 }
@@ -199,9 +199,8 @@ class CroesusChestTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.kismetStackSize) return
         if (chestInventory == null) return
         if (!kismetPattern.matches(event.stack.name)) return
@@ -209,9 +208,8 @@ class CroesusChestTracker {
         event.stackTip = "§a$kismetAmountCache"
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemTipIsKismetable(event: RenderInventoryItemTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.showUsedKismets) return
         if (!inCroesusInventory) return
         if (event.slot.slotIndex != event.slot.slotNumber) return
@@ -222,12 +220,12 @@ class CroesusChestTracker {
         event.stackTip = "§a✔"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {
         if (event.floor == "E") return
         croesusChests?.add(0, DungeonRunInfo(event.floor))
         currentRunIndex = 0
-        if ((croesusChests?.size ?: 0) > maxChests) {
+        if ((croesusChests?.size ?: 0) > MAX_CHESTS) {
             croesusChests?.dropLast(1)
         }
 
@@ -261,26 +259,22 @@ class CroesusChestTracker {
     private inline fun <reified T> runSlots(slotId: Int, any: T) =
         croesusSlotMapToRun(slotId)?.getRun()?.let { it to any }
 
-    companion object {
-        val maxChests = 60
-
-        private val croesusChests get() = ProfileStorageData.profileSpecific?.dungeons?.runs
-
-        fun resetChest() = croesusChests?.let {
-            it.clear()
-            it.addAll(generateMaxChest())
-            ChatUtils.chat("Kismet State was cleared!")
-        }
-
-        fun generateMaxChest(): Sequence<DungeonRunInfo> = generateSequence { DungeonRunInfo() }.take(maxChests)
-        fun generateMaxChestAsList(): List<DungeonRunInfo> = generateMaxChest().toList()
-
-        fun getLastActiveChest(includeDungeonKey: Boolean = false): Int =
-            (croesusChests?.indexOfLast {
-                it.floor != null &&
-                    (it.openState == OpenedState.UNOPENED || (includeDungeonKey && it.openState == OpenedState.OPENED))
-            } ?: -1) + 1
+    fun resetChest() = croesusChests?.let {
+        it.clear()
+        it.addAll(generateMaxChest())
+        ChatUtils.chat("Kismet State was Reset!")
     }
+
+    @JvmStatic
+    fun generateMaxChestAsList(): MutableList<DungeonRunInfo> = generateMaxChest().toMutableList()
+    private fun generateMaxChest(): Sequence<DungeonRunInfo> = generateSequence { DungeonRunInfo() }.take(MAX_CHESTS)
+
+    private fun getLastActiveChest(includeDungeonKey: Boolean = false): Int = (
+        croesusChests?.indexOfLast {
+            it.floor != null &&
+                (it.openState == OpenedState.UNOPENED || (includeDungeonKey && it.openState == OpenedState.OPENED))
+        } ?: -1
+        ) + 1
 
     enum class OpenedState {
         UNOPENED,

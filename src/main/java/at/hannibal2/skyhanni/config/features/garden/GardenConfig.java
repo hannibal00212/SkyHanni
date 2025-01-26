@@ -15,6 +15,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
 
 public class GardenConfig {
     @Expose
@@ -79,7 +80,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Armor Drop Tracker", desc = "")
     @Accordion
-    // TODO renmae to armorDropTracker
+    // TODO rename to armorDropTracker
     public ArmorDropTrackerConfig farmingArmorDrop = new ArmorDropTrackerConfig();
 
     @Expose
@@ -141,6 +142,11 @@ public class GardenConfig {
     public AtmosphericFilterDisplayConfig atmosphericFilterDisplay = new AtmosphericFilterDisplayConfig();
 
     @Expose
+    @ConfigOption(name = "Personal Bests", desc = "")
+    @Accordion
+    public PersonalBestsConfig personalBests = new PersonalBestsConfig();
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -157,12 +163,6 @@ public class GardenConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean burrowingSporesNotification = true;
-
-    @Expose
-    @ConfigOption(name = "Wild Strawberry", desc = "Show a notification when a Wild Strawberry Dye drops while farming.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean wildStrawberryDyeNotification = true;
 
     @Expose
     @ConfigOption(
@@ -242,4 +242,11 @@ public class GardenConfig {
     @Expose
     @ConfigLink(owner = GardenConfig.class, field = "showLogBookStats")
     public Position logBookStatsPos = new Position(427, 92, false, true);
+
+    @Expose
+    @ConfigOption(name = "Carrolyn Fetch Helper", desc = "Helps to fetch items to Carrolyn for permanent buffs.")
+    @SearchTag("Expired Pumpkin, Exportable Carrots, Supreme Chocolate Bar, Fine Flour")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean helpCarrolyn = true;
 }

@@ -20,4 +20,10 @@ public interface AccessorGuiContainer {
 
     @Invoker("drawGuiContainerBackgroundLayer")
     void invokeDrawGuiContainerBackgroundLayer_skyhanni(float f, int i, int mouseY);
+
+    @Accessor("xSize")
+    int getWidth();
+
+    @Accessor("ySize")
+    int getHeight();
 }

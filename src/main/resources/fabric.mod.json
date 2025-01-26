@@ -1,0 +1,12 @@
+{
+    "schemaVersion": 1,
+    "version": "${version}",
+    "id": "skyhanni",
+    "name": "SkyHanni",
+    "description": "SkyHanni is a Minecraft Mod for Hypixel SkyBlock.",
+    "icon": "assets/skyhanni/logo.png",
+    "authors": [],
+    "depends": {
+        "minecraft": "1.8.9"
+    }
+}

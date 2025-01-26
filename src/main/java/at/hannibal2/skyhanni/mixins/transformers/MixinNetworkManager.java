@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.mixins.hooks.NetworkManagerHookKt;
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import net.minecraft.network.NetworkManager;
@@ -15,8 +15,8 @@ public abstract class MixinNetworkManager extends SimpleChannelInboundHandler<Pa
 
     @Inject(method = "channelRead0*", at = @At("HEAD"), cancellable = true)
     private void onReceivePacket(ChannelHandlerContext context, Packet<?> packet, CallbackInfo ci) {
-        if (packet != null) {
-            NetworkManagerHookKt.onReceivePacket(packet, ci);
+        if (packet != null && new PacketReceivedEvent(packet).post()) {
+            ci.cancel();
         }
     }
 }

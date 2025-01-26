@@ -26,15 +26,15 @@ public class EnchantParsingConfig {
         COMPRESSED("Compressed"),
         STACKED("Stacked");
 
-        public final String str;
+        public final String displayName;
 
-        EnchantFormat(String str) {
-            this.str = str;
+        EnchantFormat(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -68,15 +68,15 @@ public class EnchantParsingConfig {
         COPY_ENCHANT("Copy enchant format"),
         DEFAULT("Default (Blue)");
 
-        public final String str;
+        public final String displayName;
 
-        CommaFormat(String str) {
-            this.str = str;
+        CommaFormat(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -87,7 +87,7 @@ public class EnchantParsingConfig {
     public Property<Boolean> hideVanillaEnchants = Property.of(true);
 
     @Expose
-    @ConfigOption(name = "Hide Enchant Description", desc = "Hides the enchant description after each enchant if available.")
+    @ConfigOption(name = "Hide Enchant Description", desc = "Hide the enchant description after each enchant if available.")
     @ConfigEditorBoolean
     @FeatureToggle
     public Property<Boolean> hideEnchantDescriptions = Property.of(false);

@@ -63,17 +63,17 @@ public class DiscordRPCConfig {
         AFK("AFK Indicator", 4),
         ;
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        PriorityEntry(String str, int legacyId) {
-            this.str = str;
+        PriorityEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        PriorityEntry(String str) {
-            this(str, -1);
+        PriorityEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -83,7 +83,7 @@ public class DiscordRPCConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -93,9 +93,14 @@ public class DiscordRPCConfig {
     public Property<LineEntry> auto = Property.of(NOTHING);
 
     @Expose
-    @ConfigOption(name = "Show Button for SkyCrypt", desc = "Adds a button to the RPC that opens your SkyCrypt profile.")
+    @ConfigOption(name = "Show Button for SkyCrypt", desc = "Add a button to the RPC that opens your SkyCrypt profile.")
     @ConfigEditorBoolean
     public Property<Boolean> showSkyCryptButton = Property.of(true);
+
+    @Expose
+    @ConfigOption(name = "Show Button for EliteBot", desc = "Add a button to the RPC that opens your EliteBot profile.")
+    @ConfigEditorBoolean
+    public Property<Boolean> showEliteBotButton = Property.of(true);
 
     public enum LineEntry implements HasLegacyId {
         NOTHING("Nothing", 0),
@@ -113,17 +118,17 @@ public class DiscordRPCConfig {
         CURRENT_PET("Current Pet", 12),
         ;
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        LineEntry(String str, int legacyId) {
-            this.str = str;
+        LineEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        LineEntry(String str) {
-            this(str, -1);
+        LineEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -133,7 +138,7 @@ public class DiscordRPCConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 }

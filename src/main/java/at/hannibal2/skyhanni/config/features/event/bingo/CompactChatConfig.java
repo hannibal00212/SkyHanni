@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class CompactChatConfig {
 
     @Expose
-    @ConfigOption(name = "Enable", desc = "Shortens chat messages about skill level ups, collection gains, " +
+    @ConfigOption(name = "Enable", desc = "Shorten chat messages about skill level ups, collection gains, " +
         "new area discoveries and SkyBlock level up messages while on Bingo.")
     @ConfigEditorBoolean
     @FeatureToggle

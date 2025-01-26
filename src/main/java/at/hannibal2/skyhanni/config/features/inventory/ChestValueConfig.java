@@ -18,6 +18,11 @@ public class ChestValueConfig {
     public boolean enabled = false;
 
     @Expose
+    @ConfigOption(name = "Enabled in own Inventory", desc = "Enable the feature for your own inventory.")
+    @ConfigEditorBoolean
+    public boolean enableInOwnInventory = false;
+
+    @Expose
     @ConfigOption(name = "Enabled in dungeons", desc = "Enable the feature in dungeons.")
     @ConfigEditorBoolean
     public boolean enableInDungeons = false;
@@ -57,17 +62,17 @@ public class ChestValueConfig {
         DESCENDING("Descending", 0),
         ASCENDING("Ascending", 1),
         ;
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        SortingTypeEntry(String str, int legacyId) {
-            this.str = str;
+        SortingTypeEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        SortingTypeEntry(String str) {
-            this(str, -1);
+        SortingTypeEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -77,7 +82,7 @@ public class ChestValueConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -90,17 +95,17 @@ public class ChestValueConfig {
         SHORT("Short", 0),
         LONG("Long", 1);
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        NumberFormatEntry(String str, int legacyId) {
-            this.str = str;
+        NumberFormatEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        NumberFormatEntry(String str) {
-            this(str, -1);
+        NumberFormatEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -110,7 +115,7 @@ public class ChestValueConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -125,7 +130,7 @@ public class ChestValueConfig {
     public int itemToShow = 15;
 
     @Expose
-    @ConfigOption(name = "Hide below", desc = "Item item value below configured amount.\n" +
+    @ConfigOption(name = "Hide below", desc = "Hide items with value below configured amount.\n" +
         "Items are still counted for the total value.")
     @ConfigEditorSlider(
         minValue = 50_000,

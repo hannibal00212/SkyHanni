@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ArrowConfig {
     @Expose
-    @ConfigOption(name = "Arrow Amount Display", desc = "Determines how the arrow amount is displayed.")
+    @ConfigOption(name = "Arrow Amount Display", desc = "Determine how the arrow amount is displayed.")
     @ConfigEditorDropdown
     public ArrowAmountDisplay arrowAmountDisplay = ArrowAmountDisplay.NUMBER;
 
@@ -16,15 +16,15 @@ public class ArrowConfig {
         PERCENTAGE("Percentage"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        ArrowAmountDisplay(String str) {
-            this.str = str;
+        ArrowAmountDisplay(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

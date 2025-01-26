@@ -16,8 +16,5 @@ class Cache {
         configChanged = false
     }
 
-    fun isCached(loreBeforeModification: List<String>): Boolean {
-        if (configChanged || loreBeforeModification.size != cachedLoreBefore.size) return false
-        return loreBeforeModification.indices.none { loreBeforeModification[it] != cachedLoreBefore[it] }
-    }
+    fun isCached(loreBeforeModification: List<String>): Boolean = !configChanged && loreBeforeModification == cachedLoreBefore
 }

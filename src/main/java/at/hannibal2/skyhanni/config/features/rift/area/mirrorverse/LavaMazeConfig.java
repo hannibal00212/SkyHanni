@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 public class LavaMazeConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Helps solving the lava maze in the Mirrorverse by showing the correct way.")
+    @ConfigOption(name = "Enabled", desc = "Help solve the lava maze in the Mirrorverse by showing the correct way.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;

@@ -40,15 +40,15 @@ public class TrophyFishDisplayConfig {
         ONLY_WITH_KEYBIND("On keybind"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        WhenToShow(String str) {
-            this.str = str;
+        WhenToShow(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -93,19 +93,19 @@ public class TrophyFishDisplayConfig {
         SILVER_AMOUNT("Silver Amount"),
         GOLD_AMOUNT("Gold Amount"),
         DIAMOND_AMOUNT("Diamond Amount"),
-        HIGHEST_RARITY("Highest Rariy"),
+        HIGHEST_RARITY("Highest Rarity"),
         NAME("Name Alphabetical"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        TrophySorting(String str) {
-            this.str = str;
+        TrophySorting(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -143,22 +143,22 @@ public class TrophyFishDisplayConfig {
         TOTAL("Amount Total"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        TextPart(String str) {
-            this.str = str;
+        TextPart(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
     @Expose
     @ConfigOption(
         name = "Show ✖",
-        desc = "instead of the number 0, show §c✖ §7 if not found."
+        desc = "Instead of the number 0, show §c✖ §7if not found."
     )
     @ConfigEditorBoolean
     public Property<Boolean> showCross = Property.of(false);
@@ -166,7 +166,7 @@ public class TrophyFishDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Show ✔",
-        desc = "instead of the exact numbers, show §e§l✔ §7 if found."
+        desc = "Instead of the exact numbers, show §e§l✔ §7if found."
     )
     @ConfigEditorBoolean
     public Property<Boolean> showCheckmark = Property.of(false);
@@ -184,15 +184,15 @@ public class TrophyFishDisplayConfig {
         DIAMOND("Diamond"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        HideCaught(String str) {
-            this.str = str;
+        HideCaught(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

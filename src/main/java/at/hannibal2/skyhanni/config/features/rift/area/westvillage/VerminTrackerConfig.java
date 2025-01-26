@@ -21,7 +21,7 @@ public class VerminTrackerConfig {
     public boolean showOutsideWestVillage = false;
 
     @Expose
-    @ConfigOption(name = "Show without Vacuum", desc = "Requires you to have Turbomax Vacuum in your inventory.")
+    @ConfigOption(name = "Show without Vacuum", desc = "Require having Turbomax Vacuum in your inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showWithoutVacuum = false;

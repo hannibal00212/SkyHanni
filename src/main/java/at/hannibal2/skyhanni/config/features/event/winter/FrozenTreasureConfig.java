@@ -32,7 +32,7 @@ public class FrozenTreasureConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Tracks all of your drops from Frozen Treasure in the Glacial Caves.\n" +
+        desc = "Track all of your drops from Frozen Treasure in the Glacial Caves.\n" +
             "§eIce calculations are an estimate but are relatively accurate."
     )
     @ConfigEditorBoolean
@@ -82,17 +82,17 @@ public class FrozenTreasureConfig {
         EINARY_RED_HOODIE("§b1 §cEinary's Red Hoodie"),
         SPACER_2(" ", 16);
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        FrozenTreasureDisplayEntry(String str, int legacyId) {
-            this.str = str;
+        FrozenTreasureDisplayEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        FrozenTreasureDisplayEntry(String str) {
-            this(str, -1);
+        FrozenTreasureDisplayEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -102,23 +102,23 @@ public class FrozenTreasureConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
     @Expose
-    @ConfigOption(name = "Only in Glacial Cave", desc = "Only shows the overlay while in the Glacial Cave.")
+    @ConfigOption(name = "Only in Glacial Cave", desc = "Only show the overlay while in the Glacial Cave.")
     @ConfigEditorBoolean
     public boolean onlyInCave = true;
 
     @Expose
-    @ConfigOption(name = "Show as Drops", desc = "Multiplies the numbers on the display by the base drop. \n" +
+    @ConfigOption(name = "Show as Drops", desc = "Multiply the numbers on the display by the base drop.\n" +
         "E.g. 3 Ice Bait -> 48 Ice Bait")
     @ConfigEditorBoolean
     public boolean showAsDrops = false;
 
     @Expose
-    @ConfigOption(name = "Hide Chat Messages", desc = "Hides the chat messages from Frozen Treasures.")
+    @ConfigOption(name = "Hide Chat Messages", desc = "Hide the chat messages from Frozen Treasures.")
     @ConfigEditorBoolean
     public boolean hideMessages = false;
 

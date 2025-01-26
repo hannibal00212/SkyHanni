@@ -1,12 +1,14 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.CustomRenderGlobal
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.OpenGlHelper
@@ -17,8 +19,6 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.MinecraftForgeClient
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL13
 import org.lwjgl.opengl.GL30
@@ -37,7 +37,7 @@ import java.lang.reflect.Method
 object EntityOutlineRenderer {
 
     private val entityRenderCache: CachedInfo = CachedInfo(null, null, null)
-    private var stopLookingForOptifine = false
+    private var stopLookingForOptiFine = false
     private var isMissingMixin = false
     private var isFastRender: Method? = null
     private var isShaders: Method? = null
@@ -56,13 +56,13 @@ object EntityOutlineRenderer {
      */
     private fun initSwapBuffer(): Framebuffer {
         val main = mc.framebuffer
-        val framebuffer = Framebuffer(main.framebufferTextureWidth, main.framebufferTextureHeight, true)
-        framebuffer.setFramebufferFilter(GL11.GL_NEAREST)
-        framebuffer.setFramebufferColor(0.0f, 0.0f, 0.0f, 0.0f)
-        return framebuffer
+        val frameBuffer = Framebuffer(main.framebufferTextureWidth, main.framebufferTextureHeight, true)
+        frameBuffer.setFramebufferFilter(GL11.GL_NEAREST)
+        frameBuffer.setFramebufferColor(0.0f, 0.0f, 0.0f, 0.0f)
+        return frameBuffer
     }
 
-    private fun updateFramebufferSize() {
+    private fun updateFrameBufferSize() {
         val width = mc.displayWidth
         val height = mc.displayHeight
         if (swapBuffer.framebufferWidth != width || swapBuffer.framebufferHeight != height) {
@@ -94,7 +94,7 @@ object EntityOutlineRenderer {
         val renderGlobal = mc.renderGlobal as CustomRenderGlobal
         val renderManager = mc.renderManager
         mc.theWorld.theProfiler.endStartSection("entityOutlines")
-        updateFramebufferSize()
+        updateFrameBufferSize()
 
         // Clear and bind the outline framebuffer
         renderGlobal.frameBuffer.framebufferClear()
@@ -216,14 +216,14 @@ object EntityOutlineRenderer {
     }
 
     /**
-     * Caches optifine settings and determines whether outlines should be rendered
+     * Caches OptiFine settings and determines whether outlines should be rendered
      *
      * @return `true` iff outlines should be rendered
      */
     @JvmStatic
     fun shouldRenderEntityOutlines(): Boolean {
         // SkyBlock Conditions
-        if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.HIGHLIGHT_PARTY_MEMBERS.isSelected()) return false
+        if (!LorenzUtils.inSkyBlock && !OutsideSBFeature.HIGHLIGHT_PARTY_MEMBERS.isSelected()) return false
 
         // Main toggle for outlines features
         if (!isEnabled()) return false
@@ -232,8 +232,8 @@ object EntityOutlineRenderer {
         val renderGlobal = mc.renderGlobal as CustomRenderGlobal
         if (renderGlobal.frameBuffer == null || renderGlobal.shader == null || mc.thePlayer == null) return false
 
-        // Optifine Conditions
-        if (!stopLookingForOptifine && isFastRender == null) {
+        // OptiFine Conditions
+        if (!stopLookingForOptiFine && isFastRender == null) {
             try {
                 val config = Class.forName("Config")
                 try {
@@ -241,12 +241,12 @@ object EntityOutlineRenderer {
                     isShaders = config.getMethod("isShaders")
                     isAntialiasing = config.getMethod("isAntialiasing")
                 } catch (ex: Exception) {
-                    logger.log("Couldn't find Optifine methods for entity outlines.")
-                    stopLookingForOptifine = true
+                    logger.log("Couldn't find OptiFine methods for entity outlines.")
+                    stopLookingForOptiFine = true
                 }
             } catch (ex: Exception) {
-                logger.log("Couldn't find Optifine for entity outlines.")
-                stopLookingForOptifine = true
+                logger.log("Couldn't find OptiFine for entity outlines.")
+                stopLookingForOptiFine = true
             }
         }
         var isFastRenderValue = false
@@ -258,9 +258,9 @@ object EntityOutlineRenderer {
                 isShadersValue = isShaders!!.invoke(null) as Boolean
                 isAntialiasingValue = isAntialiasing!!.invoke(null) as Boolean
             } catch (ex: IllegalAccessException) {
-                logger.log("An error occurred while calling Optifine methods for entity outlines... $ex")
+                logger.log("An error occurred while calling OptiFine methods for entity outlines... $ex")
             } catch (ex: InvocationTargetException) {
-                logger.log("An error occurred while calling Optifine methods for entity outlines... $ex")
+                logger.log("An error occurred while calling OptiFine methods for entity outlines... $ex")
             }
         }
         return !isFastRenderValue && !isShadersValue && !isAntialiasingValue
@@ -288,17 +288,21 @@ object EntityOutlineRenderer {
     private fun shouldRender(camera: ICamera, entity: Entity, vector: LorenzVec): Boolean =
         // Only render the view entity when sleeping or in 3rd person mode
         if (entity === mc.renderViewEntity &&
-            !(mc.renderViewEntity is EntityLivingBase && (mc.renderViewEntity as EntityLivingBase).isPlayerSleeping ||
-                mc.gameSettings.thirdPersonView != 0)
+            !(
+                mc.renderViewEntity is EntityLivingBase && (mc.renderViewEntity as EntityLivingBase).isPlayerSleeping ||
+                    mc.gameSettings.thirdPersonView != 0
+                )
         ) {
             false
-        } else mc.theWorld.isBlockLoaded(BlockPos(entity)) && (mc.renderManager.shouldRender(
-            entity,
-            camera,
-            vector.x,
-            vector.y,
-            vector.z
-        ) || entity.riddenByEntity === mc.thePlayer)
+        } else mc.theWorld.isBlockLoaded(BlockPos(entity)) && (
+            mc.renderManager.shouldRender(
+                entity,
+                camera,
+                vector.x,
+                vector.y,
+                vector.z
+            ) || entity.getFirstPassenger() === mc.thePlayer
+            )
     // Only render if renderManager would render and the world is loaded at the entity
 
     private fun outlineColor(color: Int) {
@@ -355,9 +359,9 @@ object EntityOutlineRenderer {
      *
      * @param event the client tick event
      */
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!(event.phase == EventPriority.NORMAL && isEnabled())) return
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
+        if (!isEnabled()) return
 
         val renderGlobal = try {
             mc.renderGlobal as CustomRenderGlobal
@@ -371,17 +375,17 @@ object EntityOutlineRenderer {
             // These events need to be called in this specific order for the xray to have priority over the no xray
             // Get all entities to render xray outlines
             val xrayOutlineEvent = RenderEntityOutlineEvent(RenderEntityOutlineEvent.Type.XRAY, null)
-            xrayOutlineEvent.postAndCatch()
+            xrayOutlineEvent.post()
             // Get all entities to render no xray outlines, using pre-filtered entities (no need to test xray outlined entities)
-            val noxrayOutlineEvent = RenderEntityOutlineEvent(
+            val noXrayOutlineEvent = RenderEntityOutlineEvent(
                 RenderEntityOutlineEvent.Type.NO_XRAY,
                 xrayOutlineEvent.entitiesToChooseFrom
             )
-            noxrayOutlineEvent.postAndCatch()
+            noXrayOutlineEvent.post()
             // Cache the entities for future use
             entityRenderCache.xrayCache = xrayOutlineEvent.entitiesToOutline
-            entityRenderCache.noXrayCache = noxrayOutlineEvent.entitiesToOutline
-            entityRenderCache.noOutlineCache = noxrayOutlineEvent.entitiesToChooseFrom
+            entityRenderCache.noXrayCache = noXrayOutlineEvent.entitiesToOutline
+            entityRenderCache.noOutlineCache = noXrayOutlineEvent.entitiesToChooseFrom
             emptyLastTick = if (isCacheEmpty()) {
                 if (!emptyLastTick) {
                     renderGlobal.frameBuffer.framebufferClear()

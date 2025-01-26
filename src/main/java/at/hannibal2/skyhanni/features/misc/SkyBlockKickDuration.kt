@@ -1,16 +1,18 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -24,11 +26,32 @@ object SkyBlockKickDuration {
     private var lastKickTime = SimpleTimeMark.farPast()
     private var hasWarned = false
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!isEnabled()) return
-        if (event.message == "§cYou were kicked while joining that server!") {
+    private val patternGroup = RepoPattern.group("misc.kickduration")
 
+    /**
+     * REGEX-TEST: §cYou were kicked while joining that server!
+     * REGEX-TEST: §cA kick occurred in your connection, so you were put in the SkyBlock lobby!
+     * REGEX-TEST: §cAn exception occurred in your connection, so you were put in the SkyBlock Lobby!
+     */
+    @Suppress("MaxLineLength")
+    private val kickPattern by patternGroup.pattern(
+        "kicked",
+        "§c(?:You were kicked while joining that server!|An? (?:kick|exception) occurred in your connection, so you were put in the SkyBlock [lL]obby!)",
+    )
+
+    /**
+     * REGEX-TEST: §cThere was a problem joining SkyBlock, try again in a moment!
+     */
+    private val problemJoiningPattern by patternGroup.pattern(
+        "problemjoining",
+        "§cThere was a problem joining SkyBlock, try again in a moment!",
+    )
+
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
+        if (!isEnabled()) return
+
+        if (kickPattern.matches(event.message)) {
             if (LorenzUtils.onHypixel && !LorenzUtils.inSkyBlock) {
                 kickMessage = false
                 showTime = true
@@ -38,15 +61,15 @@ object SkyBlockKickDuration {
             }
         }
 
-        if (event.message == "§cThere was a problem joining SkyBlock, try again in a moment!") {
+        if (problemJoiningPattern.matches(event.message)) {
             kickMessage = false
             showTime = true
             lastKickTime = SimpleTimeMark.now()
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         if (!isEnabled()) return
         if (kickMessage) {
             kickMessage = false
@@ -56,7 +79,7 @@ object SkyBlockKickDuration {
         hasWarned = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!LorenzUtils.onHypixel) return
@@ -80,7 +103,7 @@ object SkyBlockKickDuration {
         val format = lastKickTime.passedSince().format()
         config.position.renderString(
             "§cLast kicked from SkyBlock §b$format ago",
-            posLabel = "SkyBlock Kick Duration"
+            posLabel = "SkyBlock Kick Duration",
         )
     }
 

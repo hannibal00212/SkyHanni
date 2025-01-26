@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SkipTabListLineEvent
@@ -10,10 +11,10 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EnumPlayerModelParts
 import net.minecraftforge.client.event.RenderGameOverlayEvent
@@ -45,9 +46,8 @@ object TabListRenderer {
     private var isPressed = false
     private var isTabToggled = false
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled.get()) return
         if (!config.toggleTab) return
         if (Minecraft.getMinecraft().currentScreen != null) return
@@ -100,8 +100,7 @@ object TabListRenderer {
         }
 
         val minecraft = Minecraft.getMinecraft()
-        val scaledResolution = ScaledResolution(minecraft)
-        val screenWidth = scaledResolution.scaledWidth / 2
+        val screenWidth = GuiScreenUtils.scaledWindowWidth / 2
         val x = screenWidth - totalWidth / 2
         val y = 10
 
@@ -126,6 +125,24 @@ object TabListRenderer {
             }
         }
 
+        drawColumms(x, headerY, columns, minecraft)
+
+        if (footer.isNotEmpty()) {
+            var footerY = y + totalHeight - footer.size * LINE_HEIGHT + TAB_PADDING / 2 + 1
+            for (line in footer) {
+                minecraft.fontRendererObj.drawStringWithShadow(
+                    line,
+                    x + totalWidth / 2f - minecraft.fontRendererObj.getStringWidth(line) / 2f,
+                    footerY.toFloat(),
+                    -0x1
+                )
+                footerY += LINE_HEIGHT
+            }
+        }
+        GlStateManager.translate(0f, 0f, -TAB_Z_OFFSET)
+    }
+
+    private fun drawColumms(x: Int, headerY: Int, columns: List<RenderColumn>, minecraft: Minecraft) {
         var middleX = x
         var lastTitle: TabLine? = null
         var lastSubTitle: TabLine? = null
@@ -140,7 +157,7 @@ object TabListRenderer {
                 if (tabLine.type == TabStringType.SUB_TITLE) {
                     lastSubTitle = tabLine
                 }
-                !SkipTabListLineEvent(tabLine, lastSubTitle, lastTitle).postAndCatch()
+                !SkipTabListLineEvent(tabLine, lastSubTitle, lastTitle).post()
             }.let(::RenderColumn)
 
             Gui.drawRect(
@@ -192,20 +209,6 @@ object TabListRenderer {
             }
             middleX += column.getMaxWidth() + COLUMN_SPACING
         }
-
-        if (footer.isNotEmpty()) {
-            var footerY = y + totalHeight - footer.size * LINE_HEIGHT + TAB_PADDING / 2 + 1
-            for (line in footer) {
-                minecraft.fontRendererObj.drawStringWithShadow(
-                    line,
-                    x + totalWidth / 2f - minecraft.fontRendererObj.getStringWidth(line) / 2f,
-                    footerY.toFloat(),
-                    -0x1
-                )
-                footerY += LINE_HEIGHT
-            }
-        }
-        GlStateManager.translate(0f, 0f, -TAB_Z_OFFSET)
     }
 
     private val fireSalePattern by RepoPattern.pattern(
@@ -213,14 +216,14 @@ object TabListRenderer {
         "§.§lFire Sales: §r§f\\([0-9]+\\)"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSkipTablistLine(event: SkipTabListLineEvent) {
         if (config.hideFiresales && event.lastSubTitle != null && fireSalePattern.matches(event.lastSubTitle.text)) {
             event.cancel()
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "misc.compactTabList", "gui.compactTabList")
     }

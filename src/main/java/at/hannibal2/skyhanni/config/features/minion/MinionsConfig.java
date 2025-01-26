@@ -22,6 +22,12 @@ public class MinionsConfig {
     public boolean nameOnlyTier = false;
 
     @Expose
+    @ConfigOption(name = "Minion Upgrade Helper", desc = "Add a button in the Minion menu to obtain required items for the next upgrade from Sacks or Bazaar.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean minionConfigHelper = true;
+
+    @Expose
     @ConfigOption(name = "Last Clicked", desc = "")
     @Accordion
     public LastClickedMinionConfig lastClickedMinion = new LastClickedMinionConfig();
@@ -38,7 +44,7 @@ public class MinionsConfig {
     public boolean hopperProfitDisplay = true;
 
     @Expose
-    @ConfigOption(name = "Show Xp", desc = "Shows how much skill experience you will get when picking up items from the minion storage.")
+    @ConfigOption(name = "Show XP", desc = "Show how much skill experience you will get when picking up items from the minion storage.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean xpDisplay = true;
@@ -48,13 +54,13 @@ public class MinionsConfig {
     public Position hopperProfitPos = new Position(360, 90, false, true);
 
     @Expose
-    @ConfigOption(name = "Hide Mob Nametag", desc = "Hiding the nametag of mobs close to minions.")
+    @ConfigOption(name = "Hide Mob Nametag", desc = "Hide the nametags of mobs close to minions.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideMobsNametagNearby = false;
 
     @Expose
-    @ConfigOption(name = "Inferno Fuel Blocker", desc = "Prevents the player from picking up the fuel or minion while there is active fuel.")
+    @ConfigOption(name = "Inferno Fuel Blocker", desc = "Prevent picking up the fuel or minion while there is active fuel.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean infernoFuelBlocker = false;

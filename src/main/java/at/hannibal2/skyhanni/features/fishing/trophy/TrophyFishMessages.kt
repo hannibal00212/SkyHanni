@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.ChatMessagesConfig.DesignFormat
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getTooltip
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -14,44 +15,48 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.ordinal
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object TrophyFishMessages {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.chatMessages
 
-    private val trophyFishPattern by RepoPattern.pattern(
+    val trophyFishPattern by RepoPattern.pattern(
         "fishing.trophy.trophyfish",
         "§6§lTROPHY FISH! §r§bYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w -]+) §r(?<displayRarity>§[0-9a-f]§l\\w+)§r§b\\."
     )
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        var displayName = ""
-        var displayRarity = ""
-
-        trophyFishPattern.matchMatcher(event.message) {
-            displayName = group("displayName").replace("§k", "")
-            displayRarity = group("displayRarity")
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
+        val (displayName, displayRarity) = trophyFishPattern.matchMatcher(event.message) {
+            group("displayName").replace("§k", "") to
+                group("displayRarity")
         } ?: return
 
-        val internalName = displayName.replace("Obfuscated", "Obfuscated Fish")
-            .replace("[- ]".toRegex(), "").lowercase().removeColor()
-        val rawRarity = displayRarity.lowercase().removeColor()
-        val rarity = TrophyRarity.getByName(rawRarity) ?: return
+        val internalName = getInternalName(displayName)
+        val rarity = TrophyRarity.getByName(displayRarity.lowercase().removeColor()) ?: return
 
         val trophyFishes = TrophyFishManager.fish ?: return
         val trophyFishCounts = trophyFishes.getOrPut(internalName) { mutableMapOf() }
         val amount = trophyFishCounts.addOrPut(rarity, 1)
-        TrophyFishCaughtEvent(internalName, rarity).postAndCatch()
+        TrophyFishCaughtEvent(internalName, rarity).post()
 
         if (shouldBlockTrophyFish(rarity, amount)) {
             event.blockedReason = "low_trophy_fish"
             return
+        }
+        if (config.goldAlert && rarity == TrophyRarity.GOLD) {
+            sendTitle(displayName, displayRarity, amount)
+            if (config.playSound) SoundUtils.playBeepSound()
+        }
+
+        if (config.diamondAlert && rarity == TrophyRarity.DIAMOND) {
+            sendTitle(displayName, displayRarity, amount)
+            if (config.playSound) SoundUtils.playBeepSound()
         }
 
         val original = event.chatComponent
@@ -88,11 +93,27 @@ object TrophyFishMessages {
         }
     }
 
-    private fun shouldBlockTrophyFish(rarity: TrophyRarity, amount: Int) =
-        config.bronzeHider && rarity == TrophyRarity.BRONZE && amount != 1
-            || config.silverHider && rarity == TrophyRarity.SILVER && amount != 1
+    private fun sendTitle(displayName: String, displayRarity: String?, amount: Int) {
+        val text = "$displayName $displayRarity §8$amount§c!"
+        LorenzUtils.sendTitle(text, 3.seconds, 2.8, 7f)
+    }
 
-    @SubscribeEvent
+    val regex = "[- ]".toRegex()
+
+    fun getInternalName(displayName: String): String {
+        return displayName.replace("Obfuscated", "Obfuscated Fish")
+            .replace(regex, "").lowercase().removeColor()
+    }
+
+    private fun shouldBlockTrophyFish(rarity: TrophyRarity, amount: Int) =
+        config.bronzeHider &&
+            rarity == TrophyRarity.BRONZE &&
+            amount != 1 ||
+            config.silverHider &&
+            rarity == TrophyRarity.SILVER &&
+            amount != 1
+
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "fishing.trophyCounter", "fishing.trophyFishing.chatMessages.enabled")
         event.move(2, "fishing.trophyDesign", "fishing.trophyFishing.chatMessages.design")

@@ -21,7 +21,7 @@ import static at.hannibal2.skyhanni.config.features.garden.MoneyPerHourConfig.Cu
 public class MoneyPerHourConfig {
     @Expose
     @ConfigOption(name = "Show Money per Hour",
-        desc = "Displays the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar. " +
+        desc = "Display the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar.\n" +
             "Supports Bountiful, Mushroom Cow Perk, Armor Crops and Dicer Drops. Their toggles are below.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -90,17 +90,17 @@ public class MoneyPerHourConfig {
         NPC_PRICE("§eNPC Price", 2),
         ;
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        CustomFormatEntry(String str, int legacyId) {
-            this.str = str;
+        CustomFormatEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        CustomFormatEntry(String str) {
-            this(str, -1);
+        CustomFormatEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -110,7 +110,7 @@ public class MoneyPerHourConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -124,35 +124,35 @@ public class MoneyPerHourConfig {
     @Expose
     @ConfigOption(
         name = "Include Bountiful",
-        desc = "Includes the coins from Bountiful in the calculation.")
+        desc = "Include the coins from Bountiful in the calculation.")
     @ConfigEditorBoolean
     public boolean bountiful = true;
 
     @Expose
     @ConfigOption(
         name = "Include Mooshroom Cow",
-        desc = "Includes the coins you get from selling the mushrooms from your Mooshroom Cow pet.")
+        desc = "Include the coins you get from selling the mushrooms from your Mooshroom Cow pet.")
     @ConfigEditorBoolean
     public boolean mooshroom = true;
 
     @Expose
     @ConfigOption(
         name = "Include Armor Drops",
-        desc = "Includes the average coins/hr from your armor.")
+        desc = "Include the average coins/hr from your armor.")
     @ConfigEditorBoolean
     public boolean armor = true;
 
     @Expose
     @ConfigOption(
         name = "Include Dicer Drops",
-        desc = "Includes the average coins/hr from your melon or pumpkin dicer.")
+        desc = "Include the average coins/hr from your melon or pumpkin dicer.")
     @ConfigEditorBoolean
     public boolean dicer = true;
 
     @Expose
     @ConfigOption(
         name = "Hide Title",
-        desc = "Hides the first line of 'Money Per Hour' entirely.")
+        desc = "Hide the first line of 'Money Per Hour' entirely.")
     @ConfigEditorBoolean
     public boolean hideTitle = false;
 

@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.misc.trevor
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -13,22 +14,31 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 
+// TODO change to use skyhanni tracker
 @SkyHanniModule
 object TrevorTracker {
 
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
     private val patternGroup = RepoPattern.group("misc.trevor")
+
+    // TODO regex tests
+    /**
+     * REGEX-TEST: §aYour mob died randomly, you are rewarded §r§53 pelts§r§a.
+     */
     private val selfKillMobPattern by patternGroup.pattern(
         "selfkill",
-        "§aYour mob died randomly, you are rewarded §r§5(?<pelts>.*) pelts§r§a."
+        "§aYour mob died randomly, you are rewarded §r§5(?<pelts>.*) pelts§r§a.",
     )
+
+    /**
+     * REGEX-TEST: §aKilling the animal rewarded you §r§53 pelts§r§a.
+     */
     private val killMobPattern by patternGroup.pattern(
         "kill",
-        "§aKilling the animal rewarded you §r§5(?<pelts>.*) pelts§r§a."
+        "§aKilling the animal rewarded you §r§5(?<pelts>.*) pelts§r§a.",
     )
 
     private var display = emptyList<List<Any>>()
@@ -64,8 +74,8 @@ object TrevorTracker {
         peltsPerHour = (peltsPerSecond.average() * 3600).toInt()
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         peltsPerSecond.clear()
         peltsPerHour = 0
         stoppedChecks = 0
@@ -80,8 +90,8 @@ object TrevorTracker {
         return newList
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!TrevorFeatures.onFarmingIsland()) return
         val storage = ProfileStorageData.profileSpecific?.trapperData ?: return
 
@@ -130,7 +140,7 @@ object TrevorTracker {
         addAsSingletonList("§b${(storage.animalRarities[TrapperMobRarity.ELUSIVE] ?: 0).addSeparators()} §6Elusive Animals")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!shouldDisplay()) return
         config.position.renderStringsAndItems(display, posLabel = "Trevor Tracker")

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.inventory;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.utils.ItemPriceSource;
 import at.hannibal2.skyhanni.utils.RenderUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -38,7 +39,7 @@ public class SackDisplayConfig {
     public NumberFormatEntry numberFormat = NumberFormatEntry.FORMATTED;
 
     @Expose
-    @ConfigOption(name = "Alignment", desc = "Channge the alignment for numbers and money.")
+    @ConfigOption(name = "Alignment", desc = "Change the alignment for numbers and money.")
     @ConfigEditorDropdown
     public RenderUtils.HorizontalAlignment alignment = RenderUtils.HorizontalAlignment.LEFT;
 
@@ -47,17 +48,17 @@ public class SackDisplayConfig {
         FORMATTED("Formatted", 1),
         UNFORMATTED("Unformatted", 2);
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        NumberFormatEntry(String str, int legacyId) {
-            this.str = str;
+        NumberFormatEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        NumberFormatEntry(String str) {
-            this(str, -1);
+        NumberFormatEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -67,7 +68,7 @@ public class SackDisplayConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -90,17 +91,17 @@ public class SackDisplayConfig {
         DESC_PRICE("Descending (Price)", 2),
         ASC_PRICE("Ascending (Price)", 3);
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        SortingTypeEntry(String str, int legacyId) {
-            this.str = str;
+        SortingTypeEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        SortingTypeEntry(String str) {
-            this(str, -1);
+        SortingTypeEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -110,7 +111,7 @@ public class SackDisplayConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -145,17 +146,17 @@ public class SackDisplayConfig {
         FORMATTED("Formatted", 0),
         UNFORMATTED("Unformatted", 1);
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        PriceFormatEntry(String str, int legacyId) {
-            this.str = str;
+        PriceFormatEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        PriceFormatEntry(String str) {
-            this(str, -1);
+        PriceFormatEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -165,42 +166,14 @@ public class SackDisplayConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
     @Expose
-    @ConfigOption(name = "Show Price From", desc = "Show price from Bazaar or NPC.")
+    @ConfigOption(name = "Change Price Source", desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC.")
     @ConfigEditorDropdown
-    public PriceFrom priceFrom = PriceFrom.BAZAAR;
-
-    public enum PriceFrom implements HasLegacyId {
-        BAZAAR("Bazaar", 0),
-        NPC("NPC", 1);
-
-        private final String str;
-        private final int legacyId;
-
-        PriceFrom(String str, int legacyId) {
-            this.str = str;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
-        PriceFrom(String str) {
-            this(str, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-    }
+    public ItemPriceSource priceSource = ItemPriceSource.BAZAAR_INSTANT_BUY;
 
     @Expose
     @ConfigLink(owner = SackDisplayConfig.class, field = "enabled")

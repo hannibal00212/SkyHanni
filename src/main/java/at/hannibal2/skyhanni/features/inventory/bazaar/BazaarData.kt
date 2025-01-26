@@ -7,8 +7,4 @@ data class BazaarData(
     val sellOfferPrice: Double,
     val instantBuyPrice: Double,
     val product: BazaarProduct,
-    @Deprecated("outdated", ReplaceWith("instantBuyPrice"))
-    val sellPrice: Double = instantBuyPrice,
-    @Deprecated("outdated", ReplaceWith("sellOfferPrice"))
-    val buyPrice: Double = sellOfferPrice,
 )

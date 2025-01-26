@@ -18,7 +18,8 @@ public class MaxwellConfig {
     public boolean compactTuning = false;
 
     @Expose
-    @ConfigOption(name = "Tuning Amount", desc = "Only show the first # tunings.\n§cDoes not work with Compact Tuning.")
+    @ConfigOption(name = "Tuning Amount", desc = "Only show the first # tunings.\n" +
+        "§cDoes not work with Compact Tuning.")
     @ConfigEditorSlider(minValue = 1, maxValue = 8, minStep = 1)
     public int tuningAmount = 2;
 }

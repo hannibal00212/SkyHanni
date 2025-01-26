@@ -43,7 +43,7 @@ public class ObjectHiderConfig {
     public boolean hideSkeletonSkull = true;
 
     @Expose
-    @ConfigOption(name = "Hide Healer Orbs", desc = "Hides the damage, ability damage and defensive orbs that spawn when the Healer kills mobs.")
+    @ConfigOption(name = "Hide Healer Orbs", desc = "Hide the damage, ability damage and defensive orbs that spawn when the Healer kills mobs.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideHealerOrbs = false;

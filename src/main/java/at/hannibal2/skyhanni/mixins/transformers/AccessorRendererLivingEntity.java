@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface AccessorRendererLivingEntity<T extends EntityLivingBase>
     extends AccessorRender<T> {
     @Invoker("setBrightness")
-    boolean setBrightness_skyhanni(T entitylivingbaseIn, float partialTicks, boolean combineTextures);
+    boolean setBrightness_skyhanni(T entityLivingBaseIn, float partialTicks, boolean combineTextures);
 
     @Invoker("unsetBrightness")
     void setBrightness_skyhanni();

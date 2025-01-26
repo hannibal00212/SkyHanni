@@ -1,22 +1,24 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.FishingBobberCastEvent
-import at.hannibal2.skyhanni.events.FishingBobberInWaterEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.features.fishing.FishingAPI.isBait
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.fishing.FishingApi.isBait
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.projectile.EntityFishHook
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -25,61 +27,64 @@ object FishingBaitWarnings {
 
     private val config get() = SkyHanniMod.feature.fishing.fishingBaitWarnings
 
-    @SubscribeEvent
-    fun onBobberThrow(event: FishingBobberCastEvent) {
+    private data class Bait(
+        private val entity: EntityItem,
+        val name: String = entity.entityItem.name,
+        val location: LorenzVec = entity.getLorenzVec(),
+    ) {
+        fun distanceTo(bobber: EntityFishHook) = location.distance(bobber.getLorenzVec())
     }
 
     private var lastBait: String? = null
     private var wasUsingBait = true
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    private val baitEntities = TimeLimitedSet<Bait>(750.seconds)
+
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         lastBait = null
         wasUsingBait = true
     }
 
-    @SubscribeEvent
-    fun onBobberInWater(event: FishingBobberInWaterEvent) {
+    @HandleEvent
+    fun onBobber(event: FishingBobberInLiquidEvent) {
+        if (!isEnabled()) return
         DelayedRun.runDelayed(500.milliseconds) {
-            checkBobber()
+            checkBait()
         }
     }
 
-    private fun checkBobber() {
-        val bobber = FishingAPI.bobber ?: return
-        val bait = detectBait(bobber)
-        if (bait == null) {
-            if (config.noBaitWarning) {
-                if (!wasUsingBait) {
-                    showNoBaitWarning()
-                }
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onEntityEnterWorld(event: EntityEnterWorldEvent<EntityItem>) {
+        if (!isEnabled() || !FishingApi.isFishing()) return
+        if (event.entity.distanceToPlayer() > 10) return
+        DelayedRun.runNextTick {
+            val isBait = event.entity.entityItem.isBait()
+            if (isBait) {
+                baitEntities += Bait(event.entity)
             }
-        } else {
-            if (config.baitChangeWarning) {
-                lastBait?.let {
-                    if (it != bait) {
-                        showBaitChangeWarning(it, bait)
-                    }
+        }
+    }
+
+    private fun checkBait() {
+        val bobber = FishingApi.bobber ?: return
+        val bait = baitEntities.filter { it.distanceTo(bobber) < 8 }.minByOrNull { it.distanceTo(bobber) }?.name
+        baitEntities.clear()
+
+        if (bait == null) {
+            if (config.noBaitWarning && !wasUsingBait) {
+                showNoBaitWarning()
+            }
+        } else if (config.baitChangeWarning) {
+            lastBait?.let {
+                if (it != bait) {
+                    showBaitChangeWarning(it, bait)
                 }
             }
         }
+
         wasUsingBait = bait != null
         lastBait = bait
-    }
-
-    private fun detectBait(bobber: EntityFishHook): String? {
-        for (entity in EntityUtils.getEntitiesNearby<EntityItem>(bobber.getLorenzVec(), 6.0)) {
-            val itemStack = entity.entityItem ?: continue
-            if (!itemStack.isBait()) continue
-            val ticksExisted = entity.ticksExisted
-            if (ticksExisted in 6..15) {
-                return itemStack.name
-            }
-
-            val distance = "distance: ${entity.getDistanceToEntity(bobber).addSeparators()}"
-            ChatUtils.debug("fishing bait: ticksExisted: $ticksExisted, $distance")
-        }
-        return null
     }
 
     private fun showBaitChangeWarning(before: String, after: String) {
@@ -94,5 +99,5 @@ object FishingBaitWarnings {
         ChatUtils.chat("You're not using any fishing baits!")
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && FishingAPI.isFishing() && !LorenzUtils.inKuudraFight
+    private fun isEnabled() = LorenzUtils.inSkyBlock && !KuudraApi.inKuudra()
 }

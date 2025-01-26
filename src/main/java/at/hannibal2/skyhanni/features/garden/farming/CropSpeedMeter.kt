@@ -1,26 +1,31 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
-import at.hannibal2.skyhanni.events.CropClickEvent
-import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
+import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class CropSpeedMeter {
+@SkyHanniModule
+object CropSpeedMeter {
 
     private var display = emptyList<String>()
     private var currentCrop: CropType? = null
     private var currentBlocks = 0
     private var snapshot = emptyList<String>()
 
-    @SubscribeEvent
+    var enabled = false
+    private var startCrops = mapOf<CropType, Long>()
+
+    @HandleEvent
     fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         if (startCrops.isEmpty()) return
@@ -34,8 +39,8 @@ class CropSpeedMeter {
         breakBlock()
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(15)) return
 
@@ -71,7 +76,7 @@ class CropSpeedMeter {
         return list
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCropMilestoneUpdate(event: CropMilestoneUpdateEvent) {
         if (!isEnabled()) return
         val counters = mutableMapOf<CropType, Long>()
@@ -84,9 +89,9 @@ class CropSpeedMeter {
             snapshot = emptyList()
         } else {
             currentCrop?.let {
-                val crops = it.getCounter() - startCrops[it]!!
+                val crops = it.getCounter() - (startCrops[it] ?: 0L)
                 val blocks = currentBlocks
-                val cropsPerBlocks = (crops.toDouble() / blocks.toDouble()).round(3)
+                val cropsPerBlocks = (crops.toDouble() / blocks.toDouble()).roundTo(3)
 
                 val list = mutableListOf<String>()
                 list.add("")
@@ -96,8 +101,7 @@ class CropSpeedMeter {
                 list.add(" §7Crops per Block: " + cropsPerBlocks.addSeparators())
 
                 val baseDrops = it.baseDrops
-                val farmingFortune = (cropsPerBlocks * 100 / baseDrops).round(3)
-
+                val farmingFortune = (cropsPerBlocks * 100 / baseDrops).roundTo(3)
 
                 list.add(" §7Calculated farming Fortune: §e" + farmingFortune.addSeparators())
                 list.add("§cOpen /cropmilestones again to recalculate!")
@@ -112,24 +116,18 @@ class CropSpeedMeter {
         currentBlocks++
     }
 
-    companion object {
-
-        var enabled = false
-        private var startCrops = mapOf<CropType, Long>()
-
-        fun toggle() {
-            enabled = !enabled
-            ChatUtils.chat("Crop Speed Meter " + if (enabled) "§aEnabled" else "§cDisabled")
-            startCrops = emptyMap()
-        }
+    fun toggle() {
+        enabled = !enabled
+        ChatUtils.chat("Crop Speed Meter " + if (enabled) "§aEnabled" else "§cDisabled")
+        startCrops = emptyMap()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        GardenAPI.config.cropSpeedMeterPos.renderStrings(display, posLabel = "Crop Speed Meter")
+        GardenApi.config.cropSpeedMeterPos.renderStrings(display, posLabel = "Crop Speed Meter")
     }
 
-    fun isEnabled() = enabled && GardenAPI.inGarden()
+    fun isEnabled() = enabled && GardenApi.inGarden()
 }

@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class HotbarConfig {
 
     @Expose
-    @ConfigOption(name = "Editable", desc = "Adds the hotbar to the gui editor. Allows for moving and scaling of the hotbar.")
+    @ConfigOption(name = "Editable", desc = "Add the hotbar to the gui editor. Allows for moving and scaling of the hotbar.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean editable = false;
@@ -25,7 +25,7 @@ public class HotbarConfig {
     public Position hotbar = new Position(20, 20);
 
     @Expose
-    @ConfigOption(name = "Show Outside Skyblock", desc = "Enables the hotbar to be edited even outside of SkyBlock.")
+    @ConfigOption(name = "Show Outside SkyBlock", desc = "Enable the hotbar to be edited even outside of SkyBlock.")
     @ConfigEditorBoolean
     public boolean showOutsideSkyblock = false;
 }

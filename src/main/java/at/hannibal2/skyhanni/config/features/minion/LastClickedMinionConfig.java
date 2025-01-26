@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class LastClickedMinionConfig {
     @Expose
-    @ConfigOption(name = "Last Minion Display", desc = "Marks the location of the last clicked minion, even through walls.")
+    @ConfigOption(name = "Last Minion Display", desc = "Mark the location of the last clicked minion, even through walls.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean display = false;

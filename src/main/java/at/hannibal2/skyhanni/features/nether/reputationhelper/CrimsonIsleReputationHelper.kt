@@ -1,32 +1,35 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.crimsonisle.ReputationHelperConfig.ShowLocationEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.QuestLoader
 import at.hannibal2.skyhanni.features.nether.reputationhelper.kuudra.DailyKuudraBossHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMiniBossHelper
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiInventory
 
 class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
@@ -36,23 +39,20 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     val miniBossHelper = DailyMiniBossHelper(this)
     val kuudraBossHelper = DailyKuudraBossHelper(this)
 
-    var factionType = FactionType.NONE
+    var factionType: FactionType? = null
 
-    private var lastUpdate = SimpleTimeMark.farPast()
-
-    private var display = emptyList<List<Any>>()
+    private var display = emptyList<Renderable>()
     private var dirty = true
     var tabListQuestsMissing = false
 
     /**
-     *  c - Barbarian Not Accepted
-     *  d - Mage Not Accepted
-     *  e - Accepted
-     *  a - Completed
+     * REGEX-TEST:  §r§c✖ Rescue Mission
+     * REGEX-TEST:  §r§a✔ Digested Mushrooms §r§8x20
+     * REGEX-TEST:  §r§c✖ Slugfish §r§8x1
      */
     val tabListQuestPattern by RepoPattern.pattern(
-        "crimson.reputation.tablist",
-        " §r§[cdea].*"
+        "crimson.reputationhelper.tablist.quest",
+        " (?:§.*)?(?<status>[✖✔]) (?<name>.+?)(?: (?:§.)*?x(?<amount>\\d+))?",
     )
 
     init {
@@ -61,7 +61,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         skyHanniMod.loadModule(kuudraBossHelper)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<CrimsonIsleReputationJson>("CrimsonIsleReputation")
         miniBossHelper.onRepoReload(data.MINIBOSS)
@@ -76,18 +76,35 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ProfileStorageData.profileSpecific?.crimsonIsle?.let {
             miniBossHelper.loadData(it)
             kuudraBossHelper.loadData(it)
             questHelper.load(it)
         }
+
+        config.hideComplete.afterChange {
+            updateRender()
+        }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
+    @HandleEvent
+    fun onSackChange(event: SackChangeEvent) {
+        dirty = true
+    }
+
+    @HandleEvent
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.REPUTATION)) return
+
+        TabWidget.REPUTATION.matchMatcherFirstLine {
+            factionType = FactionType.fromName(group("faction"))
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
+    fun onTick(event: SkyHanniTickEvent) {
         if (!config.enabled.get()) return
         if (!dirty && display.isEmpty()) {
             dirty = true
@@ -96,65 +113,58 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
             dirty = false
             updateRender()
         }
-
-        if (event.repeatSeconds(3)) {
-            TabListData.getTabList()
-                .filter { it.contains("Reputation:") }
-                .forEach {
-                    factionType = if (it.contains("Mage")) {
-                        FactionType.MAGE
-                    } else if (it.contains("Barbarian")) {
-                        FactionType.BARBARIAN
-                    } else {
-                        FactionType.NONE
-                    }
-                }
-        }
-    }
-
-    @SubscribeEvent
-    fun onConfigInit(event: ConfigLoadEvent) {
-        config.hideComplete.afterChange {
-            updateRender()
-        }
     }
 
     private fun updateRender() {
-        val newList = mutableListOf<List<Any>>()
+        display = buildList {
+            addString("§e§lReputation Helper")
+            if (factionType == null) {
+                addString("§cFaction not found!")
+                return
+            }
 
-        // TODO test
-        if (factionType == FactionType.NONE) return
-
-        newList.addAsSingletonList("§e§lReputation Helper")
-        if (tabListQuestsMissing) {
-            newList.addAsSingletonList("§cFaction Quests Widget not found!")
-            newList.addAsSingletonList("§7Open §e/tab §7and enable it!")
-        } else {
-            questHelper.render(newList)
-            miniBossHelper.render(newList)
-            kuudraBossHelper.render(newList)
+            if (tabListQuestsMissing) {
+                addString("§cFaction Quests Widget not found!")
+                addString("§7Open §e/tab §7and enable it!")
+            } else {
+                questHelper.run {
+                    addQuests()
+                }
+                miniBossHelper.run {
+                    addDailyMiniBoss()
+                }
+                kuudraBossHelper.run {
+                    addKuudraBoss()
+                }
+            }
         }
-
-
-        display = newList
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST, onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled.get()) return
-        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
 
-        if (config.useHotkey && !config.hotkey.isKeyHeld()) {
+        if (config.useHotkey && !isHotkeyHeld()) {
             return
         }
 
-        config.position.renderStringsAndItems(
+        config.position.renderRenderables(
             display,
-            posLabel = "Crimson Isle Reputation Helper"
+            posLabel = "Crimson Isle Reputation Helper",
         )
     }
 
-    @SubscribeEvent
+    fun isHotkeyHeld(): Boolean {
+        val isAllowedGui = Minecraft.getMinecraft().currentScreen.let {
+            it == null || it is GuiInventory
+        }
+        if (!isAllowedGui) return false
+        if (NeuItems.neuHasFocus()) return false
+
+        return config.hotkey.isKeyHeld()
+    }
+
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.crimsonIsleReputationHelper", "crimsonIsle.reputationHelper.enabled")
         event.move(2, "misc.reputationHelperUseHotkey", "crimsonIsle.reputationHelper.useHotkey")
@@ -194,7 +204,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     fun showLocations() = when (config.showLocation) {
         ShowLocationEntry.ALWAYS -> true
-        ShowLocationEntry.ONLY_HOTKEY -> config.hotkey.isKeyHeld()
+        ShowLocationEntry.ONLY_HOTKEY -> isHotkeyHeld()
         else -> false
     }
 }

@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.SlayerAPI
-import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaAPI
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
+import at.hannibal2.skyhanni.features.event.diana.DianaApi
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
@@ -15,12 +16,11 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -30,8 +30,8 @@ object SlayerQuestWarning {
     private val config get() = SkyHanniMod.feature.slayer
 
     private var lastWeaponUse = SimpleTimeMark.farPast()
-    private val voidItem = "ASPECT_OF_THE_VOID".asInternalName()
-    private val endItem = "ASPECT_OF_THE_END".asInternalName()
+    private val voidItem = "ASPECT_OF_THE_VOID".toInternalName()
+    private val endItem = "ASPECT_OF_THE_END".toInternalName()
 
     private val outsideRiftData = SlayerData()
     private val insideRiftData = SlayerData()
@@ -41,10 +41,10 @@ object SlayerQuestWarning {
         var lastSlayerType: SlayerType? = null
     }
 
-    @SubscribeEvent
-    fun onScoreboardChange(event: ScoreboardChangeEvent) {
-        val slayerType = event.newList.nextAfter("Slayer Quest")
-        val slayerProgress = event.newList.nextAfter("Slayer Quest", skip = 2) ?: "no slayer"
+    @HandleEvent
+    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+        val slayerType = event.full.nextAfter("Slayer Quest")
+        val slayerProgress = event.full.nextAfter("Slayer Quest", skip = 2) ?: "no slayer"
         val new = slayerProgress.removeColor()
         val slayerData = getSlayerData()
 
@@ -59,22 +59,23 @@ object SlayerQuestWarning {
         }
     }
 
-    private fun getSlayerData() = if (RiftAPI.inRift()) outsideRiftData else insideRiftData
+    private fun getSlayerData() = if (RiftApi.inRift()) outsideRiftData else insideRiftData
+
+    private fun String.inCombat() = contains("Combat") || contains("Kills")
+    private fun String.inBoss() = this == "Slay the boss!"
+    private fun String?.bossSlain() = this == "Boss slain!"
+    private fun String.noSlayer() = this == "no slayer"
 
     private fun change(old: String, new: String) {
-        if (new.contains("Combat")) {
-            if (!old.contains("Combat")) {
-                needSlayerQuest = false
-            }
+        if (!old.inCombat() && new.inCombat()) {
+            needSlayerQuest = false
         }
-        if (new == "no slayer") {
-            if (old == "Slay the boss!") {
-                needNewQuest("The old slayer quest has failed!")
-            }
+        if (old.inBoss() && new.noSlayer()) {
+            needNewQuest("The old slayer quest has failed!")
         }
-        if (new == "Boss slain!") {
+        if (new.bossSlain()) {
             DelayedRun.runDelayed(2.seconds) {
-                if (getSlayerData().currentSlayerState == "Boss slain!") {
+                if (getSlayerData().currentSlayerState.bossSlain()) {
                     needNewQuest("You have no Auto-Slayer active!")
                 }
             }
@@ -99,10 +100,10 @@ object SlayerQuestWarning {
         if (!config.questWarning) return
         if (lastWarning.passedSince() < 10.seconds) return
 
-        if (DianaAPI.isDoingDiana()) return
+        if (DianaApi.isDoingDiana()) return
         // prevent warnings when mobs are hit by other players
         if (lastWeaponUse.passedSince() > 500.milliseconds) return
-      
+
         lastWarning = SimpleTimeMark.now()
         ChatUtils.chat(chatMessage)
 
@@ -111,9 +112,8 @@ object SlayerQuestWarning {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
-        if (!LorenzUtils.inSkyBlock) return
 
         val entity = event.entity
         if (entity.getLorenzVec().distanceToPlayer() < 6 && isSlayerMob(entity)) {
@@ -122,27 +122,32 @@ object SlayerQuestWarning {
     }
 
     private fun isSlayerMob(entity: EntityLivingBase): Boolean {
-        val slayerType = SlayerAPI.getSlayerTypeForCurrentArea() ?: return false
+        val slayerType = SlayerApi.getSlayerTypeForCurrentArea() ?: return false
 
-        val activeSlayer = SlayerAPI.getActiveSlayer()
+        // workaround for rift mob that is unrelated to slayer
+        if (entity.name == "Oubliette Guard") return false
+        // workaround for Bladesoul in  Crimson Isle
+        if (LorenzUtils.skyBlockArea == "Stronghold" && entity.name == "Skeleton") return false
 
-        if (activeSlayer != null) {
-            if (slayerType != activeSlayer) {
-                val activeSlayerName = activeSlayer.displayName
+        val isSlayer = slayerType.clazz.isInstance(entity)
+        if (!isSlayer) return false
+
+        SlayerApi.activeSlayer?.let {
+            if (slayerType != it) {
+                val activeSlayerName = it.displayName
                 val slayerName = slayerType.displayName
-                SlayerAPI.latestWrongAreaWarning = SimpleTimeMark.now()
+                SlayerApi.latestWrongAreaWarning = SimpleTimeMark.now()
                 warn(
                     "Wrong Slayer!",
-                    "Wrong slayer selected! You have $activeSlayerName selected and you are in an $slayerName area!"
+                    "Wrong slayer selected! You have $activeSlayerName selected and you are in an $slayerName area!",
                 )
             }
         }
-        // workaround for rift mob that is unrelated to slayer
-        val isSlayer = slayerType.clazz.isInstance(entity) && entity.name != "Oubliette Guard"
-        return (getSlayerData().lastSlayerType == slayerType) && isSlayer
+
+        return getSlayerData().lastSlayerType == slayerType
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onItemClick(event: ItemClickEvent) {
         val internalName = event.itemInHand?.getInternalNameOrNull()
 

@@ -1,33 +1,32 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object GardenComposterInventoryFeatures {
 
-    private val config get() = GardenAPI.config.composters
+    private val config get() = GardenApi.config.composters
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
-        if (!GardenAPI.inGarden()) return
+    @HandleEvent
+    fun onToolTip(event: ToolTipEvent) {
+        if (!GardenApi.inGarden()) return
         if (!config.upgradePrice) return
 
         if (InventoryUtils.openInventoryName() != "Composter Upgrades") return
@@ -53,36 +52,28 @@ object GardenComposterInventoryFeatures {
                     ErrorManager.logErrorStateWithData(
                         "Error reading item line",
                         "could not read item line",
-                        "line" to line
+                        "line" to line,
                     )
                     continue
                 }
-                val internalName = NEUInternalName.fromItemNameOrNull(itemName) ?: run {
-                    ErrorManager.logErrorStateWithData(
-                        "Error reading internal name for item: $itemName",
-                        "could not find internal name for",
-                        "itemName" to itemName
-                    )
-                    continue
-                }
+                val internalName = NeuInternalName.fromItemName(itemName)
                 val lowestBin = internalName.getPrice()
                 val price = lowestBin * amount
                 fullPrice += price
-                val format = NumberUtil.format(price)
+                val format = price.shortFormat()
                 list[i] = list[i] + " §7(§6$format§7)"
                 amountItems++
             }
         }
 
         if (amountItems > 1) {
-            val format = NumberUtil.format(fullPrice)
+            val format = fullPrice.shortFormat()
             list[indexFullCost] = list[indexFullCost] + " §7(§6$format§7)"
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.highlightUpgrade) return
 
         if (InventoryUtils.openInventoryName() == "Composter Upgrades") {
@@ -98,7 +89,7 @@ object GardenComposterInventoryFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.composterUpgradePrice", "garden.composters.upgradePrice")
         event.move(3, "garden.composterHighLightUpgrade", "garden.composters.highlightUpgrade")

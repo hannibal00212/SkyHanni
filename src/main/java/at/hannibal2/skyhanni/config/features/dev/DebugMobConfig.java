@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class DebugMobConfig {
 
     @Expose
-    @ConfigOption(name = "Mob Detection Enable", desc = "Turn off and on again to reset all Mobs.")
+    @ConfigOption(name = "Mob Detection Enable", desc = "Turn off and on again to reset all mobs.")
     @ConfigEditorBoolean
     public boolean enable = true;
 
@@ -24,15 +24,15 @@ public class DebugMobConfig {
         ONLY_HIGHLIGHT("Only Highlight"),
         NAME_AND_HIGHLIGHT("Both");
 
-        final String str;
+        final String displayName;
 
-        HowToShow(String str) {
-            this.str = str;
+        HowToShow(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -49,13 +49,14 @@ public class DebugMobConfig {
         public boolean showRayHit = false;
 
         @Expose
-        @ConfigOption(name = "Player Highlight", desc = "Highlight each entity that is a real Player in blue. (You are also include in the list but won't be highlighted for obvious reason).")
+        @ConfigOption(name = "Player Highlight", desc = "Highlight each entity that is a real Player in blue (you are also included in the list but won't be highlighted for obvious reasons).")
         @ConfigEditorBoolean
         public boolean realPlayerHighlight = false;
 
         @Expose
         @ConfigOption(name = "DisplayNPC", desc = "Shows the internal mobs that are 'DisplayNPC' as highlight (in red) or the name.")
         @ConfigEditorDropdown
+        // TODO rename to displayNpc
         public HowToShow displayNPC = HowToShow.OFF;
 
         @Expose
@@ -74,7 +75,7 @@ public class DebugMobConfig {
         public HowToShow special = HowToShow.OFF;
 
         @Expose
-        @ConfigOption(name = "Show Invisible", desc = "Shows the mob even though they are invisible (do to invisibility effect) if looked at directly.")
+        @ConfigOption(name = "Show Invisible", desc = "Shows invisible mobs (due to invisibility effect) if looked at directly.")
         @ConfigEditorBoolean
         public boolean showInvisible = false;
     }

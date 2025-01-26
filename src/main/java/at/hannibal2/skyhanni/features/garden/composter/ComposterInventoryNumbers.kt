@@ -1,35 +1,43 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ComposterInventoryNumbers {
 
     private val patternGroup = RepoPattern.group("garden.composter.inventory.numbers")
+
+    /**
+     * REGEX-TEST: §2§l§m      §f§l§m              §r §e37,547.5§6/§e130k
+     */
     private val valuePattern by patternGroup.pattern(
         "value",
-        ".* §e(?<having>.*)§6/(?<total>.*)"
-    )
-    private val amountPattern by patternGroup.pattern(
-        "amount",
-        "§7§7Compost Available: §a(?<amount>.*)"
+        ".* §e(?<having>.*)§6/(?<total>.*)",
     )
 
-    @SubscribeEvent
+    /**
+     * REGEX-TEST: §7§7Compost Available: §a62
+     */
+    private val amountPattern by patternGroup.pattern(
+        "amount",
+        "§7§7Compost Available: §a(?<amount>.*)",
+    )
+
+    @HandleEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        if (!GardenAPI.inGarden()) return
-        if (!GardenAPI.config.composters.inventoryNumbers) return
+        if (!GardenApi.inGarden()) return
+        if (!GardenApi.config.composters.inventoryNumbers) return
 
         if (event.inventoryName != "Composter") return
 
@@ -39,7 +47,7 @@ object ComposterInventoryNumbers {
 
         // Composts Available
         if (slotNumber == 13) {
-            stack.getLore().matchFirst(amountPattern) {
+            amountPattern.firstMatcher(stack.getLore()) {
                 val total = group("amount").formatInt()
                 event.offsetY = -2
                 event.offsetX = -20
@@ -50,9 +58,9 @@ object ComposterInventoryNumbers {
 
         // Organic Matter or Fuel
         if (slotNumber == 46 || slotNumber == 52) {
-            stack.getLore().matchFirst(valuePattern) {
+            valuePattern.firstMatcher(stack.getLore()) {
                 val having = group("having").removeColor().formatInt()
-                val havingFormat = NumberUtil.format(having)
+                val havingFormat = having.shortFormat()
                 val total = group("total").removeColor()
 
                 val color = if (slotNumber == 46) {
@@ -73,7 +81,7 @@ object ComposterInventoryNumbers {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.composterInventoryNumbers", "garden.composters.inventoryNumbers")
     }

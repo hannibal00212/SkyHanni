@@ -12,35 +12,35 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class MiningEventConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show information about upcoming Dwarven Mines and Crystal Hollows mining events, " +
-        "also enables you sending data. §eTakes up to a minute to sync new events.")
+    @ConfigOption(name = "Enabled", desc = "Show information about upcoming Dwarven Mines and Crystal Hollows mining events.\n" +
+        "§eAlso enables sending data from your client. May take up to a minute to sync new events.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Show Outside Mining Islands", desc = "Shows the event tracker when you are not inside of the Dwarven Mines or Crystal Hollows.")
+    @ConfigOption(name = "Show Outside Mining Islands", desc = "Show the event tracker even if you're outside of the Dwarven Mines or Crystal Hollows.")
     @ConfigEditorBoolean
     public boolean outsideMining = false;
 
     @Expose
-    @ConfigOption(name = "What to Show", desc = "Choose which island's events are shown in the gui.")
+    @ConfigOption(name = "What to Show", desc = "Choose which island's events are shown in the GUI.")
     @ConfigEditorDropdown
     public ShowType showType = ShowType.ALL;
 
     @Expose
-    @ConfigOption(name = "Compressed Format", desc = "Compresses the event names so that they are shorter.")
+    @ConfigOption(name = "Compressed Format", desc = "Compress the event names so that they are shorter.")
     @ConfigEditorDropdown
     public CompressFormat compressedFormat = CompressFormat.DEFAULT;
 
     @Expose
-    @ConfigOption(name = "Compressed Island", desc = "Shows the islands only as icon.")
+    @ConfigOption(name = "Compressed Island", desc = "Show the islands only as an icon.")
     @ConfigEditorBoolean
     public boolean islandAsIcon = false;
 
     @Expose
-    @ConfigOption(name = "Show Passed Events", desc = "Shows the most recent passed event at the start greyed out. " +
-        "§eTakes a little while to save last event.")
+    @ConfigOption(name = "Show Passed Events", desc = "Show the most recently passed event at the start, greyed out.\n" +
+        "§eTakes a little while to save the last event.")
     @ConfigEditorBoolean
     public boolean passedEvents = false;
 
@@ -49,23 +49,26 @@ public class MiningEventConfig {
         ALL("All Mining Islands"),
         CRYSTAL("Crystal Hollows Only"),
         DWARVEN("Dwarven Mines Only"),
-        MINESHAFT("Mineshaft Only"),
-        CURRENT("Current Island Only"),
-        ;
+        CURRENT("Current Island Only");
 
-        private final String str;
+        private final String displayName;
 
-        ShowType(String str) {
-            this.str = str;
+        ShowType(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
     @Expose
     @ConfigLink(owner = MiningEventConfig.class, field = "enabled")
     public Position position = new Position(200, 60, false, true);
+
+    @Expose
+    @ConfigOption(name = "Sharing Event Data", desc = "Sending Mining Event data to a server. This allows everyone to see more precise mining event timings. Thanks for your help!")
+    @ConfigEditorBoolean
+    public boolean allowDataSharing = true;
 }

@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class BlazingSoulsColor {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Shows the Blazing Souls more clearly.")
+    @ConfigOption(name = "Enabled", desc = "Show the Blazing Souls more clearly.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;

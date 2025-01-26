@@ -48,6 +48,6 @@ public class PartyCommandsConfig {
 
     @Expose
     @ConfigEditorBoolean
-    @ConfigOption(name = "Show reminder", desc = "Shows a reminder when an unauthorized player tries to run a command.")
+    @ConfigOption(name = "Show reminder", desc = "Show a reminder when an unauthorized player tries to run a command.")
     public boolean showIgnoredReminder = true;
 }

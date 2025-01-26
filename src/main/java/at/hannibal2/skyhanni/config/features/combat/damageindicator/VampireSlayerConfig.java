@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class VampireSlayerConfig {
 
     @Expose
-    @ConfigOption(name = "HP Until Steak", desc = "Show the amount of HP missing until the Steak can be used on the Vampire Slayer on top of the boss.")
+    @ConfigOption(name = "HP Until Steak", desc = "Show the amount of HP left until the Steak can be used on the Vampire Slayer on top of the boss.")
     @ConfigEditorBoolean
     public boolean hpTillSteak = false;
 
@@ -17,7 +17,7 @@ public class VampireSlayerConfig {
     public boolean maniaCircles = false;
 
     @Expose
-    @ConfigOption(name = "Percentage HP", desc = "Show the percentage of HP next to the HP.")
+    @ConfigOption(name = "Percentage HP", desc = "Show a percentage next to the HP.")
     @ConfigEditorBoolean
     public boolean percentage = false;
 }

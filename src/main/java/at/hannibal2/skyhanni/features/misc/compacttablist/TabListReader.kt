@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -13,7 +14,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeSFormattingCode
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // heavily inspired by SBA code
 @SkyHanniModule
@@ -22,38 +22,54 @@ object TabListReader {
     private val config get() = SkyHanniMod.feature.gui.compactTabList
 
     private val patternGroup = RepoPattern.group("misc.compacttablist")
+
+    /**
+     * REGEX-TEST: [164] CalMWolfs ᛝ♲
+     * REGEX-TEST: [328] vayness ☠
+     */
     val usernamePattern by patternGroup.pattern(
         "username",
-        "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)"
+        "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)",
     )
+
     /**
      * REGEX-TEST: §r§r§7You have a §r§cGod Potion §r§7active! §r§d12 Hours§r
      */
     private val godPotPattern by patternGroup.pattern(
         "effects.godpot",
-        "§r§r§7You have a §r§cGod Potion §r§7active! §r§d(?<timer>[\\w ]+)§r"
+        "§r§r§7You have a §r§cGod Potion §r§7active! §r§d(?<timer>[\\w ]+)§r",
     )
+
     /**
      * REGEX-TEST: §r§r§a§lActive Effects§r
      */
     private val activeEffectPattern by patternGroup.pattern(
         "effects.active",
-        "Active Effects(?:§.)*(?:\\n(?:§.)*§7.+)*"
+        "Active Effects(?:§.)*(?:\\n(?:§.)*§7.+)*",
     )
+
     /**
      * REGEX-TEST: §r§r§7§r§7You have §r§e1 §r§7active effect. Use "§r§6/effects§r§7" to see it!§r
      */
     private val effectCountPattern by patternGroup.pattern(
         "effects.count",
-        "You have (?:§.)*(?<effectCount>[0-9]+) (?:§.)*active effect"
+        "You have (?:§.)*(?<effectCount>[0-9]+) (?:§.)*active effect",
     )
+
+    /**
+     * REGEX-TEST: §r§r§d§lCookie Buff§r§r§r§7§r§7Not active! Obtain booster cookies from the community§r
+     */
     private val cookiePattern by patternGroup.pattern(
         "cookie",
-        "Cookie Buff(?:§.)*(?:\\n(§.)*§7.+)*"
+        "Cookie Buff(?:§.)*(?:\\n(?:§.)*§7.+)*",
     )
+
+    /**
+     * REGEX-TEST: §r§r§6§lDungeon Buffs§r§r§r§7No Buffs active. Find them by exploring the Dungeon!§r
+     */
     private val dungeonBuffPattern by patternGroup.pattern(
         "dungeonbuff",
-        "Dungeon Buffs(?:§.)*(?:\\n(§.)*§7.+)*"
+        "Dungeon Buffs(?:§.)*(?:\\n(?:§.)*§7.+)*",
     )
     private val upgradesPattern by patternGroup.pattern(
         "upgrades",
@@ -61,7 +77,7 @@ object TabListReader {
     )
     private val winterPowerUpsPattern by patternGroup.pattern(
         "winterpowerups",
-        "Active Power Ups(?:§.)*(?:\\n(§.)*§7.+)*"
+        "Active Power Ups(?:§.)*(?:\\n(?:§.)*§7.+)*"
     )
 
     var hypixelAdvertisingString = "HYPIXEL.NET"
@@ -90,9 +106,10 @@ object TabListReader {
         val renderColumn = RenderColumn()
         renderColumns.add(renderColumn)
         combineColumnsToRender(columns, renderColumn)
+
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         updateTablistData(event.tabList)
     }
@@ -263,7 +280,7 @@ object TabListReader {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.enabled) {
             updateTablistData()

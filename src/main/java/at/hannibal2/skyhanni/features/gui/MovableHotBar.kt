@@ -39,6 +39,6 @@ object MovableHotBar {
     }
 
     fun isEnabled(): Boolean =
-        (LorenzUtils.inSkyBlock || (Minecraft.getMinecraft().thePlayer != null && config.showOutsideSkyblock))
-            && config.editable
+        (LorenzUtils.inSkyBlock || (Minecraft.getMinecraft().thePlayer != null && config.showOutsideSkyblock)) &&
+            config.editable
 }

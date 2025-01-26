@@ -14,7 +14,7 @@ public class HideAshfangConfig {
     public boolean particles = false;
 
     @Expose
-    @ConfigOption(name = "Hide Full Names", desc = "Hide the names of full health blazes around Ashfang (only useful when highlight blazes is enabled)")
+    @ConfigOption(name = "Hide Full Names", desc = "Hide the names of full health blazes around Ashfang §e(only useful when highlight blazes is enabled)")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fullNames = false;

@@ -11,13 +11,12 @@ public class MayorConfig {
     public boolean showMayorPerks = true;
 
     @Expose
-    @ConfigOption(name = "Show Time till next mayor", desc = "Show the time till the next mayor is elected.")
+    @ConfigOption(name = "Show Time till Next Mayor", desc = "Show the time till the next mayor is elected.")
     @ConfigEditorBoolean
     public boolean showTimeTillNextMayor = true;
 
     @Expose
-    // TODO: Same Toggle toggles ministers
-    @ConfigOption(name = "Show Extra Mayor", desc = "Show the Perkacolypse Mayor without their perks.")
+    @ConfigOption(name = "Show Extra Mayor", desc = "Show the Perkpocalypse Mayor without their perks and the minister with their perk.")
     @ConfigEditorBoolean
     public boolean showExtraMayor = true;
 }

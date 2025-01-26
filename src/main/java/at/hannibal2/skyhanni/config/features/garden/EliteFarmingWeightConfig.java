@@ -10,9 +10,9 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class EliteFarmingWeightConfig {
     @Expose
-    @ConfigOption(name = "Display", desc = "Display your farming weight on screen. " +
-        "The calculation and API is provided by The Elite SkyBlock farmers. " +
-        "See §celitebot.dev/info §7for more info.")
+    @ConfigOption(name = "Display", desc = "Display your farming weight on screen.\n" +
+        "The calculation and API is provided by The Elite SkyBlock farmers.\n" +
+        "See §eelitebot.dev/info §7for more info.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean display = true;

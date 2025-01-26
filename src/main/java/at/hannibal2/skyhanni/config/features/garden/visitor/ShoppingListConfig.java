@@ -16,7 +16,7 @@ public class ShoppingListConfig {
     public boolean display = true;
 
     @Expose
-    // TODO renmae "postion"
+    // TODO rename "position"
     @ConfigLink(owner = ShoppingListConfig.class, field = "display")
     public Position pos = new Position(180, 170, false, true);
 
@@ -26,14 +26,14 @@ public class ShoppingListConfig {
     public boolean onlyWhenClose = false;
 
     @Expose
-    @ConfigOption(name = "Bazaar Alley", desc = "Show the Visitor Items List while inside the Bazaar Alley in the Hub. " +
-        "This helps buying the correct amount when not having a Booster Cookie Buff active.")
+    @ConfigOption(name = "Bazaar Alley", desc = "Show the Visitor Items List while inside the Bazaar Alley in the Hub.\n" +
+        "§eHelps in buying the correct amount when not having a §6Booster Cookie §ebuff active.")
     @ConfigEditorBoolean
     public boolean inBazaarAlley = true;
 
     @Expose
-    @ConfigOption(name = "Farming Areas", desc = "Show the Visitor Shopping List while on the Farming Islands or inside the Farm in the Hub. " +
-        "This helps farming the correct amount, especially when in the early game.")
+    @ConfigOption(name = "Farming Areas", desc = "Show the Visitor Shopping List while on the Farming Islands or inside the Farm in the Hub.\n" +
+        "§eHelps in farming the correct amount, especially when in the early game.")
     @ConfigEditorBoolean
     public boolean inFarmingAreas = false;
 
@@ -43,7 +43,7 @@ public class ShoppingListConfig {
     public boolean showPrice = true;
 
     @Expose
-    @ConfigOption(name = "Show Sack Count", desc = "Show the amount of this item that you already have in your sacks. " +
+    @ConfigOption(name = "Show Sack Count", desc = "Show the amount of this item that you already have in your sacks.\n" +
         "§eOnly updates on sack change messages.")
     @ConfigEditorBoolean
     public boolean showSackCount = true;
@@ -55,8 +55,15 @@ public class ShoppingListConfig {
     public boolean showSuperCraft = false;
 
     @Expose
-    @ConfigOption(name = "Item Preview", desc = "Show the base type for the required items next to new visitors. §cNote that some visitors may require any crop.")
+    @ConfigOption(name = "Item Preview", desc = "Show the base type for the required items next to new visitors.\n" +
+        "§cNote that some visitors may require any crop.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean itemPreview = true;
+
+    @Expose
+    @ConfigOption(name = "Ignore Spaceman", desc = "Exclude crops requested by Spaceman from the shopping list.")
+    @ConfigEditorBoolean
+    public boolean ignoreSpaceman = false;
+
 }

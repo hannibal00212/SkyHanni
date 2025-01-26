@@ -30,6 +30,11 @@ public class TrophyFishingConfig {
     public SulphurSkitterBoxConfig sulphurSkitterBox = new SulphurSkitterBoxConfig();
 
     @Expose
+    @ConfigOption(name = "Golden Fish Timer", desc = "")
+    @Accordion
+    public GoldenFishTimerConfig goldenFishTimer = new GoldenFishTimerConfig();
+
+    @Expose
     @ConfigOption(name = "Fillet Tooltip", desc = "Show fillet value of Trophy Fish in tooltip.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -38,8 +43,8 @@ public class TrophyFishingConfig {
     @Expose
     @ConfigOption(
         name = "Odger Waypoint",
-        desc = "Show the Odger waypoint when Trophy Fishes are in the inventory and no lava rod in hand. " +
-            "§cOnly useful for users without abiphone contact."
+        desc = "Show the Odger waypoint when Trophy Fishes are in the inventory and no lava rod in hand.\n" +
+            "§cOnly useful for users without Abiphone contact."
     )
     @ConfigEditorBoolean
     @FeatureToggle

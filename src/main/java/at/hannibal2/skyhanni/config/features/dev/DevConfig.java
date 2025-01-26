@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.dev;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig;
 import com.google.gson.annotations.Expose;
@@ -8,6 +9,8 @@ import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
@@ -32,6 +35,15 @@ public class DevConfig {
     @ConfigOption(name = "Log Expiry Time", desc = "Deletes your SkyHanni logs after this time period in days.")
     @ConfigEditorSlider(minValue = 1, maxValue = 30, minStep = 1)
     public int logExpiryTime = 14;
+
+    @Expose
+    @ConfigOption(
+        name = "Chat History Length",
+        desc = "The number of messages to keep in memory for §e/shchathistory§7.\n" +
+            "§cExcessively large values may cause memory allocation issues."
+    )
+    @ConfigEditorSlider(minValue = 100, maxValue = 5000, minStep = 10)
+    public int chatHistoryLength = 100;
 
     @Expose
     @ConfigOption(name = "Slot Number", desc = "Show slot number in inventory while pressing this key.")
@@ -61,12 +73,17 @@ public class DevConfig {
     public Position debugItemPos = new Position(90, 70);
 
     @Expose
+    @ConfigLink(owner = DebugConfig.class, field = "raytracedOreblock")
+    public Position debugOrePos = new Position(1, 200, false, true);
+
+    @Expose
     @ConfigOption(
         name = "Fancy Contributors",
         desc = "Marks §cSkyHanni's contributors §7fancy in the tab list. " +
             "§eThose are the folks that coded the mod for you for free :)"
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean fancyContributors = true;
 
     @Expose
@@ -75,6 +92,7 @@ public class DevConfig {
         desc = "Makes SkyHanni contributors' nametags fancy too. "
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean contributorNametags = true;
 
     @Expose
@@ -82,6 +100,7 @@ public class DevConfig {
         name = "Flip Contributors",
         desc = "Make SkyHanni contributors appear upside down in the world.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean flipContributors = true;
 
     @Expose
@@ -100,8 +119,37 @@ public class DevConfig {
     public boolean fancySbaContributors = false;
 
     @Expose
+    @ConfigOption(
+        name = "Number Format Override",
+        desc = "Forces the number format to use the en_US locale.")
+    @ConfigEditorBoolean
+    public boolean numberFormatOverride = false;
+
+    @Expose
+    @ConfigOption(name = "Use Hypixel Mod API", desc = "Use the Hypixel Mod API for better location data.")
+    @ConfigEditorBoolean
+    public boolean hypixelModApi = true;
+
+    @Expose
+    @ConfigOption(name = "Damage Indicator", desc = "Enable the backend of the Damage Indicator. §cOnly disable when you know what you are doing!")
+    @ConfigEditorBoolean
+    public boolean damageIndicatorBackend = true;
+
+    @Expose
+    @ConfigOption(
+        name = "NTP Server",
+        desc = "Change the NTP-Server Address. Default is \"time.google.com\".\n§cONLY CHANGE THIS IF YOU KNOW WHAT YOU'RE DOING!"
+    )
+    @ConfigEditorText
+    public String ntpServer = "time.google.com";
+
+    @Expose
     @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")
     public MinecraftConsoleConfig minecraftConsoles = new MinecraftConsoleConfig();
+
+    @Expose
+    @Category(name = "Dev Tools", desc = "Tooling for devs")
+    public DevToolConfig devTool = new DevToolConfig();
 
     @Expose
     @Category(name = "Debug Mob", desc = "Every Debug related to the Mob System")

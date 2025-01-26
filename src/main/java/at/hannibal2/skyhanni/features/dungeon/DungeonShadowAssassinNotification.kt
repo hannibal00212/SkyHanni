@@ -1,25 +1,27 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleManager
-import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.mixins.transformers.AccessorWorldBoarderPacket
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.skyhanni.mixins.transformers.AccessorWorldBorderPacket
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.network.play.server.S44PacketWorldBorder
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object DungeonShadowAssassinNotification {
+
     private val config get() = SkyHanniMod.feature.dungeon
 
-    @SubscribeEvent
-    fun onWorldBoarderChange(event: PacketEvent.ReceiveEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    fun onWorldBorderChange(event: PacketReceivedEvent) {
         if (!isEnabled()) return
-        if (DungeonAPI.dungeonFloor?.contains("3") == true && DungeonAPI.inBossRoom) return
+        if (DungeonApi.dungeonFloor?.contains("3") == true && DungeonApi.inBossRoom) return
 
-        val packet = event.packet as? AccessorWorldBoarderPacket ?: return
+        val packet = event.packet as? AccessorWorldBorderPacket ?: return
         val action = packet.action
         val warningTime = packet.warningTime
 
@@ -29,5 +31,5 @@ object DungeonShadowAssassinNotification {
         }
     }
 
-    private fun isEnabled() = DungeonAPI.inDungeon() && config.shadowAssassinJumpNotifier
+    private fun isEnabled() = config.shadowAssassinJumpNotifier
 }

@@ -1,5 +1,5 @@
 package at.hannibal2.skyhanni.events.minecraft
 
-import at.hannibal2.skyhanni.events.LorenzEvent
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 
-class ClientDisconnectEvent : LorenzEvent()
+object ClientDisconnectEvent : SkyHanniEvent()

@@ -44,23 +44,24 @@ public class MushroomPetPerkConfig {
 
     public enum MushroomTextEntry implements HasLegacyId {
         TITLE("§6Mooshroom Cow Perk", 0),
-        MUSHROOM_TIER("§7Mushroom Tier 8", 1),
+        // TODO change to mushroom milestone
+        MUSHROOM_TIER("§7Mushroom Milestone 8", 1),
         NUMBER_OUT_OF_TOTAL("§e6,700§8/§e15,000", 2),
         TIME("§7In §b12m 34s", 3),
         PERCENTAGE("§7Percentage: §e12.34%", 4),
         ;
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        MushroomTextEntry(String str, int legacyId) {
-            this.str = str;
+        MushroomTextEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        MushroomTextEntry(String str) {
-            this(str, -1);
+        MushroomTextEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -70,7 +71,7 @@ public class MushroomPetPerkConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

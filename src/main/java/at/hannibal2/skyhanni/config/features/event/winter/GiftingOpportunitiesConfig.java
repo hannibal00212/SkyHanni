@@ -13,14 +13,15 @@ public class GiftingOpportunitiesConfig {
     public boolean enabled = true;
 
     @Expose
-    @ConfigOption(name = "Only While Holding Gift", desc = "Only highlight ungifted players while holding a gift.")
+    @ConfigOption(name = "Only While Holding Gift", desc = "Only highlight players you haven't gifted while holding a gift.")
     @ConfigEditorBoolean
+    // TODO highlightWithGiftOnly
     public boolean highlighWithGiftOnly = true;
 
 
     @Expose
-    @ConfigOption(name = "Use Armor Stands", desc = "Make use of armor stands to stop highlighting players. " +
-        "This is a bit inaccurate, but it can help with people you gifted before this feature was used.")
+    @ConfigOption(name = "Use Armor Stands", desc = "Make use of armor stands to stop highlighting players.\n" +
+        "§eThis is a bit inaccurate, but it can help with people you gifted before this feature was used.")
     @ConfigEditorBoolean
     public boolean useArmorStandDetection = false;
 

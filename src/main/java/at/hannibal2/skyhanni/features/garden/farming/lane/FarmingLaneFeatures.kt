@@ -1,36 +1,36 @@
 package at.hannibal2.skyhanni.features.garden.farming.lane
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.farming.FarmingLaneSwitchEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.getValue
-import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.setValue
+import at.hannibal2.skyhanni.events.garden.farming.FarmingLaneSwitchEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneApi.getValue
+import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneApi.setValue
 import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object FarmingLaneFeatures {
-    val config get() = FarmingLaneAPI.config
+    val config get() = FarmingLaneApi.config
 
     private var currentPositon: Double? = null
     private var currentDistance = 0.0
@@ -48,26 +48,25 @@ object FarmingLaneFeatures {
         TOO_SLOW("§cToo slow!"),
         CALCULATING("§aCalculating.."),
         NORMAL(""),
-        ;
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onFarmingLaneSwitch(event: FarmingLaneSwitchEvent) {
         display = emptyList()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         display = emptyList()
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!GardenAPI.inGarden()) return
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
+        if (!GardenApi.inGarden()) return
         if (!config.distanceDisplay && !config.laneSwitchNotification.enabled) return
 
         if (!calculateDistance()) return
-        if (!GardenAPI.isCurrentlyFarming()) return
+        if (!GardenApi.isCurrentlyFarming()) return
 
         if (calculateSpeed()) {
             showWarning()
@@ -75,7 +74,7 @@ object FarmingLaneFeatures {
 
         if (config.distanceDisplay) {
             display = buildList {
-                add("§7Distance until switch: §e${currentDistance.round(1)}")
+                add("§7Distance until switch: §e${currentDistance.roundTo(1)}")
 
                 val normal = movementState == MovementState.NORMAL
                 val color = if (normal) "§b" else "§8"
@@ -93,7 +92,7 @@ object FarmingLaneFeatures {
     }
 
     private fun calculateDistance(): Boolean {
-        val lane = FarmingLaneAPI.currentLane ?: return false
+        val lane = FarmingLaneApi.currentLane ?: return false
         val min = lane.min
         val max = lane.max
         val position = lane.direction.getValue(LocationUtils.playerLocation())
@@ -151,7 +150,7 @@ object FarmingLaneFeatures {
     private var sameSpeedCounter = 0
 
     private fun calculateSpeed(): Boolean {
-        val speed = MovementSpeedDisplay.speed.round(2)
+        val speed = MovementSpeedDisplay.speed.roundTo(2)
         movementState = calculateMovementState(speed)
         if (movementState != MovementState.NORMAL) return false
 
@@ -191,12 +190,12 @@ object FarmingLaneFeatures {
         return MovementState.NORMAL
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!GardenAPI.inGarden()) return
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+        if (!GardenApi.inGarden()) return
         if (!config.cornerWaypoints) return
 
-        val lane = FarmingLaneAPI.currentLane ?: return
+        val lane = FarmingLaneApi.currentLane ?: return
         val direction = lane.direction
         val location = LocationUtils.playerLocation()
         val min = direction.setValue(location, lane.min).capAtBuildHeight()
@@ -210,9 +209,9 @@ object FarmingLaneFeatures {
 
     private fun LorenzVec.capAtBuildHeight(): LorenzVec = if (y > 76) copy(y = 76.0) else this
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         if (!config.distanceDisplay) return
 
         config.distanceDisplayPosition.renderStrings(display, posLabel = "Lane Display")

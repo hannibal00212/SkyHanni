@@ -11,6 +11,9 @@ data class MayorInfo(
     @Expose val key: String,
     @Expose val name: String,
     @Expose val perks: List<MayorPerk>,
+    // Ministers won't exist,
+    // when the current mayor is a special mayor
+    @Expose val minister: Minister?,
     @Expose val election: MayorElection,
 )
 
@@ -26,7 +29,14 @@ data class MayorCandidate(
     @Expose val votes: Int,
 )
 
+data class Minister(
+    @Expose val key: String,
+    @Expose val name: String,
+    @Expose val perk: MayorPerk,
+)
+
 data class MayorPerk(
     @Expose val name: String,
     @Expose val description: String,
+    @Expose val minister: Boolean = false,
 )

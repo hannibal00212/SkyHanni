@@ -11,7 +11,7 @@ public class DianaProfitTrackerConfig {
 
     @Expose
     @ConfigOption(name = "Enabled", desc = "Count all items you pick up while doing Diana, " +
-        "keep track how often you dug burrows and calculates money per burrow.")
+        "keeping track of how often you dig burrows, and calculating money earned per burrow.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;

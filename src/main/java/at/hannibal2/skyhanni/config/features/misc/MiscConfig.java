@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature;
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature;
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
 import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig;
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig;
@@ -15,6 +15,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +43,10 @@ public class MiscConfig {
     @Category(name = "Stranded", desc = "Features for the Stranded game mode.")
     public StrandedConfig stranded = new StrandedConfig();
 
+    @Expose
+    @Category(name = "Area Navigation", desc = "Helps navigate to different areas on the current island.")
+    public AreaNavigationConfig areaNavigation = new AreaNavigationConfig();
+
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     @Expose
@@ -48,8 +54,9 @@ public class MiscConfig {
     public HideArmorConfig hideArmor2 = new HideArmorConfig();
 
     @Expose
-    @ConfigOption(name = "Potion Effects", desc = "")
+    @ConfigOption(name = "Non-God Pot Effects", desc = "")
     @Accordion
+    // TODO rename nonGodPotEffect
     public PotionEffectsConfig potionEffect = new PotionEffectsConfig();
 
     @Expose
@@ -108,30 +115,79 @@ public class MiscConfig {
     public PatcherCoordsWaypointConfig patcherCoordsWaypoint = new PatcherCoordsWaypointConfig();
 
     @Expose
-    @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")
-    @ConfigEditorDraggableList
-    public List<OutsideSbFeature> showOutsideSB = new ArrayList<>();
+    @ConfigOption(name = "Reminders", desc = "")
+    @Accordion
+    public RemindersConfig reminders = new RemindersConfig();
 
     @Expose
-    @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
+    @ConfigOption(name = "Last Servers", desc = "")
+    @Accordion
+    public LastServersConfig lastServers = new LastServersConfig();
+
+    @Expose
+    @ConfigOption(name = "Enchanted Clock", desc = "")
+    @Accordion
+    public EnchantedClockConfig enchantedClock = new EnchantedClockConfig();
+
+    @Expose
+    @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
+    @ConfigEditorBoolean
+    public boolean resetSearchGuiOnClose = true;
+
+    @Expose
+    @ConfigOption(name = "Show Outside SkyBlock", desc = "Show these features outside of SkyBlock.")
+    @ConfigEditorDraggableList
+    public Property<List<OutsideSBFeature>> showOutsideSB = Property.of(new ArrayList<>());
+
+    @Expose
+    @ConfigOption(name = "Auto Join Skyblock", desc = "Automatically join Skyblock when you join Hypixel.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean autoJoinSkyblock = false;
+
+    @Expose
+    @ConfigOption(name = "Exp Bottles", desc = "Hide all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideExpBottles = false;
 
     @Expose
-    @ConfigOption(name = "Armorstands", desc = "Hides Armorstands that are sometimes visible for a fraction of a second.")
+    @ConfigOption(name = "Armor Stands", desc = "Hide armor stands that are sometimes visible for a fraction of a second.")
     @ConfigEditorBoolean
     @FeatureToggle
+    // TODO rename to hideTemporaryArmorStands
     public boolean hideTemporaryArmorstands = true;
 
     @Expose
     public Position collectionCounterPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Brewing Stand Overlay", desc = "Display the Item names directly inside the Brewing Stand.")
+    public Position carryPosition = new Position(10, 10, false, true);
+
+    @Expose
+    @ConfigOption(name = "Brewing Stand Overlay", desc = "Display the item names directly inside the Brewing Stand.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean brewingStandOverlay = true;
+
+    @Expose
+    @ConfigOption(name = "Crash On Death", desc = "Crashes your game every time you die in Skyblock")
+    @ConfigEditorBoolean
+    public boolean crashOnDeath = false;
+
+    @Expose
+    @ConfigOption(name = "SkyBlock XP Bar", desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.\nExcept in Catacombs & Rift.\nBest used with the option below.")
+    @SearchTag("skyblockxp")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    // TODO rename to skyblockXPBar
+    public boolean skyblockXpBar = false;
+
+    @Expose
+    @ConfigOption(name = "XP in Inventory", desc = "Show your current XP in inventories that would use your XP.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean xpInInventory = true;
 
     // TODO move into scoreboard accordion
     @Expose
@@ -141,7 +197,7 @@ public class MiscConfig {
     public boolean hideScoreboardNumbers = false;
 
     @Expose
-    @ConfigOption(name = "Hide Piggy", desc = "Replacing 'Piggy' with 'Purse' in the Scoreboard.")
+    @ConfigOption(name = "Hide Piggy", desc = "Replace 'Piggy' with 'Purse' in the Scoreboard.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hidePiggyScoreboard = true;
@@ -159,7 +215,7 @@ public class MiscConfig {
     public boolean hideExplosions = false;
 
     @Expose
-    @ConfigOption(name = "CH Join", desc = "Helps buy a Pass for accessing the Crystal Hollows if needed.")
+    @ConfigOption(name = "CH Join", desc = "Help buy a pass for accessing the Crystal Hollows if needed.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean crystalHollowsJoin = true;
@@ -171,7 +227,7 @@ public class MiscConfig {
     public boolean hideFireOverlay = false;
 
     @Expose
-    @ConfigOption(name = "Better Sign Editing", desc = "Allows pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.")
+    @ConfigOption(name = "Better Sign Editing", desc = "Allow pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean betterSignEditing = true;
@@ -187,6 +243,16 @@ public class MiscConfig {
     public Position playerMovementSpeedPos = new Position(394, 124, false, true);
 
     @Expose
+    @ConfigOption(name = "Frog Mask Display", desc = "Displays information about the §5Frog Mask§7.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean frogMaskDisplay = false;
+
+    @Expose
+    @ConfigLink(owner = MiscConfig.class, field = "frogMaskDisplay")
+    public Position frogMaskDisplayPosition = new Position(25, 25, false, true);
+
+    @Expose
     @ConfigOption(name = "Server Restart Title", desc = "Show a title with seconds remaining until the server restarts after a Game Update or Scheduled Restart.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -199,16 +265,26 @@ public class MiscConfig {
     public boolean restorePieceOfWizardPortalLore = true;
 
     @Expose
-    @ConfigOption(name = "Account Upgrade Reminder", desc = "Remind you to claim account upgrades when complete.")
+    @ConfigOption(name = "Account Upgrade Reminder", desc = "Remind you to claim community shop account and profile upgrades when complete.")
     @ConfigEditorBoolean
+    @SearchTag("Elizabeth Community Center")
     @FeatureToggle
     public boolean accountUpgradeReminder = true;
 
     @Expose
-    @ConfigOption(name = "NEU Heavy Pearls", desc = "Fixing NEU Heavy Pearl detection.")
+    @ConfigOption(name = "NEU Heavy Pearls", desc = "Fix NEU's Heavy Pearl detection.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fixNeuHeavyPearls = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Fix Patcher Lines",
+        desc = "Suggest in chat to disable Patcher's `parallax fix` that breaks SkyHanni's line from middle of player to somewhere else."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean fixPatcherLines = true;
 
     @Expose
     @ConfigOption(
@@ -233,7 +309,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Lesser Orb of Healing Hider",
-        desc = "Hides the Lesser Orb of Healing.")
+        desc = "Hide the Lesser Orb of Healing.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean lesserOrbHider = false;
@@ -254,20 +330,64 @@ public class MiscConfig {
     public Position inventoryLoadPos = new Position(394, 124, false, true);
 
     @Expose
-    @ConfigOption(name = "Fix Ghost Entities", desc = "Removes ghost entities caused by a Hypixel bug. " +
-        "This included Diana, Dungeon and Crimson Isle mobs and nametags.")
+    @ConfigOption(name = "Fix Ghost Entities", desc = "Remove ghost entities caused by a Hypixel bug.\n" +
+        "This includes Diana, Dungeon and Crimson Isle mobs and nametags.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fixGhostEntities = true;
 
     @Expose
-    @ConfigOption(name = "Replace Roman Numerals", desc = "Replaces Roman Numerals with Arabic Numerals on any item.")
+    @ConfigOption(name = "Replace Roman Numerals", desc = "Replace Roman Numerals with Arabic Numerals on any item.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean replaceRomanNumerals = false;
+    public Property<Boolean> replaceRomanNumerals = Property.of(false);
+
+    @Expose
+    @ConfigOption(name = "Thunder Bottle", desc = "Show a notification when your Thunder Bottle is fully charged.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean thunderBottleNotification = true;
+
+    @Expose
+    @ConfigOption(name = "Unknown Perkpocalypse Mayor Warning", desc = "Show a warning when the Unknown Perkpocalypse Mayor is unknown.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean unknownPerkpocalypseMayorWarning = true;
 
     @ConfigOption(name = "Hide Far Entities", desc = "")
     @Accordion
     @Expose
     public HideFarEntitiesConfig hideFarEntities = new HideFarEntitiesConfig();
+
+    @Expose
+    @ConfigOption(name = "Last Storage", desc = "")
+    @Accordion
+    public LastStorageConfig lastStorage = new LastStorageConfig();
+
+    @Expose
+    @ConfigOption(name = "Maintain Volume During Warnings", desc = "Do not change game volume levels when warning sounds are played.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean maintainGameVolume = false;
+
+    @Expose
+    @ConfigOption(name = "GFS Piggy Bank", desc = "When your Piggy Bank breaks, send a chat warning to get enchanted pork from sacks.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean gfsPiggyBank = true;
+
+    @Expose
+    @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean userluckEnabled = true;
+
+    @Expose
+    @ConfigOption(name = "Computer Time Offset Warning",
+        desc = "Sends a Chat Warning if your computer time is not synchronized with the actual time.\n" +
+            "§cMaking sure your computer time is correct is important for SkyHanni to display times correctly."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean warnAboutPcTimeOffset = true;
 }
