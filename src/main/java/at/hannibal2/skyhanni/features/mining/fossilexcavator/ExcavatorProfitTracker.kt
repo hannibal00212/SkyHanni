@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.mining.fossilexcavator
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -232,8 +234,12 @@ object ExcavatorProfitTracker {
     fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled &&
         LorenzUtils.skyBlockArea == "Fossil Research Center"
 
-    fun resetCommand() {
-        tracker.resetCommand()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetexcavatortracker") {
+            description = "Resets the Fossil Excavator Profit Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
-
 }

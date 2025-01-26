@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -338,6 +340,15 @@ object GardenVisitorDropStatistics {
 
         event.transform(11, "${newPrefix}textFormat") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, DropsStatisticsTextEntry::class.java)
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetvisitordrops") {
+            description = "Resets the Visitors Drop Statistics"
+            category = CommandCategory.USERS_RESET
+            callback { resetCommand() }
         }
     }
 }

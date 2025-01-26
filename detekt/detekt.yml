@@ -149,3 +149,6 @@ potential-bugs:
         active: false
     StorageNeedsExpose:
         active: true
+    ImmutableTypesWithExpectedInteriorMutabilityInConfig:
+        active: true
+
