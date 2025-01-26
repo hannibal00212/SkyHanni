@@ -15,7 +15,7 @@ object CommandsRegistry {
         if (commandList.any { it.name == name || it.aliases.contains(name) }) {
             error("The command '$name is already registered!'")
         }
-        if (command.description.isEmpty() && command.category !in listOf(CommandCategory.DEVELOPER_DEBUG, CommandCategory.DEVELOPER_TEST)) {
+        if (command.description.isEmpty() && command.category !in CommandCategory.developmentCategories) {
             error("The command '$name' has no description!")
         }
         ClientCommandHandler.instance.registerCommand(command.toSimpleCommand())
