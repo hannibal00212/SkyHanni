@@ -44,11 +44,14 @@ object LivingCaveSnakeFeatures {
         var invalidHeadSince: SimpleTimeMark? = null,
         var lastBrokenBlock: LorenzVec? = null,
     ) {
+        val head get() = blocks.first()
+        val tail get() = blocks.last()
+
         fun invalidSize(): Boolean = blocks.isEmpty() || blocks.zipWithNext().any { (a, b) ->
             a.distance(b) > 3
         }
 
-        fun invalidHeadRightNow(): Boolean = blocks.first().getBlockAt() != Blocks.lapis_block
+        fun invalidHeadRightNow(): Boolean = head.getBlockAt() != Blocks.lapis_block
 
         fun invalidHead(): Boolean = invalidHeadSince?.let { it.passedSince() > 1.seconds } ?: false
 
@@ -126,8 +129,8 @@ object LivingCaveSnakeFeatures {
 
     // sqrt(3) =~ 1.73
     private fun findNearbySnakeHeads(location: LorenzVec): List<Snake> =
-        snakes.filter { it.blocks.isNotEmpty() && it.blocks.first().distance(location) < 1.74 }
-            .sortedBy { it.blocks.first().distance(location) }
+        snakes.filter { it.blocks.isNotEmpty() && it.head.distance(location) < 1.74 }
+            .sortedBy { it.head.distance(location) }
 
     private fun fixCollisions(found: List<Snake>): Snake? = if (found.size > 1) {
         val filtered = found.filter { it.state != State.CALM }
@@ -220,45 +223,39 @@ object LivingCaveSnakeFeatures {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
-        val seeThroughBlocks = true
-
         for (snake in snakes) {
+            val seeThroughBlocks = snake == selectedSnake
             val blocks = snake.blocks
             if (blocks.isEmpty()) continue
             val interaction = snake.getInteraction()
             if (LorenzUtils.debug) {
-                event.drawString(blocks.first().add(0.5, 0.8, 0.5), "§fstate = ${snake.state}", seeThroughBlocks)
-                event.drawString(blocks.first().add(0.5, 1.1, 0.5), "§finteraction = $interaction", seeThroughBlocks)
+                event.drawString(snake.head.add(0.5, 0.8, 0.5), "§fstate = ${snake.state}", seeThroughBlocks)
+                event.drawString(snake.head.add(0.5, 1.1, 0.5), "§finteraction = $interaction", seeThroughBlocks)
             }
 
-            val remainingSize = blocks.size
+            val size = blocks.size
             val color = snake.state.color.toColor()
+            if (size > 1 && snake.state == State.CALM && interaction != Interaction.CALMING) {
+                val tail = snake.tail
+                val lastBrokenBlock = snake.lastBrokenBlock
+                val location = if (interaction == Interaction.BREAKING && lastBrokenBlock != null) {
+                    LocationUtils.slopeOverTime(snake.lastRemoveTime, 300.milliseconds, lastBrokenBlock, tail)
+                } else tail
 
+                event.drawWaypointFilled(location, LorenzColor.GREEN.toColor(), seeThroughBlocks)
+                event.drawString(location.add(0.5, 0.5, 0.5), "§aTail", seeThroughBlocks)
 
-            if (blocks.size > 1 && snake.state == State.CALM && interaction != Interaction.CALMING) {
-                blocks.last().let {
-                    val lastBrokenBlock = snake.lastBrokenBlock
-                    val location = if (interaction == Interaction.BREAKING && lastBrokenBlock != null) {
-                        LocationUtils.slopeOverTime(snake.lastRemoveTime, 300.milliseconds, lastBrokenBlock, it)
-                    } else {
-                        it
-                    }
-
-                    event.drawWaypointFilled(location, LorenzColor.GREEN.toColor(), seeThroughBlocks)
-                    event.drawString(location.add(0.5, 0.5, 0.5), "§aTail", seeThroughBlocks)
-
-                    if (interaction == Interaction.BREAKING) {
-                        event.drawString(location.add(0.5, 0.2, 0.5), "§7($remainingSize blocks)", seeThroughBlocks)
-                    }
+                if (interaction == Interaction.BREAKING) {
+                    event.drawString(location.add(0.5, 0.2, 0.5), "§7($size blocks)", seeThroughBlocks)
                 }
             }
-            if (interaction != Interaction.BREAKING || blocks.size == 1) {
-                blocks.first().let {
+            if (interaction != Interaction.BREAKING || size == 1) {
+                snake.head.let {
                     event.drawWaypointFilled(it, color, seeThroughBlocks)
                     val headColor = if (snake.state == State.NOT_TOUCHING_AIR) "§c" else "§e"
                     event.drawString(it.add(0.5, 0.5, 0.5), "${headColor}Head", seeThroughBlocks)
                     if (interaction == Interaction.CALMING) {
-                        event.drawString(it.add(0.5, 0.2, 0.5), "§7($remainingSize blocks)", seeThroughBlocks)
+                        event.drawString(it.add(0.5, 0.2, 0.5), "§7($size blocks)", seeThroughBlocks)
                     }
                 }
             }
