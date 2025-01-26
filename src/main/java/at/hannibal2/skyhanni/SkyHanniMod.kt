@@ -63,8 +63,6 @@ object SkyHanniMod {
         SkyHanniEvents.init(modules)
         if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesManager.downloadRepo()
 
-        CommandRegistrationEvent.post()
-
         PreInitFinishedEvent.post()
     }
 
