@@ -7,27 +7,10 @@ import net.minecraftforge.client.ClientCommandHandler
 
 @SkyHanniModule
 object CommandsRegistry {
-
-    private val commandList = mutableListOf<CommandBuilder>()
-
-    fun registry(name: String, block: CommandBuilder.() -> Unit) {
-        val command = CommandBuilder(name).apply(block)
-        if (commandList.any { it.name == name || it.aliases.contains(name) }) {
-            error("The command '$name is already registered!'")
-        }
-        if (command.description.isEmpty() && command.category !in CommandCategory.developmentCategories) {
-            error("The command '$name' has no description!")
-        }
-        ClientCommandHandler.instance.registerCommand(command.toSimpleCommand())
-        commandList.add(command)
-    }
-
-    interface CommandListGetter {
-        fun getCommandList() = commandList
-    }
+    private val builders = mutableListOf<CommandBuilder>()
 
     @HandleEvent
     fun onPreInitFinished(event: PreInitFinishedEvent) {
-        CommandRegistrationEvent.post()
+        CommandRegistrationEvent(builders).post()
     }
 }

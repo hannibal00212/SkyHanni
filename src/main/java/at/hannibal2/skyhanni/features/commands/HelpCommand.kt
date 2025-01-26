@@ -73,7 +73,7 @@ object HelpCommand {
         event.register("shcommands") {
             description = "Shows this list"
             aliases = listOf("shhelp", "shcommand", "shcmd", "shc")
-            callback { onCommand(it, event.getCommandList()) }
+            callback { onCommand(it, event.commands) }
         }
     }
 }
