@@ -32,6 +32,15 @@ class CommandsConfig {
     @FeatureToggle
     var shortCommands: Boolean = true
 
+    @Expose
+    @ConfigOption(
+        name = "Accept Last Invite",
+        desc = "Automatically accept the latest party invite if no player is specified with /p accept.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var acceptLastInvite: Boolean = true
+
     @ConfigOption(
         name = "Party Kick Reason",
         desc = "Send a reason when kicking people using §e/pk lrg89 Dupe Archer §7or §e/party kick nea89o Low Cata Level§7."
