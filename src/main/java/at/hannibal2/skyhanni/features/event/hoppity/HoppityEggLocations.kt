@@ -1,12 +1,14 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -123,14 +125,14 @@ object HoppityEggLocations {
     // to be removed - in case there are any issues with missing locations
     private var legacyEggLocations: Map<IslandType, Set<LorenzVec>> = mapOf()
 
-    fun toggleDebug() {
+    private fun toggleDebug() {
         showEggLocationsDebug = !showEggLocationsDebug
         val enabledDisabled = if (showEggLocationsDebug) "§aEnabled" else "§cDisabled"
         ChatUtils.chat("$enabledDisabled hoppity egg location debug viewer.")
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!showEggLocationsDebug) return
         val legacyLocations = legacyEggLocations[LorenzUtils.skyBlockIsland] ?: return
         val apiLocations = apiEggLocations[LorenzUtils.skyBlockIsland] ?: return
@@ -146,6 +148,15 @@ object HoppityEggLocations {
             if (location.distanceSqToPlayer() < 100) {
                 event.drawDynamicText(location.up(0.5), location.toCleanString(), 1.0, yOff = 12f)
             }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtoggleegglocationdebug") {
+            description = "Shows Hoppity egg locations with their internal API names and status."
+            category = CommandCategory.DEVELOPER_TEST
+            callback { toggleDebug() }
         }
     }
 }

@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
@@ -63,8 +64,8 @@ object KeyboardManager {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         val currentScreen = Minecraft.getMinecraft().currentScreen
         val isConfigScreen = currentScreen is GuiScreenElementWrapper
         if (isConfigScreen) return

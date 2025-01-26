@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -11,8 +13,8 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.ElitePlayerWeightJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.UpcomingLeaderboardPlayer
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -37,7 +39,6 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -86,8 +87,8 @@ object FarmingWeightDisplay {
         rankGoal = -1
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
         update()
@@ -556,7 +557,7 @@ object FarmingWeightDisplay {
         return cropWeight[this] ?: backupCropWeights[this] ?: error("Crop $this not in backupFactors!")
     }
 
-    fun lookUpCommand(it: Array<String>) {
+    private fun lookUpCommand(it: Array<String>) {
         val name = if (it.size == 1) it[0] else LorenzUtils.getPlayerName()
         openWebsite(name, ignoreCooldown = true)
     }
@@ -612,5 +613,14 @@ object FarmingWeightDisplay {
             CropType.COCOA_BEANS to 267_174.04,
             CropType.CACTUS to 177_254.45,
         )
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shfarmingprofile") {
+            description = "Look up the farming profile from yourself or another player on elitebot.dev"
+            category = CommandCategory.USERS_ACTIVE
+            callback { lookUpCommand(it) }
+        }
     }
 }

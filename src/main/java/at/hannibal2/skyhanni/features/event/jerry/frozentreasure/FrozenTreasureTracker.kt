@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.event.jerry.frozentreasure
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.event.winter.FrozenTreasureConfig.FrozenTreasureDisplayEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -153,7 +155,7 @@ object FrozenTreasureTracker {
         addSearchString("")
     }
 
-    fun formatNumber(amount: Number): String {
+    private fun formatNumber(amount: Number): String {
         if (amount is Int) return amount.addSeparators()
         if (amount is Long) return amount.shortFormat()
         return "$amount"
@@ -196,7 +198,12 @@ object FrozenTreasureTracker {
     private fun inGlacialCave() =
         onJerryWorkshop() && ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §3Glacial Cave")
 
-    fun resetCommand() {
-        tracker.resetCommand()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetfrozentreasuretracker") {
+            description = "Resets the Frozen Treasure Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
 }
