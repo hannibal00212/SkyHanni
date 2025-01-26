@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.CropStartLocationConfig.CropLocationMode
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
@@ -20,7 +22,7 @@ object GardenStartLocation {
     private val config get() = GardenApi.config.cropStartLocation
     private var shouldShowLastFarmedWaypoint = false
 
-    fun setLocationCommand() {
+    private fun setLocationCommand() {
         if (!GardenApi.inGarden()) {
             ChatUtils.userError("This Command only works in the garden!")
             return
@@ -98,6 +100,15 @@ object GardenStartLocation {
                     }
                 }
             }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shcropstartlocation") {
+            description = "Manually sets the crop start location"
+            category = CommandCategory.USERS_ACTIVE
+            callback { setLocationCommand() }
         }
     }
 

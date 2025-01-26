@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -42,7 +44,7 @@ object TitleManager {
         }
     }
 
-    fun command(args: Array<String>) {
+    private fun command(args: Array<String>) {
         if (args.size < 4) {
             ChatUtils.userError("Usage: /shsendtitle <duration> <height> <fontSize> <text ..>")
             return
@@ -81,5 +83,14 @@ object TitleManager {
         GlStateManager.scale(fontSizeModifier, fontSizeModifier, fontSizeModifier)
         TextRenderUtils.drawStringCenteredScaledMaxWidth(display, renderer, 0f, 0f, true, 75, 0)
         GlStateManager.popMatrix()
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shsendtitle") {
+            description = "Display a title on the screen with the specified settings."
+            category = CommandCategory.DEVELOPER_TEST
+            callback { command(it) }
+        }
     }
 }
