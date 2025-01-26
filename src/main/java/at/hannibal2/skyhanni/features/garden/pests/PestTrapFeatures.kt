@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestTrapConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataUpdatedEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.sendTeleportTo
@@ -53,9 +53,9 @@ object PestTrapFeatures {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTick(event: SkyHanniTickEvent) {
-        if (nextWarning.isInFuture()) return
-        val (finalWarning, actionPlot) = activeWarning.takeIf { it.first.isNotEmpty() } ?: return
+    fun onSecondPassed(event: SecondPassedEvent) {
+        val (finalWarning, actionPlot) = activeWarning
+        if (nextWarning.isInFuture() ||  finalWarning.isEmpty()) return
 
         tryWarnSound()
         tryWarnChat(finalWarning, actionPlot)
@@ -66,11 +66,7 @@ object PestTrapFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPestTrapDataUpdate(event: PestTrapDataUpdatedEvent) {
-        val warnings = WarningReason.entries.filter {
-            userEnabledWarnings.contains(it)
-        }.mapNotNull {
-            generateWarning(it, event.data)
-        }
+        val warnings = userEnabledWarnings.mapNotNull { generateWarning(it, event.data) }
 
         val finalWarning = warnings.joinToString(" §8| ") { it.first }
         val actionPlot = warnings.firstOrNull()?.second

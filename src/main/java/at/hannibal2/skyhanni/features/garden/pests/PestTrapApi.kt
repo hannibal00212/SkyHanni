@@ -157,7 +157,7 @@ object PestTrapApi {
     )
     // </editor-fold>
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         timeEnteredGarden = when (event.newIsland) {
             IslandType.GARDEN -> SimpleTimeMark.now()
