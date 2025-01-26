@@ -4,10 +4,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 enum class PowderChestReward(val displayName: String, pattern: String) {
 
-    MITHRIL_POWDER(
-        "§aMithril Powder",
-        " {4}§r§2Mithril Powder(?: §r§8x(?<amount>.*))?",
-    ),
     GEMSTONE_POWDER(
         "§dGemstone Powder",
         " {4}§r§dGemstone Powder(?: §r§8x(?<amount>.*))?",
@@ -119,6 +115,8 @@ enum class PowderChestReward(val displayName: String, pattern: String) {
         "§9FTX 3070",
         " {4}§r§9FTX 3070(?: §r§8x(?<amount>.*))?",
     ),
+
+    // TODO: Fix typo
     ELECTRON_TRANSIMTTER(
         "§9Electron Transmitter",
         " {4}§r§9Electron Transmitter(?: §r§8x(?<amount>.*))?",

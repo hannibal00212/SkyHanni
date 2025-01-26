@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
@@ -16,9 +18,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
+import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object KeyboardManager {
+
+    const val LEFT_MOUSE = -100
+    const val RIGHT_MOUSE = -99
 
     private var lastClickedMouseButton = -1
 
@@ -53,13 +59,13 @@ object KeyboardManager {
     @SubscribeEvent
     fun onGuiScreenKeybind(event: GuiScreenEvent.KeyboardInputEvent.Pre) {
         val guiScreen = event.gui as? GuiContainer ?: return
-        if (GuiKeyPressEvent(guiScreen).postAndCatch()) {
+        if (GuiKeyPressEvent(guiScreen).post()) {
             event.isCanceled = true
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         val currentScreen = Minecraft.getMinecraft().currentScreen
         val isConfigScreen = currentScreen is GuiScreenElementWrapper
         if (isConfigScreen) return
@@ -68,21 +74,20 @@ object KeyboardManager {
 
         if (Mouse.getEventButtonState() && Mouse.getEventButton() != -1) {
             val key = Mouse.getEventButton() - 100
-            LorenzKeyPressEvent(key).postAndCatch()
+            postEvent(key)
             lastClickedMouseButton = key
             return
         }
 
         if (Keyboard.getEventKeyState() && Keyboard.getEventKey() != 0) {
-            val key = Keyboard.getEventKey()
-            LorenzKeyPressEvent(key).postAndCatch()
+            postEvent(Keyboard.getEventKey())
             lastClickedMouseButton = -1
             return
         }
 
         if (Mouse.getEventButton() == -1 && lastClickedMouseButton != -1) {
             if (lastClickedMouseButton.isKeyHeld()) {
-                LorenzKeyPressEvent(lastClickedMouseButton).postAndCatch()
+                postEvent(lastClickedMouseButton)
                 return
             }
             lastClickedMouseButton = -1
@@ -90,7 +95,14 @@ object KeyboardManager {
 
         // This is needed because of other keyboards that don't have a key code for the key, but is read as a character
         if (Keyboard.getEventKey() == 0) {
-            LorenzKeyPressEvent(Keyboard.getEventCharacter().code + 256).postAndCatch()
+            postEvent(Keyboard.getEventCharacter().code + 256)
+        }
+    }
+
+    private fun postEvent(keyCode: Int) {
+        DelayedRun.runDelayed(150.milliseconds) {
+            if (TextInput.isActive()) return@runDelayed
+            KeyPressEvent(keyCode).post()
         }
     }
 
@@ -154,11 +166,14 @@ object KeyboardManager {
             object : Iterator<KeyBinding> {
 
                 var current = w
+                var finished = false
 
                 override fun hasNext(): Boolean =
-                    current != down
+                    !finished
 
                 override fun next(): KeyBinding {
+                    if (!hasNext()) throw NoSuchElementException()
+
                     return current.also {
                         current = when (it) {
                             w -> a
@@ -166,7 +181,10 @@ object KeyboardManager {
                             s -> d
                             d -> up
                             up -> down
-                            else -> throw java.lang.IndexOutOfBoundsException()
+                            else -> {
+                                finished = true
+                                throw NoSuchElementException()
+                            }
                         }
                     }
                 }

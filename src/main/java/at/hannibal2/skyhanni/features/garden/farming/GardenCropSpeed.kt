@@ -1,32 +1,31 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
-import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DicerDropsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DicerType
-import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
 @SkyHanniModule
 object GardenCropSpeed {
 
-    private val config get() = GardenAPI.config
-    private val cropsPerSecond: MutableMap<CropType, Int>? get() = GardenAPI.storage?.cropsPerSecond
-    private val latestBlocksPerSecond: MutableMap<CropType, Double>? get() = GardenAPI.storage?.latestBlocksPerSecond
+    private val config get() = GardenApi.config
+    private val cropsPerSecond: MutableMap<CropType, Int>? get() = GardenApi.storage?.cropsPerSecond
+    private val latestBlocksPerSecond: MutableMap<CropType, Double>? get() = GardenApi.storage?.latestBlocksPerSecond
 
     var lastBrokenCrop: CropType? = null
     var lastBrokenTime = SimpleTimeMark.now()
@@ -46,7 +45,7 @@ object GardenCropSpeed {
         // TODO use SecondPassedEvent + passedSince
         fixedRateTimer(name = "skyhanni-crop-milestone-speed", period = 1000L) {
             if (isEnabled()) {
-                if (GardenAPI.mushroomCowPet) {
+                if (GardenApi.mushroomCowPet) {
                     CropType.MUSHROOM.setCounter(
                         CropType.MUSHROOM.getCounter() + blocksBroken * (lastBrokenCrop?.multiplier ?: 1)
                     )
@@ -57,12 +56,12 @@ object GardenCropSpeed {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         lastBrokenCrop = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         if (isEnabled()) {
             resetSpeed()
@@ -74,7 +73,7 @@ object GardenCropSpeed {
         GardenCropMilestoneDisplay.update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCropClick(event: CropClickEvent) {
         if (event.clickType != ClickType.LEFT_CLICK) return
 
@@ -84,7 +83,7 @@ object GardenCropSpeed {
     }
 
     private fun checkSpeed() {
-        val blocksBroken = blocksBroken.coerceAtMost(20)
+        val blocksBroken = blocksBroken
         this.blocksBroken = 0
 
         if (blocksBroken == 0) {
@@ -106,11 +105,11 @@ object GardenCropSpeed {
                 }
             }
             averageBlocksPerSecond = if (blocksSpeedList.size > 5) {
-                blocksSpeedList.drop(3).average()
+                blocksSpeedList.drop(3).average().coerceAtMost(20.0)
             } else if (blocksSpeedList.size > 1) {
-                blocksSpeedList.drop(1).average()
+                blocksSpeedList.drop(1).average().coerceAtMost(20.0)
             } else 0.0
-            GardenAPI.getCurrentlyFarmedCrop()?.let {
+            GardenApi.getCurrentlyFarmedCrop()?.let {
                 val heldTool = InventoryUtils.getItemInHand()
                 val toolName = heldTool?.getInternalName()?.asString()
                 if (toolName?.contains("DICER") == true) {
@@ -138,7 +137,7 @@ object GardenCropSpeed {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DicerDropsJson>("DicerDrops")
         calculateAverageDicer(melonDicer, data.MELON)
@@ -177,7 +176,7 @@ object GardenCropSpeed {
         secondsStopped = 0
     }
 
-    fun isEnabled() = GardenAPI.inGarden()
+    fun isEnabled() = GardenApi.inGarden()
 
     fun CropType.getSpeed() = cropsPerSecond?.get(this)
 
@@ -189,7 +188,7 @@ object GardenCropSpeed {
 
     fun isSpeedDataEmpty() = cropsPerSecond?.values?.sum()?.let { it == 0 } ?: true
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.blocksBrokenResetTime", "garden.cropMilestones.blocksBrokenResetTime")
     }

@@ -1,22 +1,21 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -29,9 +28,9 @@ object BurrowWarpHelper {
     private var lastWarpTime = SimpleTimeMark.farPast()
     private var lastWarp: WarpPoint? = null
 
-    @SubscribeEvent
-    fun onKeyClick(event: LorenzKeyPressEvent) {
-        if (!DianaAPI.isDoingDiana()) return
+    @HandleEvent
+    fun onKeyPress(event: KeyPressEvent) {
+        if (!DianaApi.isDoingDiana()) return
         if (!config.burrowNearestWarp) return
 
         if (event.keyCode != config.keyBindWarp) return
@@ -43,17 +42,15 @@ object BurrowWarpHelper {
                 HypixelCommands.warp(it.name)
                 lastWarp = currentWarp
                 GriffinBurrowHelper.lastTitleSentTime = SimpleTimeMark.now() + 2.seconds
-                TitleManager.optionalResetTitle {
-                    it.startsWith("§bWarp to ")
+                TitleManager.optionalResetTitle { currentTitle ->
+                    currentTitle.startsWith("§bWarp to ")
                 }
             }
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
         if (event.message == "§cYou haven't unlocked this fast travel destination!") {
             if (lastWarpTime.passedSince() < 1.seconds) {
                 lastWarp?.let {
@@ -67,17 +64,17 @@ object BurrowWarpHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         lastWarp = null
         currentWarp = null
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Diana Burrow Nearest Warp")
 
-        if (!DianaAPI.isDoingDiana()) {
+        if (!DianaApi.isDoingDiana()) {
             event.addIrrelevant("not doing diana")
             return
         }
@@ -104,11 +101,11 @@ object BurrowWarpHelper {
         debug?.add("warpPoint: ${warpPoint.displayName}")
 
         val playerDistance = playerLocation.distance(target)
-        debug?.add("playerDistance: ${playerDistance.round(1)}")
+        debug?.add("playerDistance: ${playerDistance.roundTo(1)}")
         val warpDistance = warpPoint.distance(target)
-        debug?.add("warpDistance: ${warpDistance.round(1)}")
+        debug?.add("warpDistance: ${warpDistance.roundTo(1)}")
         val difference = playerDistance - warpDistance
-        debug?.add("difference: ${difference.round(1)}")
+        debug?.add("difference: ${difference.roundTo(1)}")
         val setWarpPoint = difference > 10
         debug?.add("setWarpPoint: $setWarpPoint")
         currentWarp = if (setWarpPoint) warpPoint else null

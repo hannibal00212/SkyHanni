@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.renderables
 
-import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
 class Searchable(val renderable: Renderable, val string: String?)
@@ -9,15 +8,16 @@ fun Renderable.toSearchable(searchText: String? = null) = Searchable(this, searc
 fun Searchable.toRenderable() = renderable
 fun List<Searchable>.toRenderable() = map { it.toRenderable() }
 fun List<Searchable>.toMap() = associate { it.renderable to it.string }
-val searchPrefix = "§eSearch: §7"
+const val SEARCH_PREFIX = "§eSearch: §7"
+
 fun List<Searchable>.buildSearchBox(
-    textInput: TextInput,
+    textInput: SearchTextInput,
 ): Renderable {
     val key = 0
     return Renderable.searchBox(
         Renderable.verticalSearchableContainer(toMap(), textInput = textInput, key = key + 1),
-        searchPrefix,
-        onUpdateSize = { println("onUpdateSize") },
+        SEARCH_PREFIX,
+        onUpdateSize = {},
         textInput = textInput,
         key = key,
     )
@@ -25,7 +25,7 @@ fun List<Searchable>.buildSearchBox(
 
 fun List<Searchable>.buildSearchableScrollable(
     height: Int,
-    textInput: TextInput,
+    textInput: SearchTextInput,
     scrollValue: ScrollValue = ScrollValue(),
     velocity: Double = 2.0,
 ): Renderable {
@@ -39,20 +39,22 @@ fun List<Searchable>.buildSearchableScrollable(
             scrollValue = scrollValue,
             velocity = velocity,
         ),
-        searchPrefix,
-        onUpdateSize = { println("onUpdateSize") },
+        SEARCH_PREFIX,
+        onUpdateSize = {},
         textInput = textInput,
         key = key,
     )
 }
 
+// TODO remove this function entirely, sack display should use a SearchTextInput object per sack name
+@Deprecated("remove this function, instead use a fix SearchTextInput object")
 fun Map<List<Renderable>, String?>.buildSearchableTable(): Renderable {
-    val textInput = TextInput()
+    val textInput = SearchTextInput()
     val key = 0
     return Renderable.searchBox(
         Renderable.searchableTable(toMap(), textInput = textInput, key = key + 1),
-        searchPrefix,
-        onUpdateSize = { println("onUpdateSize") },
+        SEARCH_PREFIX,
+        onUpdateSize = {},
         textInput = textInput,
         key = key,
     )

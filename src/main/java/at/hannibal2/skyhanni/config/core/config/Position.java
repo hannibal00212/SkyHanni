@@ -234,20 +234,20 @@ public class Position {
     }
 
     public boolean canJumpToConfigOptions() {
-        return linkField != null && ConfigGuiManager.INSTANCE.getEditorInstance().getProcessedConfig().getOptionFromField(linkField) != null;
+        return linkField != null && ConfigGuiManager.INSTANCE.getEditorInstance().getOptionFromField(linkField) != null;
     }
 
     public void jumpToConfigOptions() {
         MoulConfigEditor<Features> editor = ConfigGuiManager.INSTANCE.getEditorInstance();
         if (linkField == null) return;
-        ProcessedOption option = editor.getProcessedConfig().getOptionFromField(linkField);
+        ProcessedOption option = editor.getOptionFromField(linkField);
         if (option == null) return;
         editor.search("");
         if (!editor.goToOption(option)) return;
-        SkyHanniMod.Companion.setScreenToOpen(new GuiScreenElementWrapper(editor));
+        SkyHanniMod.INSTANCE.setScreenToOpen(new GuiScreenElementWrapper(editor));
     }
 
     public void setLink(@NotNull ConfigLink configLink) throws NoSuchFieldException {
-        linkField = configLink.owner().getField(configLink.field());
+        linkField = configLink.owner().getDeclaredField(configLink.field());
     }
 }

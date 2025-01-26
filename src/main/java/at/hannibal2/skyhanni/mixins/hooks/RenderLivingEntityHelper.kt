@@ -1,10 +1,11 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import net.minecraft.entity.EntityLivingBase
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.awt.Color
 
 @SkyHanniModule
 object RenderLivingEntityHelper {
@@ -14,8 +15,8 @@ object RenderLivingEntityHelper {
 
     private val entityNoHurtTimeCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         entityColorMap.clear()
         entityColorCondition.clear()
 
@@ -32,6 +33,10 @@ object RenderLivingEntityHelper {
         entityColorCondition[entity] = condition
     }
 
+    fun <T : EntityLivingBase> setEntityColor(entity: T, color: Color, condition: () -> Boolean) {
+        setEntityColor(entity, color.rgb, condition)
+    }
+
     fun <T : EntityLivingBase> setNoHurtTime(entity: T, condition: () -> Boolean) {
         entityNoHurtTimeCondition[entity] = condition
     }
@@ -39,6 +44,10 @@ object RenderLivingEntityHelper {
     fun <T : EntityLivingBase> setEntityColorWithNoHurtTime(entity: T, color: Int, condition: () -> Boolean) {
         setEntityColor(entity, color, condition)
         setNoHurtTime(entity, condition)
+    }
+
+    fun <T : EntityLivingBase> setEntityColorWithNoHurtTime(entity: T, color: Color, condition: () -> Boolean) {
+        setEntityColorWithNoHurtTime(entity, color.rgb, condition)
     }
 
     fun <T : EntityLivingBase> removeNoHurtTime(entity: T) {

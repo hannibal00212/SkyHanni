@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object InGameDateDisplay {
@@ -20,18 +20,28 @@ object InGameDateDisplay {
     private val config get() = SkyHanniMod.feature.gui.inGameDate
 
     private val patternGroup = RepoPattern.group("misc.ingametime")
+
+    /**
+     * REGEX-TEST: Spring 26th
+     * REGEX-TEST: Early Winter 1st
+     */
     private val monthAndDatePattern by patternGroup.pattern(
         "date",
-        ".*((Early|Late) )?(Winter|Spring|Summer|Autumn) [0-9]{1,2}(nd|rd|th|st)?.*"
+        ".*(?:(?:Early|Late) )?(?:Winter|Spring|Summer|Autumn) [0-9]{1,2}(?:nd|rd|th|st)?.*",
     )
+
+    /**
+     * REGEX-TEST: 8:30am ☀
+     * REGEX-TEST: 11:40pm ☽
+     */
     private val timeSymbolsPattern by patternGroup.pattern(
         "symbols",
-        "([☀☽࿇])"
+        "[☀☽࿇]",
     )
 
     private var display = ""
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
@@ -68,7 +78,7 @@ object InGameDateDisplay {
 
     private fun String.removeOrdinal() = replace("nd", "").replace("rd", "").replace("st", "").replace("th", "")
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 

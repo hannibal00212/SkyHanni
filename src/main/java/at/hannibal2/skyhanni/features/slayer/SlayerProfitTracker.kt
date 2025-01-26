@@ -1,28 +1,32 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SlayerProfitTrackerItemsJson
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
+import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -33,14 +37,14 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object SlayerProfitTracker {
 
     private val config get() = SkyHanniMod.feature.slayer.itemProfitTracker
 
-    private var itemLogCategory = ""
+    private var category = ""
+    private val categoryName get() = ReplaceRomanNumerals.replaceLine(category)
     private var baseSlayerType = ""
     private val trackers = mutableMapOf<String, SkyHanniItemTracker<Data>>()
 
@@ -95,87 +99,87 @@ object SlayerProfitTracker {
         }
     }
 
-    private var allowedItems = mapOf<String, List<NEUInternalName>>()
+    private var allowedItems = mapOf<String, List<NeuInternalName>>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         allowedItems = event.getConstant<SlayerProfitTrackerItemsJson>("SlayerProfitTrackerItems").slayers
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled()) return
         val coins = event.coins
-        if (event.reason == PurseChangeCause.GAIN_MOB_KILL && SlayerAPI.isInCorrectArea) {
-            tryAddItem(NEUInternalName.SKYBLOCK_COIN, coins.toInt(), command = false)
+        if (event.reason == PurseChangeCause.GAIN_MOB_KILL && SlayerApi.isInCorrectArea) {
+            tryAddItem(NeuInternalName.SKYBLOCK_COIN, coins.toInt(), command = false)
         }
         if (event.reason == PurseChangeCause.LOSE_SLAYER_QUEST_STARTED) {
             addSlayerCosts(coins)
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         autoSlayerBankPattern.matchMatcher(event.message) {
             addSlayerCosts(-group("coins").formatDouble())
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlayerChange(event: SlayerChangeEvent) {
         val newSlayer = event.newSlayer
-        itemLogCategory = newSlayer.removeColor()
-        baseSlayerType = itemLogCategory.substringBeforeLast(" ")
+        category = newSlayer.removeColor()
+        baseSlayerType = category.substringBeforeLast(" ")
         getTracker()?.update()
     }
 
     private fun getTracker(): SkyHanniItemTracker<Data>? {
-        if (itemLogCategory == "") return null
+        if (category == "") return null
 
-        return trackers.getOrPut(itemLogCategory) {
+        return trackers.getOrPut(category) {
             val getStorage: (ProfileSpecificStorage) -> Data = {
                 it.slayerProfitData.getOrPut(
-                    itemLogCategory,
+                    category,
                 ) { Data() }
             }
-            SkyHanniItemTracker("$itemLogCategory Profit Tracker", { Data() }, getStorage) { drawDisplay(it) }
+            SkyHanniItemTracker("$categoryName Profit Tracker", { Data() }, getStorage) { drawDisplay(it) }
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onQuestComplete(event: SlayerQuestCompleteEvent) {
         getTracker()?.modify {
             it.slayerCompletedCount++
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled()) return
-        if (!SlayerAPI.isInCorrectArea) return
-        if (!SlayerAPI.hasActiveSlayerQuest()) return
+        if (!SlayerApi.isInCorrectArea) return
+        if (!SlayerApi.hasActiveSlayerQuest()) return
 
         tryAddItem(event.internalName, event.amount, event.source == ItemAddManager.Source.COMMAND)
     }
 
-    private fun tryAddItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
-        if (!isAllowedItem(internalName) && internalName != NEUInternalName.SKYBLOCK_COIN) {
-            ChatUtils.debug("Ignored non-slayer item pickup: '$internalName' '$itemLogCategory'")
+    private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
+        if (!isAllowedItem(internalName) && internalName != NeuInternalName.SKYBLOCK_COIN) {
+            ChatUtils.debug("Ignored non-slayer item pickup: '$internalName' '$category'")
             return
         }
 
         getTracker()?.addItem(internalName, amount, command)
     }
 
-    private fun isAllowedItem(internalName: NEUInternalName): Boolean {
+    private fun isAllowedItem(internalName: NeuInternalName): Boolean {
         val allowedList = allowedItems[baseSlayerType] ?: return false
         return internalName in allowedList
     }
 
     private fun drawDisplay(data: Data) = buildList<Searchable> {
         val tracker = getTracker() ?: return@buildList
-        addSearchString("§e§l$itemLogCategory Profit Tracker")
+        addSearchString("§e§l$categoryName Profit Tracker")
 
         var profit = tracker.drawItems(data, { true }, this)
         val slayerSpawnCost = data.slayerSpawnCost
@@ -190,11 +194,14 @@ object SlayerProfitTracker {
             profit += slayerSpawnCost
         }
 
-        val slayerCompletedCount = data.slayerCompletedCount
+        val slayerCompletedCount = data.slayerCompletedCount.addSeparators()
         add(
             Renderable.hoverTips(
-                "§7Bosses killed: §e${slayerCompletedCount.addSeparators()}",
-                listOf("§7You killed the $itemLogCategory boss", "§e${slayerCompletedCount.addSeparators()} §7times."),
+                "§7Bosses killed: §e$slayerCompletedCount",
+                listOf(
+                    "§7You killed the $categoryName boss",
+                    "§e$slayerCompletedCount §7times.",
+                ),
             ).toSearchable(),
         )
 
@@ -203,6 +210,7 @@ object SlayerProfitTracker {
         tracker.addPriceFromButton(this)
     }
 
+    // TODO reintroduce this? whats going on?
     val coinFormat: (ItemTrackerData.TrackedItem) -> Pair<String, List<String>> = { item ->
         val mobKillCoinsFormat = item.totalAmount.shortFormat()
         val text = " §6Mob kill coins§7: §6$mobKillCoinsFormat"
@@ -214,15 +222,26 @@ object SlayerProfitTracker {
         text to lore
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (!SlayerAPI.isInCorrectArea) return
-
-        getTracker()?.renderDisplay(config.pos)
+    init {
+        // Can not use tracker.initRenderer(), since we have multiple tracker instances in use
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = { shouldShowDisplay() },
+            onRender = {
+                getTracker()?.renderDisplay(config.pos)
+            },
+        )
     }
 
-    @SubscribeEvent
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        if (!SlayerApi.isInCorrectArea) return false
+
+        return true
+    }
+
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(10, "#profile.slayerProfitData") { old ->
             for (data in old.asJsonObject.entrySet().map { it.value.asJsonObject }) {
@@ -246,8 +265,8 @@ object SlayerProfitTracker {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
-    fun clearProfitCommand(args: Array<String>) {
-        if (itemLogCategory == "") {
+    fun resetCommand() {
+        if (category == "") {
             ChatUtils.userError(
                 "No current slayer data found! " +
                     "§eGo to a slayer area and start the specific slayer type you want to reset the data of.",
@@ -256,5 +275,14 @@ object SlayerProfitTracker {
         }
 
         getTracker()?.resetCommand()
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetslayerprofits") {
+            description = "Resets the total slayer profit for the current slayer type"
+            category = CommandCategory.USERS_RESET
+            callback { resetCommand() }
+        }
     }
 }

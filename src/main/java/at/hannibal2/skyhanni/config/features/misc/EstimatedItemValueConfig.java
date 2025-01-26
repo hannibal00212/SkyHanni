@@ -83,15 +83,15 @@ public class EstimatedItemValueConfig {
         INSTANT_BUY("Instant Buy"),
         BUY_ORDER("Buy Order"),
         ;
-        private final String str;
+        private final String displayName;
 
-        BazaarPriceSource(String str) {
-            this.str = str;
+        BazaarPriceSource(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -106,5 +106,6 @@ public class EstimatedItemValueConfig {
 
     @Expose
     @ConfigLink(owner = EstimatedItemValueConfig.class, field = "enabled")
+    // TODO rename "position"
     public Position itemPriceDataPos = new Position(140, 90, false, true);
 }

@@ -1,25 +1,29 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.PurseApi
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import at.hannibal2.skyhanni.utils.StringUtils.isValidUuid
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import java.time.Instant
 import kotlin.math.sin
@@ -28,6 +32,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object HoppityCallWarning {
 
+    // <editor-fold desc="Patterns">
     /**
      * Test messages (and the real ones from Hypixel) have a space at the end of
      * them that the IDE kills. So it's "§r§e ✆ "
@@ -35,7 +40,7 @@ object HoppityCallWarning {
      * REGEX-TEST: §e✆ §r§bHoppity§r§e ✆
      * REGEX-TEST: §e✆ §r§aHoppity§r§e ✆
      */
-    private val initHoppityCallPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    private val initHoppityCallPattern by ChocolateFactoryApi.patternGroup.pattern(
         "hoppity.call.init",
         "§e✆ §r(?:§a|§b)Hoppity§r§e ✆.*",
     )
@@ -46,7 +51,7 @@ object HoppityCallWarning {
      * REGEX-TEST: §a✆ RING... RING... RING... §r §r§2§l[PICK UP]
      * REGEX-TEST: §a✆ RING... RING... RING...
      */
-    private val callRingPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    private val callRingPattern by ChocolateFactoryApi.patternGroup.pattern(
         "hoppity.call.ring",
         "§a✆ (?:RING\\.{3} ?){1,3}(?:§r §r§2§l\\[PICK UP])?",
     )
@@ -54,10 +59,11 @@ object HoppityCallWarning {
     /**
      * REGEX-TEST: §e[NPC] §aHoppity§f: §b✆ §f§rWhat's up, §boBlazin§f?
      */
-    private val pickupHoppityCallPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    private val pickupHoppityCallPattern by ChocolateFactoryApi.patternGroup.pattern(
         "hoppity.call.pickup",
         "§e\\[NPC] §aHoppity§f: §b✆ §f§rWhat's up, .*§f\\?",
     )
+    // </editor-fold>
 
     private val config get() = HoppityEggsManager.config.hoppityCallWarning
     private var warningSound = SoundUtils.createSound("note.pling", 1f)
@@ -66,9 +72,10 @@ object HoppityCallWarning {
     private var finalWarningTime: Instant? = null
     private val callLength = 7.seconds
     private var acceptUUID: String? = null
+    private var commandSentTimer = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
-    fun onKeyPress(event: LorenzKeyPressEvent) {
+    @HandleEvent
+    fun onKeyPress(event: KeyPressEvent) {
         if (config.acceptHotkey == Keyboard.KEY_NONE || config.acceptHotkey != event.keyCode) return
         acceptUUID?.let {
             HypixelCommands.callback(acceptUUID!!)
@@ -76,7 +83,7 @@ object HoppityCallWarning {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val soundProperty = config.hoppityCallSound
         ConditionalUtils.onToggle(soundProperty) {
@@ -86,16 +93,16 @@ object HoppityCallWarning {
         finalWarningTime = null
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent(priority = HandleEvent.HIGHEST)
+    fun onChat(event: SkyHanniChatEvent) {
         if (callRingPattern.matches(event.message) && acceptUUID == null) readPickupUuid(event)
         if (!isEnabled()) return
         if (initHoppityCallPattern.matches(event.message)) startWarningUser()
         if (pickupHoppityCallPattern.matches(event.message)) stopWarningUser()
     }
 
-    @SubscribeEvent
-    fun onTick(event: SecondPassedEvent) {
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!activeWarning) return
         if (nextWarningTime == null || finalWarningTime == null) return
@@ -107,8 +114,8 @@ object HoppityCallWarning {
         if (currentTime >= finalWarningTime) stopWarningUser()
     }
 
-    @SubscribeEvent
-    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !activeWarning) return
         val minecraft = Minecraft.getMinecraft()
         // Calculate a fluctuating alpha value based on the sine of time, for a smooth oscillation
@@ -123,12 +130,35 @@ object HoppityCallWarning {
             minecraft.displayWidth,
             minecraft.displayHeight,
             // Apply the shifted alpha and combine it with the RGB components of flashColor.
-            shiftedRandomAlpha or (config.flashColor.toChromaColorInt() and 0xFFFFFF),
+            shiftedRandomAlpha or (config.flashColor.toSpecialColorInt() and 0xFFFFFF),
         )
         GlStateManager.color(1F, 1F, 1F, 1F)
     }
 
-    private fun readPickupUuid(event: LorenzChatEvent) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onCommandSend(event: MessageSendToServerEvent) {
+        if (!HoppityApi.pickupOutgoingCommandPattern.matches(event.message)) return
+        if (!config.ensureCoins || commandSentTimer.passedSince() < 5.seconds) return
+        if (PurseApi.getPurse() >= config.coinThreshold) return
+
+        commandSentTimer = SimpleTimeMark.now()
+        event.cancel()
+        ChatUtils.clickToActionOrDisable(
+            "§cBlocked picking up Hoppity without enough coins!",
+            config::ensureCoins,
+            actionName = "open bank menu",
+            // TODO if no booster cookie active, suggest to warp to hub/path find to bank. ideally into an utils
+            action = { HypixelCommands.bank() },
+        )
+    }
+
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
+        acceptUUID = null
+        stopWarningUser()
+    }
+
+    private fun readPickupUuid(event: SkyHanniChatEvent) {
         val siblings = event.chatComponent.siblings.takeIf { it.size >= 3 } ?: return
         val clickEvent = siblings[2]?.chatStyle?.chatClickEvent ?: return
         if (clickEvent.action.name.lowercase() != "run_command" || !clickEvent.value.lowercase().startsWith("/cb")) return

@@ -1,19 +1,19 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenBurrowingSporesNotifier {
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!GardenAPI.inGarden()) return
-        if (!GardenAPI.config.burrowingSporesNotification) return
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
+        if (!GardenApi.inGarden()) return
+        if (!GardenApi.config.burrowingSporesNotification) return
 
         if (event.message.endsWith("§6§lVERY RARE CROP! §r§f§r§9Burrowing Spores")) {
             LorenzUtils.sendTitle("§9Burrowing Spores!", 5.seconds)

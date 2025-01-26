@@ -1,8 +1,7 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchableSelector
@@ -12,7 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -21,6 +20,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("SpreadOperator")
 class SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
     createNewSession: () -> Data,
@@ -30,10 +30,14 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 ) : SkyHanniTracker<Data>(name, createNewSession, getStorage, *extraStorage, drawDisplay = drawDisplay) {
 
     companion object {
-        val SKYBLOCK_COIN = NEUInternalName.SKYBLOCK_COIN
+        val SKYBLOCK_COIN = NeuInternalName.SKYBLOCK_COIN
     }
 
-    fun addItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
+    fun addCoins(amount: Int, command: Boolean) {
+        addItem(SKYBLOCK_COIN, amount, command)
+    }
+
+    fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
         modify {
             it.addItem(internalName, amount, command)
         }
@@ -53,7 +57,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             return
         }
         // TODO move the function to common
-        val (itemName, price) = SlayerAPI.getItemNameAndPrice(internalName, amount)
+        val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
         if (config.warnings.chat && price >= config.warnings.minimumChat) {
             ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
         }
@@ -78,11 +82,11 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
     fun drawItems(
         data: Data,
-        filter: (NEUInternalName) -> Boolean,
+        filter: (NeuInternalName) -> Boolean,
         lists: MutableList<Searchable>,
     ): Double {
         var profit = 0.0
-        val items = mutableMapOf<NEUInternalName, Long>()
+        val items = mutableMapOf<NeuInternalName, Long>()
         for ((internalName, itemProfit) in data.items) {
             if (!filter(internalName)) continue
 
@@ -119,9 +123,9 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             val newDrop = itemProfit.lastTimeUpdated.passedSince() < 10.seconds && config.showRecentDrops
             val numberColor = if (newDrop) "§a§l" else "§7"
 
-            val name = cleanName.removeColor(keepFormatting = true).replace("§r", "")
+            val formattedName = cleanName.removeColor(keepFormatting = true).replace("§r", "")
             var displayName = if (hidden) {
-                "§8§m$name"
+                "§8§m$formattedName"
             } else cleanName
             displayName = " $numberColor${displayAmount.addSeparators()}x $displayName§7: §6$priceFormat"
 
@@ -152,7 +156,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                 },
             ) else Renderable.string(displayName)
 
-            lists.add(renderable.toSearchable(name))
+            lists.add(renderable.toSearchable(formattedName))
         }
         if (hiddenItemTexts.size > 0) {
             val text = Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts).toSearchable()
@@ -167,7 +171,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         item: ItemTrackerData.TrackedItem,
         hidden: Boolean,
         newDrop: Boolean,
-        internalName: NEUInternalName,
+        internalName: NeuInternalName,
     ) = buildList {
         if (internalName == SKYBLOCK_COIN) {
             addAll(data.getCoinDescription(item))
@@ -187,9 +191,9 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         add("§7to edit the number.")
         add("§7Use negative numbers to remove items.")
 
-        if (SkyHanniMod.feature.dev.debug.enabled) {
+        if (LorenzUtils.debug) {
             add("")
-            add("§7${internalName}")
+            add("§7$internalName")
         }
     }
 

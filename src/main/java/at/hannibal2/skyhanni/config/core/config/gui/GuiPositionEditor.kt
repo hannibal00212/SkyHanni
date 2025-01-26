@@ -27,11 +27,9 @@ import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
@@ -58,7 +56,7 @@ class GuiPositionEditor(
     }
 
     override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        //Items aren't drawn due to a bug in neu rendering
+        // Items aren't drawn due to a bug in neu rendering
         drawDefaultBackground()
         if (oldScreen != null) {
             val accessor = oldScreen as AccessorGuiContainer
@@ -100,7 +98,7 @@ class GuiPositionEditor(
         }
 
         val pos = positions[displayPos]
-        val location = "§7x: §e${pos.rawX}§7, y: §e${pos.rawY}§7, scale: §e${pos.scale.round(2)}"
+        val location = "§7x: §e${pos.rawX}§7, y: §e${pos.rawY}§7, scale: §e${pos.scale.roundTo(2)}"
         GuiRenderUtils.drawStringCentered("§b" + pos.internalName, getScaledWidth() / 2, 18)
         GuiRenderUtils.drawStringCentered(location, getScaledWidth() / 2, 28)
         if (pos.canJumpToConfigOptions())
@@ -116,8 +114,9 @@ class GuiPositionEditor(
         GlStateManager.pushMatrix()
         width = getScaledWidth()
         height = getScaledHeight()
-        val mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
-        val mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
+
+        val (mouseX, mouseY) = GuiScreenUtils.mousePos
+
         for ((index, position) in positions.withIndex()) {
             var elementWidth = position.getDummySize(true).x
             var elementHeight = position.getDummySize(true).y
@@ -155,8 +154,8 @@ class GuiPositionEditor(
     override fun mouseClicked(originalX: Int, priginalY: Int, mouseButton: Int) {
         super.mouseClicked(originalX, priginalY, mouseButton)
 
-        val mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
-        val mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
+        val (mouseX, mouseY) = GuiScreenUtils.mousePos
+
         for (i in positions.indices.reversed()) {
             val position = positions[i]
             val elementWidth = position.getDummySize().x
@@ -223,8 +222,8 @@ class GuiPositionEditor(
         for (position in positions) {
             if (!position.clicked) continue
 
-            val mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
-            val mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
+            val (mouseX, mouseY) = GuiScreenUtils.mousePos
+
             val elementWidth = position.getDummySize(true).x
             val elementHeight = position.getDummySize(true).y
             grabbedX += position.moveX(mouseX - grabbedX, elementWidth)
@@ -237,13 +236,14 @@ class GuiPositionEditor(
         super.handleMouseInput()
         val mw = Mouse.getEventDWheel()
         if (mw == 0) return
-        val mx = Mouse.getEventX() * width / mc.displayWidth
-        val my = height - Mouse.getEventY() * height / mc.displayHeight - 1
+
+        val (mouseX, mouseY) = GuiScreenUtils.mousePos
+
         val hovered = positions.firstOrNull { it.clicked }
             ?: positions.lastOrNull {
                 val size = it.getDummySize()
                 GuiRenderUtils.isPointInRect(
-                    mx, my,
+                    mouseX, mouseY,
                     it.getAbsX() - border, it.getAbsY() - border,
                     size.x + border * 2, size.y + border * 2,
                 )

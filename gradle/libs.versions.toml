@@ -1,8 +1,10 @@
 [versions]
 libautoupdate = "1.3.1"
-moulconfig = "3.0.0-beta.7"
+moulconfig = "3.5.0"
 headlessLwjgl = "1.7.2"
 jbAnnotations = "24.1.0"
+hypixelmodapi = "1.0.1.1"
+
 
 [libraries]
 moulconfig = { module = "org.notenoughupdates.moulconfig:legacy", version.ref = "moulconfig" }
@@ -10,3 +12,8 @@ libautoupdate = { module = "moe.nea:libautoupdate", version.ref = "libautoupdate
 headlessLwjgl = { module = "com.github.3arthqu4ke.HeadlessMc:headlessmc-lwjgl", version.ref = "headlessLwjgl" }
 jbAnnotations = { module = "org.jetbrains:annotations", version.ref = "jbAnnotations" }
 hotswapagentforge = { module = "moe.nea:hotswapagent-forge", version = "1.0.1" }
+autoservice_ksp = {module="dev.zacsweers.autoservice:auto-service-ksp",version="1.1.0"}
+autoservice_annotations = {module="com.google.auto.service:auto-service-annotations",version="1.1.1"}
+hypixelmodapi = { module = "net.hypixel:mod-api-forge", version.ref = "hypixelmodapi" }
+hypixelmodapitweaker = { module = "net.hypixel:mod-api-forge-tweaker", version.ref = "hypixelmodapi" }
+

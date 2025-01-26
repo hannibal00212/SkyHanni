@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.event.diana;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -29,6 +30,11 @@ public class InquisitorSharingConfig {
     @ConfigOption(name = "Share Key", desc = "Press this key to share your Inquisitor Waypoint.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_Y)
     public int keyBindShare = Keyboard.KEY_Y;
+
+    @Expose
+    @ConfigOption(name = "Inquisitor Sound", desc = "")
+    @Accordion
+    public InquisitorSoundConfig sound = new InquisitorSoundConfig();
 
     @Expose
     @ConfigOption(name = "Show Despawn Time", desc = "Show the time until the shared Inquisitor will despawn.")

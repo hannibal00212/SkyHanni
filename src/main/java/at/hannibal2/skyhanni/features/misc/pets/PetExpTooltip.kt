@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.features.misc.pets
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
@@ -11,15 +12,14 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetExp
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object PetExpTooltip {
@@ -29,22 +29,21 @@ object PetExpTooltip {
     private const val LEVEL_100_LEGENDARY = 25_353_230
     private const val LEVEL_200_LEGENDARY = 210_255_385
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onItemTooltipLow(event: LorenzToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(priority = HandleEvent.LOWEST, onlyOnSkyblock = true)
+    fun onTooltip(event: ToolTipEvent) {
         if (!config.petDisplay) return
         if (!KeyboardManager.isShiftKeyDown() && !config.showAlways) return
 
         val itemStack = event.itemStack
-        val petExperience = itemStack.getPetExp()?.round(1) ?: return
+        val petExperience = itemStack.getPetExp()?.roundTo(1) ?: return
         val name = itemStack.name
         try {
 
             val index = findIndex(event.toolTip) ?: return
 
-            val (maxLevel, maxXp) = getMaxValues(name, petExperience)
+            val (maxLevel, maxXP) = getMaxValues(name, petExperience)
 
-            val percentage = petExperience / maxXp
+            val percentage = petExperience / maxXP
             val percentageFormat = LorenzUtils.formatPercentage(percentage)
 
             if (percentage < 1) {
@@ -54,7 +53,7 @@ object PetExpTooltip {
                 val addLegendaryColor = if (isBelowLegendary) "§6" else ""
                 event.toolTip.add(
                     index,
-                    "$progressBar §e${petExperience.addSeparators()}§6/§e${maxXp.shortFormat()}"
+                    "$progressBar §e${petExperience.addSeparators()}§6/§e${maxXP.shortFormat()}",
                 )
                 event.toolTip.add(index, "§7Progress to ${addLegendaryColor}Level $maxLevel: §e$percentageFormat")
             }
@@ -80,7 +79,7 @@ object PetExpTooltip {
         index = toolTip.indexOfFirst { it.contains("Progress to Level") }
         if (index != -1) {
 
-            val offset = if (isNeuExtendedExpEnabled) 4 else 3
+            val offset = if (PlatformUtils.isNeuLoaded() && isNeuExtendedExpEnabled) 4 else 3
             return index + offset
         }
 
@@ -104,24 +103,24 @@ object PetExpTooltip {
 
         val maxLevel = if (useGoldenDragonLevels) 200 else 100
 
-        val maxXp = when {
-            useGoldenDragonLevels -> LEVEL_200_LEGENDARY // lvl 200 legendary
+        val maxXP = when {
+            useGoldenDragonLevels -> LEVEL_200_LEGENDARY
             petName.contains("Bingo") -> LEVEL_100_COMMON
 
             else -> LEVEL_100_LEGENDARY
         }
 
-        return Pair(maxLevel, maxXp)
+        return Pair(maxLevel, maxXP)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.petExperienceToolTip.petDisplay", "misc.pets.petExperienceToolTip.petDisplay")
         event.move(3, "misc.petExperienceToolTip.showAlways", "misc.pets.petExperienceToolTip.showAlways")
         event.move(
             3,
             "misc.petExperienceToolTip.showGoldenDragonEgg",
-            "misc.pets.petExperienceToolTip.showGoldenDragonEgg"
+            "misc.pets.petExperienceToolTip.showGoldenDragonEgg",
         )
     }
 }

@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.observer.Property
-import java.util.TreeSet
 import net.minecraft.item.ItemStack
+import java.util.TreeSet
 
 open class Enchant : Comparable<Enchant> {
     @Expose
@@ -21,10 +21,10 @@ open class Enchant : Comparable<Enchant> {
     var loreName = ""
 
     @Expose
-    private var goodLevel = 0
+    private val goodLevel = 0
 
     @Expose
-    private var maxLevel = 0
+    private val maxLevel = 0
 
     private fun isNormal() = this is Normal
     private fun isUltimate() = this is Ultimate
@@ -94,8 +94,7 @@ open class Enchant : Comparable<Enchant> {
         return if (this.isUltimate()) -1 else 1
     }
 
-    class Normal : Enchant() {
-    }
+    class Normal : Enchant()
 
     class Ultimate : Enchant() {
         override fun getFormat(level: Int, itemStack: ItemStack?) = "§d§l"
@@ -103,15 +102,16 @@ open class Enchant : Comparable<Enchant> {
 
     class Stacking : Enchant() {
         @Expose
-        private var nbtNum: String? = null
+        private val nbtNum: String? = null
 
         @Expose
-        private var statLabel: String? = null
+        @Suppress("UnusedPrivateProperty")
+        private val statLabel: String? = null
 
         @Expose
-        private var stackLevel: TreeSet<Int>? = null
+        private val stackLevel: TreeSet<Int>? = null
 
-        override fun toString() = "$nbtNum ${stackLevel.toString()} ${super.toString()}"
+        override fun toString() = "$nbtNum $stackLevel ${super.toString()}"
     }
 
     class Dummy(name: String) : Enchant() {

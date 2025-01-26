@@ -1,20 +1,25 @@
 package at.hannibal2.skyhanni.features.fame
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.EntityMovementData
+import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -22,7 +27,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -52,6 +56,8 @@ object UpgradeReminder {
         "claimed",
         "§eYou claimed the §r§a(?<upgrade>.+) §r§eupgrade!",
     )
+
+    @Suppress("UnusedPrivateProperty")
     private val upgradePattern by patternGroup.pattern(
         "upgrade",
         "§eClick to start upgrade!",
@@ -75,7 +81,7 @@ object UpgradeReminder {
     private var lastReminderSend = SimpleTimeMark.farPast()
 
     // TODO: (for 0.27) merge this logic with reminder manager
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (ReminderUtils.isBusy()) return
@@ -88,18 +94,47 @@ object UpgradeReminder {
         lastReminderSend = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inInventory = event.inventoryName == "Community Shop"
+        if (!inInventory) return
+
+        if (currentProfileUpgrade == null && currentAccountUpgrade == null) return
+        detectWrongAccountUpgradeData(event.inventoryItems)
     }
 
-    @SubscribeEvent
+    private fun detectWrongAccountUpgradeData(items: Map<Int, ItemStack>) {
+        val hasProfileUpgrade = foundActiveUpgrade(items, 27..35)
+        if (!hasProfileUpgrade && currentProfileUpgrade != null) {
+            ChatUtils.chat("§eRemoved invalid Profile Upgrade information.")
+            currentProfileUpgrade = null
+        }
+
+        val hasAccountUpgrade = foundActiveUpgrade(items, 36..44)
+        if (!hasAccountUpgrade && currentAccountUpgrade != null) {
+            ChatUtils.chat("§eRemoved invalid Account Upgrade information.")
+            currentAccountUpgrade = null
+        }
+    }
+
+    private fun foundActiveUpgrade(items: Map<Int, ItemStack>, slots: IntRange): Boolean {
+        for (slot in slots) {
+            val item = items[slot] ?: continue
+            val isUpgrading = item.getLore().any { it == "§aCurrently upgrading!" }
+            val isDone = item.getLore().any { it == "§cClick to claim!" }
+            val isReadyForUpgrade = item.getLore().any { it == "§eClick to start upgrade!" }
+            if (isUpgrading || isDone) return true
+            if (isReadyForUpgrade) return false
+        }
+        return false
+    }
+
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inInventory) return
         val item = event.item ?: return
@@ -107,9 +142,8 @@ object UpgradeReminder {
         clickedUpgrade = CommunityShopUpgrade.fromItem(item) ?: return
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
         if (upgradeStartedPattern.matches(event.message)) {
             clickedUpgrade?.start()
             when (clickedUpgradeType) {
@@ -131,7 +165,7 @@ object UpgradeReminder {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.accountUpgradeReminder
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(
             49,
@@ -162,7 +196,16 @@ object UpgradeReminder {
                 "The §a$name §eupgrade has completed!",
                 config::accountUpgradeReminder,
                 actionName = "warp to Hub",
-                action = { HypixelCommands.warp("hub") },
+                action = {
+                    HypixelCommands.warp("hub")
+                    EntityMovementData.onNextTeleport(IslandType.HUB) {
+                        IslandGraphs.pathFind(
+                            LorenzVec(-2.6, 73.0, -101.6),
+                            "§eCommunity Shop",
+                            condition = { config.accountUpgradeReminder },
+                        )
+                    }
+                },
             )
         }
 
@@ -171,7 +214,7 @@ object UpgradeReminder {
                 val name = item.displayName
                 val lore = item.getLore()
                 val upgrade = CommunityShopUpgrade(name)
-                upgrade.duration = lore.matchFirst(upgradeDurationPattern) {
+                upgrade.duration = upgradeDurationPattern.firstMatcher(lore) {
                     val durationStr = group("duration")
                     if (durationStr == "Instant!") return null
                     TimeUtils.getDuration(durationStr)

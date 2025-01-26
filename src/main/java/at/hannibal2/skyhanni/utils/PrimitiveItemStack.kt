@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import net.minecraft.item.ItemStack
 
-data class PrimitiveItemStack(val internalName: NEUInternalName, val amount: Int) {
+data class PrimitiveItemStack(val internalName: NeuInternalName, val amount: Int) {
 
     fun createItem(): ItemStack = internalName.getItemStack().apply { stackSize = amount }
 
@@ -15,9 +15,11 @@ data class PrimitiveItemStack(val internalName: NEUInternalName, val amount: Int
 
     val itemName by lazy { internalName.itemName }
 
+    fun toPair() = Pair(internalName, amount)
+
     companion object {
 
-        fun NEUInternalName.makePrimitiveStack(amount: Int = 1) = PrimitiveItemStack(this, amount)
+        fun NeuInternalName.makePrimitiveStack(amount: Int = 1) = PrimitiveItemStack(this, amount)
         fun ItemStack.toPrimitiveStackOrNull() = getInternalNameOrNull()?.let { PrimitiveItemStack(it, stackSize) }
     }
 }

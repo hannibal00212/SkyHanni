@@ -21,7 +21,7 @@ internal enum class FFInfos(
         },
     ),
     FARMING_LEVEL(UNIVERSAL, { FFStats.baseFF }, FFTypes.FARMING_LVL, 240),
-    BESTIARY(UNIVERSAL, { FFStats.baseFF }, FFTypes.BESTIARY, 60),
+    BESTIARY(UNIVERSAL, { FFStats.baseFF }, FFTypes.BESTIARY, 66),
     GARDEN_PLOTS(UNIVERSAL, { FFStats.baseFF }, FFTypes.PLOTS, 72),
     ANITA_BUFF(UNIVERSAL, { FFStats.baseFF }, FFTypes.ANITA, 60),
     COMMUNITY_SHOP(UNIVERSAL, { FFStats.baseFF }, FFTypes.COMMUNITY_SHOP, 40),
@@ -63,7 +63,7 @@ internal enum class FFInfos(
         from = { FarmingItems.currentArmor?.getFFData() ?: FFStats.armorTotalFF },
         what = FFTypes.ENCHANT,
         x4 = { FarmingItems.currentArmor == null },
-        max = 5,
+        max = 12,
     ),
     GEMSTONE_ARMOR(
         TOTAL_ARMOR, { FarmingItems.currentArmor?.getFFData() ?: FFStats.armorTotalFF }, FFTypes.GEMSTONE,
@@ -84,6 +84,7 @@ internal enum class FFInfos(
                 FarmingItems.MOOSHROOM_COW -> 158
                 FarmingItems.BEE -> 30
                 FarmingItems.SLUG -> 100
+                FarmingItems.HEDGEHOG -> 45 * 3
                 else -> 0
             }
         },
@@ -120,7 +121,7 @@ internal enum class FFInfos(
         from = { FarmingItems.currentEquip?.getFFData() ?: FFStats.equipmentTotalFF },
         what = FFTypes.ENCHANT,
         x4 = { FarmingItems.currentEquip == null },
-        max = { at.hannibal2.skyhanni.features.garden.GardenAPI.totalAmountVisitorsExisting.toDouble() / 4.0 },
+        max = { at.hannibal2.skyhanni.features.garden.GardenApi.totalAmountVisitorsExisting.toDouble() / 4.0 },
     ),
     ;
 

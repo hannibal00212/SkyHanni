@@ -1,33 +1,29 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.ReflectionUtils.getPropertiesWithType
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
-import io.github.moulberry.notenoughupdates.itemeditor.GuiElementTextField
-import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import org.lwjgl.opengl.GL11
-import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -37,12 +33,12 @@ object GuiEditManager {
 
     private var lastHotkeyPressed = SimpleTimeMark.farPast()
 
-    private var currentPositions = TimeLimitedCache<String, Position>(15.seconds)
-    private var currentBorderSize = mutableMapOf<String, Pair<Int, Int>>()
+    private val currentPositions = TimeLimitedCache<String, Position>(15.seconds)
+    private val currentBorderSize = mutableMapOf<String, Pair<Int, Int>>()
     private var lastMovedGui: String? = null
 
-    @SubscribeEvent
-    fun onKeyClick(event: LorenzKeyPressEvent) {
+    @HandleEvent
+    fun onKeyPress(event: KeyPressEvent) {
         if (event.keyCode != SkyHanniMod.feature.gui.keyBindOpen) return
         if (event.keyCode == Keyboard.KEY_RETURN) {
             ChatUtils.chat("You can't use Enter as a keybind to open the gui editor!")
@@ -50,29 +46,33 @@ object GuiEditManager {
         }
         if (isInGui()) return
 
-        Minecraft.getMinecraft().currentScreen?.let {
-            if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign && !(it is GuiProfileViewer && !it.anyTextBoxFocused())) return
+        val guiScreen = Minecraft.getMinecraft().currentScreen
+        val openGui = guiScreen?.javaClass?.name ?: "none"
+        val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
+        if (isInNeuPv) return
+        guiScreen?.let {
+            if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign) return
             if (it is GuiEditSign && !it.isRancherSign()) return
         }
 
         if (lastHotkeyPressed.passedSince() < 500.milliseconds) return
-        if (NEUItems.neuHasFocus()) return
+        if (NeuItems.neuHasFocus()) return
         lastHotkeyPressed = SimpleTimeMark.now()
 
         openGuiPositionEditor(hotkeyReminder = false)
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         lastMovedGui?.let {
-            GuiPositionMovedEvent(it).postAndCatch()
+            GuiPositionMovedEvent(it).post()
             lastMovedGui = null
         }
     }
@@ -81,7 +81,7 @@ object GuiEditManager {
     fun add(position: Position, posLabel: String, width: Int, height: Int) {
         var name = position.internalName
         if (name == null) {
-            name = if (posLabel == "none") "none " + UUID.randomUUID() else posLabel
+            name = if (posLabel == "none") "none " + StringUtils.generateRandomId() else posLabel
             position.internalName = name
         }
         currentPositions[name] = position
@@ -93,7 +93,7 @@ object GuiEditManager {
     @JvmStatic
     fun openGuiPositionEditor(hotkeyReminder: Boolean) {
         SkyHanniMod.screenToOpen = GuiPositionEditor(
-            currentPositions.values().toList(),
+            currentPositions.values.toList(),
             2,
             Minecraft.getMinecraft().currentScreen as? GuiContainer,
         )
@@ -114,11 +114,11 @@ object GuiEditManager {
 
         GlStateManager.translate(0f, 0f, 200f)
 
-        GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
+        RenderData.renderOverlay()
 
         GlStateManager.pushMatrix()
         GlStateManager.enableDepth()
-        GuiRenderEvent.ChestGuiOverlayRenderEvent().postAndCatch()
+        GuiRenderEvent.ChestGuiOverlayRenderEvent().post()
         GlStateManager.popMatrix()
 
         GlStateManager.translate(0f, 0f, -200f)
@@ -135,9 +135,6 @@ object GuiEditManager {
     fun Position.getAbsX() = getAbsX0(getDummySize(true).x)
 
     fun Position.getAbsY() = getAbsY0(getDummySize(true).y)
-
-    fun GuiProfileViewer.anyTextBoxFocused() =
-        this.getPropertiesWithType<GuiElementTextField>().any { it.focus }
 
     fun handleGuiPositionMoved(guiName: String) {
         lastMovedGui = guiName

@@ -1,22 +1,26 @@
 package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MiningAPI
-import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -24,8 +28,6 @@ import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.EnumMap
 
 @SkyHanniModule
 object CorpseTracker {
@@ -40,11 +42,15 @@ object CorpseTracker {
 
     class BucketData : BucketedItemTrackerData<CorpseType>() {
         override fun resetItems() {
-            corpsesLooted = EnumMap(CorpseType::class.java)
+            corpsesLooted = enumMapOf()
         }
 
         override fun getDescription(timesGained: Long): List<String> {
-            val divisor = 1.coerceAtLeast(getSelectedBucket()?.let { corpsesLooted[it]?.toInt() } ?: corpsesLooted.sumAllValues().toInt())
+            val divisor = 1.coerceAtLeast(
+                getSelectedBucket()?.let {
+                    corpsesLooted[it]?.toInt()
+                } ?: corpsesLooted.sumAllValues().toInt(),
+            )
             val percentage = timesGained.toDouble() / divisor
             val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
             return listOf(
@@ -57,18 +63,19 @@ object CorpseTracker {
         override fun getCoinDescription(bucket: CorpseType?, item: TrackedItem): List<String> = listOf("<no coins>")
 
         @Expose
-        var corpsesLooted: MutableMap<CorpseType, Long> = EnumMap(CorpseType::class.java)
+        var corpsesLooted: MutableMap<CorpseType, Long> = enumMapOf()
 
         fun getCorpseCount(): Long = getSelectedBucket()?.let { corpsesLooted[it] } ?: corpsesLooted.values.sum()
     }
 
     private fun addLootedCorpse(type: CorpseType) = tracker.modify { it.corpsesLooted.addOrPut(type, 1) }
 
-    @SubscribeEvent
-    fun onCorpseLoot(event: CorpseLootedEvent) {
+    @HandleEvent
+    fun onCorpseLooted(event: CorpseLootedEvent) {
         addLootedCorpse(event.corpseType)
         for ((itemName, amount) in event.loot) {
-            NEUInternalName.fromItemNameOrNull(itemName)?.let { item ->
+            if (itemName.removeColor().trim() == "Glacite Powder") continue
+            NeuInternalName.fromItemNameOrNull(itemName)?.let { item ->
                 tracker.modify {
                     it.addItem(event.corpseType, item, amount)
                 }
@@ -83,7 +90,9 @@ object CorpseTracker {
         if (bucketData.getCorpseCount() == 0L) return@buildList
 
         var profit = tracker.drawItems(bucketData, { true }, this)
-        val applicableKeys: List<CorpseType> = bucketData.getSelectedBucket()?.let { listOf(it) } ?: enumValues<CorpseType>().toList()
+        val applicableKeys: List<CorpseType> = bucketData.getSelectedBucket()?.let {
+            listOf(it)
+        } ?: enumValues<CorpseType>().toList()
             .filter { bucketData.corpsesLooted[it] != null }
         var totalKeyCost = 0.0
         var totalKeyCount = 0
@@ -121,23 +130,29 @@ object CorpseTracker {
         tracker.addPriceFromButton(this)
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        tracker.renderDisplay(config.position)
+    init {
+        tracker.initRenderer(config.position) { isEnabled() }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.MINESHAFT || event.newIsland == IslandType.DWARVEN_MINES) {
             tracker.firstUpdate()
         }
     }
 
-    fun resetCommand() {
-        tracker.resetCommand()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetcorpsetracker") {
+            description = "Resets the Glacite Mineshaft Corpse Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
 
     fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.enabled && (IslandType.MINESHAFT.isInIsland() || (!config.onlyInMineshaft && MiningAPI.inGlacialTunnels()))
+        LorenzUtils.inSkyBlock && config.enabled && (
+            IslandType.MINESHAFT.isInIsland() ||
+                (!config.onlyInMineshaft && MiningApi.inGlacialTunnels())
+            )
 }

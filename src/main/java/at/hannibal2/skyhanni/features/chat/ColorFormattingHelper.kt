@@ -21,7 +21,7 @@ object ColorFormattingHelper {
                     "§f&k = Obfuscated (like this: §khellspawn§r)\n" +
                     "§f&l = §lBold           §r&m = §mStrikethrough \n" +
                     "§f&o = §oItalic            §r&n = §nUnderline\n" +
-                    "§f&r = Reset\n"+
+                    "§f&r = Reset\n" +
                     "§c==================================================="
             )
         )

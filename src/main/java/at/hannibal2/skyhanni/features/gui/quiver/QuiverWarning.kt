@@ -1,27 +1,27 @@
 package at.hannibal2.skyhanni.features.gui.quiver
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ArrowType
-import at.hannibal2.skyhanni.data.QuiverAPI
-import at.hannibal2.skyhanni.data.QuiverAPI.amount
+import at.hannibal2.skyhanni.data.QuiverApi
+import at.hannibal2.skyhanni.data.QuiverApi.amount
 import at.hannibal2.skyhanni.data.TitleManager
-import at.hannibal2.skyhanni.events.DungeonCompleteEvent
-import at.hannibal2.skyhanni.events.KuudraCompleteEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.QuiverUpdateEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
+import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
+import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -30,14 +30,14 @@ object QuiverWarning {
     private val config get() = SkyHanniMod.feature.combat.quiverConfig
 
     private var lastLowQuiverReminder = SimpleTimeMark.farPast()
-    private var arrowsInInstance = mutableSetOf<ArrowType>()
+    private val arrowsInInstance = mutableSetOf<ArrowType>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {
         onInstanceComplete()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKuudraComplete(event: KuudraCompleteEvent) {
         onInstanceComplete()
     }
@@ -71,11 +71,11 @@ object QuiverWarning {
         ChatUtils.chat("Low on arrows §e(${amount.addSeparators()} left)")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onQuiverUpdate(event: QuiverUpdateEvent) {
         val amount = event.currentAmount
         val arrow = event.currentArrow ?: return
-        if (arrow == QuiverAPI.NONE_ARROW_TYPE) return
+        if (arrow == QuiverApi.NONE_ARROW_TYPE) return
 
         if (inInstance()) arrowsInInstance.add(arrow)
 
@@ -85,14 +85,14 @@ object QuiverWarning {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldSwitch(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         arrowsInInstance.clear()
     }
 
-    private fun inInstance() = DungeonAPI.inDungeon() || KuudraAPI.inKuudra()
+    private fun inInstance() = DungeonApi.inDungeon() || KuudraApi.inKuudra()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(35, "inventory.quiverAlert", "combat.quiverConfig.lowQuiverNotification")
     }

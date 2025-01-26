@@ -1,15 +1,16 @@
 package at.hannibal2.skyhanni.data.model
 
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
 import com.google.gson.stream.JsonToken
-import java.util.PriorityQueue
 
+// TODO: This class should be disambiguated into a NodePath and a Graph class
 @JvmInline
 value class Graph(
     @Expose val nodes: List<GraphNode>,
@@ -49,7 +50,7 @@ value class Graph(
                         out.name("Name").value(it)
                     }
 
-                    it.tagNames?.takeIf { it.isNotEmpty() }?.let {
+                    it.tagNames.takeIf { list -> list.isNotEmpty() }?.let {
                         out.name("Tags")
                         out.beginArray()
                         for (tagName in it) {
@@ -62,7 +63,7 @@ value class Graph(
                     out.beginObject()
                     for ((node, weight) in it.neighbours) {
                         val id = node.id.toString()
-                        out.name(id).value(weight.round(2))
+                        out.name(id).value(weight.roundTo(2))
                     }
                     out.endObject()
 
@@ -79,8 +80,8 @@ value class Graph(
                     reader.beginObject()
                     var position: LorenzVec? = null
                     var name: String? = null
-                    var tags: List<String>? = null
-                    var neighbors = mutableListOf<Pair<Int, Double>>()
+                    var tags = emptyList<String>()
+                    val neighbors = mutableListOf<Pair<Int, Double>>()
                     while (reader.hasNext()) {
                         if (reader.peek() != JsonToken.NAME) {
                             reader.skipValue()
@@ -137,13 +138,17 @@ value class Graph(
         fun fromJson(json: String): Graph = gson.fromJson<Graph>(json)
         fun fromJson(json: JsonElement): Graph = gson.fromJson<Graph>(json)
     }
+
+    fun toPositionsList() = this.map { it.position }
+
+    fun toJson(): String = gson.toJson(this)
 }
 
 // The node object that gets parsed from/to json
-class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null, val tagNames: List<String>? = null) {
+class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null, val tagNames: List<String> = emptyList()) {
 
     val tags: List<GraphNodeTag> by lazy {
-        tagNames?.mapNotNull { GraphNodeTag.byId(it) } ?: emptyList()
+        tagNames.mapNotNull { GraphNodeTag.byId(it) }
     }
 
     /** Keys are the neighbours and value the edge weight (e.g. Distance) */
@@ -163,53 +168,42 @@ class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null, 
 
         return true
     }
+
+    fun sameNameAndTags(other: GraphNode): Boolean = name == other.name && allowedTags == other.allowedTags
+
+    private val allowedTags get() = tags.filter { it in NavigationHelper.allowedTags }
 }
 
-fun Graph.findShortestPathAsGraph(start: GraphNode, end: GraphNode): Graph = this.findShortestPathAsGraphWithDistance(start, end).first
+data class DijkstraTree(
+    val origin: GraphNode,
+    /**
+     * A map of distances between the [origin] and each node in a graph. This distance map is only accurate for nodes closer to the
+     * origin than the [lastVisitedNode]. In case there is no early bailout, this map will be accurate for all nodes in the graph.
+     */
+    val distances: Map<GraphNode, Double>,
+    /**
+     * A map of nodes to the neighbouring node that is the quickest path towards the origin (the neighbouring node that has the lowest value
+     * in [distances])
+     */
+    val towardsOrigin: Map<GraphNode, GraphNode>,
+    /**
+     * This is either the furthest away node in the graph, or the node that was bailed out on early because it fulfilled the search
+     * condition. In case the search condition matches nothing, this will *still* be the furthest away node, so an additional check might be
+     * necessary.
+     */
+    val lastVisitedNode: GraphNode,
+)
 
-fun Graph.findShortestPathAsGraphWithDistance(start: GraphNode, end: GraphNode): Pair<Graph, Double> {
-    val distances = mutableMapOf<GraphNode, Double>()
-    val previous = mutableMapOf<GraphNode, GraphNode>()
-    val visited = mutableSetOf<GraphNode>()
-    val queue = PriorityQueue<GraphNode>(compareBy { distances.getOrDefault(it, Double.MAX_VALUE) })
-
-    distances[start] = 0.0
-    queue.add(start)
-
-    while (queue.isNotEmpty()) {
-        val current = queue.poll()
-        if (current == end) break
-
-        visited.add(current)
-
-        current.neighbours.forEach { (neighbour, weight) ->
-            if (neighbour !in visited) {
-                val newDistance = distances.getValue(current) + weight
-                if (newDistance < distances.getOrDefault(neighbour, Double.MAX_VALUE)) {
-                    distances[neighbour] = newDistance
-                    previous[neighbour] = current
-                    queue.add(neighbour)
-                }
-            }
+@Suppress("MapGetWithNotNullAssertionOperator")
+fun DijkstraTree.findPathToDestination(end: GraphNode): Pair<Graph, Double> {
+    val distances = this
+    val reversePath = buildList {
+        var current = end
+        while (true) {
+            add(current)
+            if (current == distances.origin) break
+            current = distances.towardsOrigin[current] ?: return Graph(emptyList()) to 0.0
         }
     }
-
-    return Graph(
-        buildList {
-            var current = end
-            while (current != start) {
-                add(current)
-                current = previous[current] ?: return Graph(emptyList()) to 0.0
-            }
-            add(start)
-        }.reversed(),
-    ) to distances[end]!!
+    return Graph(reversePath.reversed()) to distances.distances[end]!!
 }
-
-fun Graph.findShortestPath(start: GraphNode, end: GraphNode): List<LorenzVec> = this.findShortestPathAsGraph(start, end).toPositionsList()
-
-fun Graph.findShortestDistance(start: GraphNode, end: GraphNode): Double = this.findShortestPathAsGraphWithDistance(start, end).second
-
-fun Graph.toPositionsList() = this.map { it.position }
-
-fun Graph.toJson(): String = Graph.gson.toJson(this)

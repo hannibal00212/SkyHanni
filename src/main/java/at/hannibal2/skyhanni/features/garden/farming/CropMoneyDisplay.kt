@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.MoneyPerHourConfig.CustomFormatEntry
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
@@ -9,7 +10,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.isSpeedDataEmpty
@@ -25,26 +26,25 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import kotlinx.coroutines.launch
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object CropMoneyDisplay {
 
-    var multipliers = mapOf<NEUInternalName, Int>()
+    var multipliers = mapOf<NeuInternalName, Int>()
     private var showCalculation = false
 
     fun toggleShowCalculation() {
@@ -54,39 +54,41 @@ object CropMoneyDisplay {
     }
 
     private var display = emptyList<List<Any>>()
-    private val config get() = GardenAPI.config.moneyPerHours
+    private val config get() = GardenApi.config.moneyPerHours
     private var loaded = false
     private var ready = false
-    private val cropNames = mutableMapOf<NEUInternalName, CropType>()
-    private val toolHasBountiful get() = GardenAPI.storage?.toolWithBountiful
+    private val cropNames = mutableMapOf<NeuInternalName, CropType>()
+    private val toolHasBountiful get() = GardenApi.storage?.toolWithBountiful
 
-    val BOX_OF_SEEDS by lazy { "BOX_OF_SEEDS".asInternalName().getItemStack() }
+    private val BOX_OF_SEEDS by lazy { "BOX_OF_SEEDS".toInternalName().getItemStack() }
+    private val SEEDS = "SEEDS".toInternalName()
+    private val ENCHANTED_SEEDS = "ENCHANTED_SEEDS".toInternalName()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        if (!GardenAPI.hideExtraGuis()) {
+        if (!GardenApi.hideExtraGuis()) {
             config.pos.renderStringsAndItems(display, posLabel = "Garden Money Per Hour")
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(5)) return
 
-        if (GardenAPI.getCurrentlyFarmedCrop() == null && !config.alwaysOn) return
+        if (GardenApi.getCurrentlyFarmedCrop() == null && !config.alwaysOn) return
 
         update()
     }
@@ -112,11 +114,11 @@ object CropMoneyDisplay {
             return newDisplay
         }
 
-        if (GardenAPI.getCurrentlyFarmedCrop() == null && !config.alwaysOn) return newDisplay
+        if (GardenApi.getCurrentlyFarmedCrop() == null && !config.alwaysOn) return newDisplay
 
         newDisplay.addAsSingletonList(fullTitle(title))
 
-        if (!GardenAPI.config.cropMilestones.progress) {
+        if (!GardenApi.config.cropMilestones.progress) {
             newDisplay.addAsSingletonList("§cCrop Milestone Progress Display is disabled!")
             return newDisplay
         }
@@ -124,13 +126,13 @@ object CropMoneyDisplay {
         var extraMushroomCowPerkCoins = 0.0
         var extraDicerCoins = 0.0
         var extraArmorCoins = 0.0
-        GardenAPI.getCurrentlyFarmedCrop()?.let {
+        GardenApi.getCurrentlyFarmedCrop()?.let {
             val reforgeName = InventoryUtils.getItemInHand()?.getReforgeName()
             toolHasBountiful?.put(it, reforgeName == "bountiful")
 
-            if (GardenAPI.mushroomCowPet && it != CropType.MUSHROOM && config.mooshroom) {
-                val redMushroom = "ENCHANTED_RED_MUSHROOM".asInternalName()
-                val brownMushroom = "ENCHANTED_BROWN_MUSHROOM".asInternalName()
+            if (GardenApi.mushroomCowPet && it != CropType.MUSHROOM && config.mooshroom) {
+                val redMushroom = "ENCHANTED_RED_MUSHROOM".toInternalName()
+                val brownMushroom = "ENCHANTED_BROWN_MUSHROOM".toInternalName()
                 val (redPrice, brownPrice) = if (LorenzUtils.noTradeMode) {
                     val redPrice = (redMushroom.getNpcPriceOrNull() ?: 160.0) / 160
                     val brownPrice = (brownMushroom.getNpcPriceOrNull() ?: 160.0) / 160
@@ -149,8 +151,8 @@ object CropMoneyDisplay {
             val itemInHand = InventoryUtils.getItemInHand()?.getInternalName()
             if (itemInHand?.contains("DICER") == true && config.dicer) {
                 val (dicerDrops, internalName) = when (it) {
-                    CropType.MELON -> GardenCropSpeed.latestMelonDicer to "ENCHANTED_MELON".asInternalName()
-                    CropType.PUMPKIN -> GardenCropSpeed.latestPumpkinDicer to "ENCHANTED_PUMPKIN".asInternalName()
+                    CropType.MELON -> GardenCropSpeed.latestMelonDicer to "ENCHANTED_MELON".toInternalName()
+                    CropType.PUMPKIN -> GardenCropSpeed.latestPumpkinDicer to "ENCHANTED_PUMPKIN".toInternalName()
 
                     else -> ErrorManager.skyHanniError(
                         "Unknown dicer detected.",
@@ -160,14 +162,14 @@ object CropMoneyDisplay {
                 }
                 val bazaarData = internalName.getBazaarData()
                 val price =
-                    if (LorenzUtils.noTradeMode || bazaarData == null) internalName.getNpcPrice() / 160 else (bazaarData.instantBuyPrice + bazaarData.sellOfferPrice) / 320
+                    if (LorenzUtils.noTradeMode || bazaarData == null) internalName.getNpcPrice() / 160
+                    else (bazaarData.instantBuyPrice + bazaarData.sellOfferPrice) / 320
                 extraDicerCoins = 60 * 60 * GardenCropSpeed.getRecentBPS() * dicerDrops * price
             }
 
             if (config.armor) {
-                val amountPerHour =
-                    it.multiplier * GardenCropSpeed.getRecentBPS() * ArmorDropTracker.getDropsPerHour(it)
-                extraArmorCoins = amountPerHour * it.specialDropType.asInternalName().getNpcPrice()
+                val amountPerHour = GardenCropSpeed.getRecentBPS() * ArmorDropTracker.getDropsPerHour(it)
+                extraArmorCoins = amountPerHour * it.specialDropType.toInternalName().getNpcPrice()
             }
         }
 
@@ -190,7 +192,7 @@ object CropMoneyDisplay {
         for (internalName in help.sortedDesc().keys) {
             number++
             val crop = cropNames[internalName]!!
-            val isCurrent = crop == GardenAPI.getCurrentlyFarmedCrop()
+            val isCurrent = crop == GardenApi.getCurrentlyFarmedCrop()
             if (number > config.showOnlyBest && (!config.showCurrent || !isCurrent)) continue
             val debug = isCurrent && showCalculation
             if (debug) {
@@ -229,7 +231,7 @@ object CropMoneyDisplay {
             }
 
             val coinsColor = if (isCurrent && config.compact) "§e" else "§6"
-            val moneyArray = moneyPerHourData[internalName]!!
+            val moneyArray = moneyPerHourData[internalName].orEmpty()
 
             for (price in moneyArray) {
                 val finalPrice = price + extraMushroomCowPerkCoins + extraDicerCoins + extraArmorCoins
@@ -286,8 +288,8 @@ object CropMoneyDisplay {
         moneyPerHour.toLong().addSeparators()
     }
 
-    private fun calculateMoneyPerHour(debugList: MutableList<List<Any>>): Map<NEUInternalName, Array<Double>> {
-        val moneyPerHours = mutableMapOf<NEUInternalName, Array<Double>>()
+    private fun calculateMoneyPerHour(debugList: MutableList<List<Any>>): Map<NeuInternalName, Array<Double>> {
+        val moneyPerHours = mutableMapOf<NeuInternalName, Array<Double>>()
 
         var seedsPrice: BazaarData? = null
         var seedsPerHour = 0.0
@@ -297,7 +299,7 @@ object CropMoneyDisplay {
                 (config.useCustomFormat && config.customFormat.singleOrNull() == CustomFormatEntry.NPC_PRICE)
 
         for ((internalName, amount) in multipliers.moveEntryToTop { isSeeds(it.key) }) {
-            if (internalName.equals("BOX_OF_SEEDS")) continue
+            if (internalName == BOX_OF_SEEDS.getInternalName()) continue
 
             val crop = cropNames[internalName]!!
             // When only the NPC price is shown, display the price only for the base item
@@ -311,7 +313,7 @@ object CropMoneyDisplay {
 
             var speed = crop.getSpeed()?.toDouble() ?: continue
 
-            val isCurrent = crop == GardenAPI.getCurrentlyFarmedCrop()
+            val isCurrent = crop == GardenApi.getCurrentlyFarmedCrop()
             val debug = isCurrent && showCalculation
             if (debug) {
                 debugList.addAsSingletonList("calculateMoneyPerHour: $internalName/$crop")
@@ -361,8 +363,8 @@ object CropMoneyDisplay {
                         if (debug) {
                             debugList.addAsSingletonList(" added seedsPerHour: $seedsPerHour")
                         }
-                        val factor = NEUItems.getPrimitiveMultiplier(internalName).amount
-                        npcPrice += "SEEDS".asInternalName().getNpcPrice() * seedsPerHour / factor
+                        val factor = NeuItems.getPrimitiveMultiplier(internalName).amount
+                        npcPrice += SEEDS.getNpcPrice() * seedsPerHour / factor
                         sellOffer += it.sellOfferPrice * seedsPerHour
                         instantSell += it.instantBuyPrice * seedsPerHour
                     }
@@ -380,8 +382,7 @@ object CropMoneyDisplay {
         return moneyPerHours
     }
 
-    private fun isSeeds(internalName: NEUInternalName) =
-        internalName.equals("ENCHANTED_SEEDS") || internalName.equals("SEEDS")
+    private fun isSeeds(internalName: NeuInternalName) = internalName == ENCHANTED_SEEDS || internalName == SEEDS
 
     // TODO : Rewrite to not be index-reliant
     private fun formatNumbers(sellOffer: Double, instantSell: Double, npcPrice: Double): Array<Double> {
@@ -413,15 +414,15 @@ object CropMoneyDisplay {
         loaded = true
 
         SkyHanniMod.coroutineScope.launch {
-            val map = mutableMapOf<NEUInternalName, Int>()
-            for ((rawInternalName, _) in NEUItems.allNeuRepoItems()) {
+            val map = mutableMapOf<NeuInternalName, Int>()
+            for ((rawInternalName, _) in NeuItems.allNeuRepoItems()) {
                 if (rawInternalName == "ENCHANTED_PAPER") continue
                 if (rawInternalName == "ENCHANTED_BREAD") continue
                 if (rawInternalName == "SIMPLE_CARROT_CANDY") continue
-                val internalName = rawInternalName.asInternalName()
+                val internalName = rawInternalName.toInternalName()
                 if (!internalName.isBazaarItem()) continue
 
-                val (newId, amount) = NEUItems.getPrimitiveMultiplier(internalName)
+                val (newId, amount) = NeuItems.getPrimitiveMultiplier(internalName)
                 val itemName = newId.itemNameWithoutColor
                 val crop = getByNameOrNull(itemName)
                 crop?.let {
@@ -437,9 +438,9 @@ object CropMoneyDisplay {
         }
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.display
+    private fun isEnabled() = GardenApi.inGarden() && config.display
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.moneyPerHourDisplay", "garden.moneyPerHours.display")
         event.move(3, "garden.moneyPerHourShowOnlyBest", "garden.moneyPerHours.showOnlyBest")

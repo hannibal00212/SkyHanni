@@ -12,8 +12,15 @@ annotation class HandleEvent(
 
     /**
      * If the event should only be received while on a specific skyblock island.
+     * To specify multiple islands, use [onlyOnIslands] instead.
      */
-    vararg val onlyOnIslands: IslandType = [IslandType.ANY],
+    val onlyOnIsland: IslandType = IslandType.ANY,
+
+    /**
+     * If the event should only be received while being on specific skyblock islands.
+     * To specify only one island, use [onlyOnIsland] instead.
+     */
+    vararg val onlyOnIslands: IslandType = [],
 
     /**
      * The priority of when the event will be called, lower priority will be called first, see the companion object.

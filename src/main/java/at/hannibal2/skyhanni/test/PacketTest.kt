@@ -1,16 +1,19 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.compat.getLocation
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
@@ -43,7 +46,7 @@ object PacketTest {
 
     private val entityMap = mutableMapOf<Int, MutableList<Packet<*>>>()
 
-    fun command(args: Array<String>) {
+    private fun command(args: Array<String>) {
         if (args.size == 1 && args[0].isInt()) {
             sendEntityPacketData(args[0].toInt())
             return
@@ -187,7 +190,7 @@ object PacketTest {
     }
 
     private fun getDistance(location: LorenzVec?): Double {
-        return location?.distanceToPlayer()?.round(1) ?: 0.0
+        return location?.distanceToPlayer()?.roundTo(1) ?: 0.0
     }
 
     private fun getLocation(packet: Packet<*>, entity: Entity?): LorenzVec? {
@@ -201,7 +204,7 @@ object PacketTest {
             return LorenzVec(packet.x, packet.y, packet.z)
         }
         if (packet is C03PacketPlayer) {
-            return LorenzVec(packet.positionX, packet.positionY, packet.positionZ)
+            return packet.getLocation()
         }
 
         if (packet is S0FPacketSpawnMob) {
@@ -254,5 +257,14 @@ object PacketTest {
         is S14PacketEntity.S16PacketEntityLook -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
         is S14PacketEntity.S17PacketEntityLookMove -> packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int */
         else -> null
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtestpacket") {
+            description = "Logs incoming and outgoing packets to the console"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { command(it) }
+        }
     }
 }

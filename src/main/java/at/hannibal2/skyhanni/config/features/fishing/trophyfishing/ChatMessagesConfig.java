@@ -32,17 +32,17 @@ public class ChatMessagesConfig {
         STYLE_1("Style 1", 0),
         STYLE_2("Style 2", 1),
         STYLE_3("Style 3", 2);
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        DesignFormat(String str, int legacyId) {
-            this.str = str;
+        DesignFormat(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        DesignFormat(String str) {
-            this(str, -1);
+        DesignFormat(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -52,7 +52,7 @@ public class ChatMessagesConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -82,4 +82,19 @@ public class ChatMessagesConfig {
     @ConfigOption(name = "Silver Duplicates", desc = "Hide duplicate messages for silver Trophy Fishes from chat.")
     @ConfigEditorBoolean
     public boolean silverHider = false;
+
+    @Expose
+    @ConfigOption(name = "Gold Alert", desc = "Send an alert upon catching a gold Trophy Fish.")
+    @ConfigEditorBoolean
+    public boolean goldAlert = false;
+
+    @Expose
+    @ConfigOption(name = "Diamond Alert", desc = "Send an alert upon catching a diamond Trophy Fish.")
+    @ConfigEditorBoolean
+    public boolean diamondAlert = false;
+
+    @Expose
+    @ConfigOption(name = "Play Sound Alert", desc = "Play a sound effect when rare trophy fishes are caught.")
+    @ConfigEditorBoolean
+    public boolean playSound = true;
 }

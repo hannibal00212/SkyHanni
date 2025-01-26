@@ -14,6 +14,7 @@ pluginManagement {
         maven("https://repo.nea.moe/releases")
         maven("https://repo.sk1er.club/repository/maven-releases/")
         maven("https://maven.deftu.dev/releases")
+        maven("https://maven.teamresourceful.com/repository/maven-private/") // Blossom
         maven("https://jitpack.io") {
             content {
                 includeGroupByRegex("(com|io)\\.github\\..*")
@@ -37,6 +38,7 @@ plugins {
 MultiVersionStage.initFrom(file(".gradle/private.properties"))
 
 include("annotation-processors")
+include("detekt")
 rootProject.name = "SkyHanni"
 rootProject.buildFileName = "root.gradle.kts"
 

@@ -1,0 +1,62 @@
+name: "PR Changelog Verification"
+
+on:
+    pull_request_target:
+        types: [ opened, edited, ready_for_review ]
+
+jobs:
+    verify-changelog:
+        if: github.event.pull_request.state == 'open' && '511310721' == github.repository_id && github.event.pull_request.draft == false
+        runs-on: ubuntu-latest
+        concurrency:
+            group: verify-changelog-${{ github.event.pull_request.number }}
+            cancel-in-progress: true
+        steps:
+            -   name: Checkout code
+                uses: actions/checkout@v4
+                with:
+                    ref: ${{ github.event.pull_request.head.sha }}
+                    repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+            -   uses: ./.github/actions/setup-normal-workspace
+
+            -   name: Grant execute permission for gradlew
+                run: chmod +x gradlew
+
+            -   name: Run ChangeLog verification
+                env:
+                    PR_TITLE: ${{ github.event.pull_request.title }}
+                    PR_BODY: ${{ github.event.pull_request.body }}
+                run: |
+                    ./gradlew checkPrDescription -PprTitle="${PR_TITLE}" -PprBody="${PR_BODY}"
+
+            -   name: Add label if changelog verification fails
+                if: failure()
+                uses: actions-ecosystem/action-add-labels@v1
+                with:
+                    github_token: ${{ secrets.GITHUB_TOKEN }}
+                    labels: 'Wrong Title/Changelog'
+
+            -   name: Remove label if changelog verification passes
+                if: success()
+                uses: actions-ecosystem/action-remove-labels@v1
+                with:
+                    github_token: ${{ secrets.GITHUB_TOKEN }}
+                    labels: 'Wrong Title/Changelog'
+
+            -   name: Add comment to PR if changelog verification fails
+                if: failure()
+                uses: actions/github-script@v6
+                with:
+                    github-token: ${{ secrets.GITHUB_TOKEN }}
+                    script: |
+                        const fs = require('fs');
+                        const test = fs.readFileSync('versions/1.8.9/build/changelog_errors.txt', 'utf8');
+                        const commentBody = `${test}`
+                        
+                        github.rest.issues.createComment({
+                            issue_number: context.issue.number,
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            body: commentBody
+                        })

@@ -11,18 +11,18 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.guide.GuideTablePage
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 
-class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7, footerSpacing: Int = 6) :
-    GuideTablePage(
-        sizeX, sizeY, paddingX, paddingY, footerSpacing,
-    ) {
+class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7, footerSpacing: Int = 6) : GuideTablePage(
+    sizeX, sizeY, paddingX, paddingY, footerSpacing,
+) {
 
     override fun onEnter() {
         val (content, footer) = getPage()
         update(content, footer)
     }
 
-    //TODO split up this 240 lines function
-    fun getPage(): Pair<List<List<Renderable>>, List<Renderable>> {
+    // TODO split up this 240 lines function - remove suppression when done
+    @Suppress("CyclomaticComplexMethod", "LongMethod")
+    private fun getPage(): Pair<List<List<Renderable>>, List<Renderable>> {
         val content = mutableListOf<MutableList<Renderable>>()
         val footer = mutableListOf<Renderable>()
         val timeUntilCakes = FFStats.cakeExpireTime.timeUntil().format(TimeUnit.HOUR, maxUnits = 1)
@@ -103,7 +103,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
 
         val moreInfo = "§2Select a piece for more info"
         val wordArmor = if (FarmingItems.currentArmor == null) "Armor" else "Piece"
-        val armorName = FarmingItems.currentArmor?.getItem()?.displayName ?: ""
+        val armorName = FarmingItems.currentArmor?.getItem()?.displayName.orEmpty()
 
         content.addTable(
             1,
@@ -161,7 +161,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
 
         val wordEquip = if (FarmingItems.currentEquip == null) "Equipment" else "Piece"
 
-        val equipmentName = FarmingItems.currentEquip?.getItem()?.displayName ?: ""
+        val equipmentName = FarmingItems.currentEquip?.getItem()?.displayName.orEmpty()
 
         content.addTable(
             1,
@@ -208,20 +208,17 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             ),
         )
 
-        footer.add(
-            Renderable.horizontalContainer(
-                FarmingItems.getPetsDisplay(true),
-                4,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-            ),
+        val petFooter = Renderable.horizontalContainer(
+            FarmingItems.getPetsDisplay(true),
+            4,
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         )
 
         footer.add(
             FFInfos.TOTAL_PET.bar(
                 "§2Total Pet Fortune",
                 "§7§2The total fortune from your pet and its item",
-                72,
             ),
         )
 
@@ -229,7 +226,6 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             FFInfos.PET_BASE.bar(
                 "§2Base Pet Fortune",
                 "§7§2The base fortune from your pet",
-                72,
             ),
         )
 
@@ -242,7 +238,6 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
                     "MINOS_RELIC" -> "§cGreen Bandana is better for fortune than minos relic!"
                     else -> "No fortune boosting pet item"
                 },
-                72,
             ),
         )
 
@@ -267,7 +262,21 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             ),
         )
 
-        return content to footer
+        val realFooter = Renderable.verticalContainer(
+            listOf(
+                petFooter,
+                Renderable.horizontalContainer(
+                    footer,
+                    spacing = 15,
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER, verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                ),
+            ),
+            spacing = 2,
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+        )
+
+        return content to listOf(realFooter)
     }
 
     private fun FFTypes.notSaved(): Boolean = FFStats.baseFF[this]?.let {

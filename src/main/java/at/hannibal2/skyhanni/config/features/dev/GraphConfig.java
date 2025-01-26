@@ -24,13 +24,18 @@ public class GraphConfig {
 
     @Expose
     @ConfigOption(name = "Toggle Ghost Position", desc = "Creates or removes the Ghost Position. This helps editing nodes tht are in the air.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_F)
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int toggleGhostPosition = Keyboard.KEY_NONE;
 
     @Expose
     @ConfigOption(name = "Select Key", desc = "Select the nearest node to be active. Double press to unselect.")
     @ConfigEditorKeybind(defaultKey = -98) // Middle Mouse
     public int selectKey = -98;
+
+    @Expose
+    @ConfigOption(name = "Select near look", desc = "Select the node closest to where you are looking.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int selectRaycastKey = Keyboard.KEY_NONE;
 
     @Expose
     @ConfigOption(name = "Connect Key", desc = "Connect the nearest node with the active node. If the nodes are already connected removes the connection.")
@@ -91,6 +96,11 @@ public class GraphConfig {
     @ConfigOption(name = "Dissolve Key", desc = "Dissolve the active node into one edge if it only has two edges.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int dissolveKey = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "Edge Cycle", desc = "Cycles the direction of the edge that is between the active and the closed node. (Used to make one-directional ways)")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_H)
+    public int edgeCycle = Keyboard.KEY_H;
 
     @Expose
     @ConfigLink(owner = GraphConfig.class, field = "enabled")

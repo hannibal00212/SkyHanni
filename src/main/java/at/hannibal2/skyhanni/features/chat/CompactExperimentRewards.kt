@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -21,7 +21,7 @@ object CompactExperimentRewards {
 
     private val config get() = SkyHanniMod.feature.chat
 
-    private var gainedRewards = mutableListOf<String>()
+    private val gainedRewards = mutableListOf<String>()
     private var lastTimeTableOpened = SimpleTimeMark.farPast()
     private var currentMessage = ""
 
@@ -58,15 +58,15 @@ object CompactExperimentRewards {
         "^(?:§8 \\+| §r§8\\+)(?<reward>.*)\$",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (isEnabled() && experimentInventoriesPattern.matches(InventoryUtils.openInventoryName())) {
             lastTimeTableOpened = SimpleTimeMark.now()
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled() || lastTimeTableOpened.passedSince() >= 3.seconds || event.blockedReason != "") return
 
         val message = event.message
@@ -89,7 +89,7 @@ object CompactExperimentRewards {
     }
 
     private fun sendMessage(reward: String?) {
-        if (gainedRewards.last() != reward || currentMessage == "") return
+        if (gainedRewards.lastOrNull() != reward || currentMessage == "") return
 
         val expList = mutableListOf<String>().apply {
             gainedRewards.forEach { add("§8+$it") }

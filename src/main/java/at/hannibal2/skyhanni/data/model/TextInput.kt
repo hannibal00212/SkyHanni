@@ -8,11 +8,12 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.insert
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.settings.KeyBinding
+import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
-class TextInput {
+open class TextInput {
 
     var textBox: String = ""
     private var carriage: Int? = null
@@ -45,6 +46,10 @@ class TextInput {
 
     private val updateEvents = mutableMapOf<Int, (TextInput) -> Unit>()
 
+    protected fun update() {
+        updateEvents.forEach { (_, it) -> it(this) }
+    }
+
     fun registerToEvent(key: Int, event: (TextInput) -> Unit) {
         updateEvents[key] = event
     }
@@ -56,6 +61,8 @@ class TextInput {
     companion object {
         private var activeInstance: TextInput? = null
 
+        fun isActive() = activeInstance != null
+
         fun activate(instance: TextInput) {
             activeInstance = instance
             timeSinceKeyEvent = Keyboard.getEventNanoseconds()
@@ -65,6 +72,7 @@ class TextInput {
             activeInstance = null
         }
 
+        @Suppress("UnusedParameter")
         fun onMinecraftInput(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
             if (activeInstance != null) {
                 cir.returnValue = false
@@ -92,7 +100,7 @@ class TextInput {
             }
 
         private var textBox
-            get() = activeInstance?.textBox ?: ""
+            get() = activeInstance?.textBox.orEmpty()
             set(value) {
                 activeInstance?.textBox = value
             }
@@ -100,7 +108,7 @@ class TextInput {
         private fun updated() {
             with(activeInstance) {
                 if (this == null) return
-                this.updateEvents.forEach { (_, it) -> it(this) }
+                update()
             }
         }
 
@@ -111,7 +119,7 @@ class TextInput {
             }
             if (KeyboardManager.isPastingKeysDown()) {
                 runBlocking {
-                    textBox = OSUtils.readFromClipboard() ?: return@runBlocking
+                    textBox = OSUtils.readFromClipboard()?.take(2024) ?: return@runBlocking
                     updated()
                 }
                 return
@@ -130,7 +138,7 @@ class TextInput {
                 }
                 return
             }
-            if (Keyboard.KEY_DELETE.isKeyClicked()) { // Does not work for some reason
+            if (Keyboard.KEY_BACK.isKeyClicked()) {
                 if (carriage != null) {
                     textBox.removeRange(carriage, carriage + 1)
                 } else {
@@ -145,15 +153,11 @@ class TextInput {
             val char = Keyboard.getEventCharacter()
             textBox = when (char) {
                 Char(0) -> return
-                '\b' -> if (carriage != null) {
-                    if (carriage == 0) {
-                        textBox.substring(1)
-                    } else {
-                        this.carriage = carriage.minus(1)
-                        textBox.removeRange(carriage - 1, carriage)
-                    }
+                '\b' -> onRemove()
+                Char(127) -> if (SystemUtils.IS_OS_MAC) {
+                    onRemove()
                 } else {
-                    textBox.dropLast(1)
+                    textBox
                 }
 
                 else -> if (carriage != null) {
@@ -165,6 +169,15 @@ class TextInput {
             }
             updated()
         }
+
+        private fun onRemove(): String = carriage?.let {
+            if (it == 0) {
+                textBox.substring(1)
+            } else {
+                this.carriage = it.minus(1)
+                textBox.removeRange(it - 1, it)
+            }
+        } ?: textBox.dropLast(1)
 
         private fun moveCarriageRight(carriage: Int) = carriage + 1
 

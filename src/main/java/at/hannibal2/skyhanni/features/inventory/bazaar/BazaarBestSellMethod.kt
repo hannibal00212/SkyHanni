@@ -1,22 +1,21 @@
 package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.BazaarOpenedProductEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.bazaar.BazaarOpenedProductEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarDataOrError
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object BazaarBestSellMethod {
@@ -29,7 +28,7 @@ object BazaarBestSellMethod {
     private var lastClickedItem: ItemStack? = null
     private var nextCloseWillResetItem = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         display = ""
         if (lastClickedItem != null) {
@@ -40,13 +39,13 @@ object BazaarBestSellMethod {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBazaarOpenedProduct(event: BazaarOpenedProductEvent) {
         if (!isEnabled()) return
         display = updateDisplay(event.openedProduct)
     }
 
-    private fun updateDisplay(internalName: NEUInternalName?): String {
+    private fun updateDisplay(internalName: NeuInternalName?): String {
         if (internalName == null) {
             return "§cUnknown Bazaar item!"
         }
@@ -66,7 +65,7 @@ object BazaarBestSellMethod {
         return "$name§7 sell difference: §6$result coins"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (display.isEmpty()) return
@@ -74,7 +73,7 @@ object BazaarBestSellMethod {
         config.bestSellMethodPos.renderString(display, posLabel = "Bazaar Best Sell Method")
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         lastClickedItem = event.slot?.stack
         nextCloseWillResetItem = false

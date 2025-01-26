@@ -1,13 +1,10 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.annotations.Expose
 
 abstract class ItemTrackerData : TrackerData() {
-
-    private val config get() = SkyHanniMod.feature.misc.tracker
 
     abstract fun resetItems()
 
@@ -17,14 +14,14 @@ abstract class ItemTrackerData : TrackerData() {
 
     abstract fun getCoinDescription(item: TrackedItem): List<String>
 
-    open fun getCustomPricePer(internalName: NEUInternalName) = SkyHanniTracker.getPricePer(internalName)
+    open fun getCustomPricePer(internalName: NeuInternalName) = SkyHanniTracker.getPricePer(internalName)
 
     override fun reset() {
         items.clear()
         resetItems()
     }
 
-    fun addItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
+    fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
         val item = items.getOrPut(internalName) { TrackedItem() }
 
         if (!command) {
@@ -38,7 +35,7 @@ abstract class ItemTrackerData : TrackerData() {
     }
 
     @Expose
-    var items: MutableMap<NEUInternalName, TrackedItem> = HashMap()
+    var items: MutableMap<NeuInternalName, TrackedItem> = HashMap()
 
     class TrackedItem {
 
