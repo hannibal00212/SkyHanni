@@ -61,22 +61,20 @@ object ShoppingList {
             itemName = null
             if (!name.isCategory()) {
                 ChatUtils.userError("Item $name not found")
-                return
             } else {
                 removeCategory(name)
-                return
             }
-
+            return
         }
 
         if (categoryName != null) {
             if (!categoryName.isCategory()) {
                 ChatUtils.userError("Category $categoryName not found")
-                return
-            }
-            val category = categories.firstOrNull { it.name == categoryName } ?: return
+            } else {
+                val category = categories.firstOrNull { it.name == categoryName } ?: return
 
-            category.remove(itemName, amount)
+                category.remove(itemName, amount)
+            }
             return
         }
 
@@ -100,10 +98,9 @@ object ShoppingList {
         }
         if (category == null) {
             ChatUtils.userError("Item $itemName not found")
-            return
+        } else {
+            category.remove(itemName, amount)
         }
-
-        category.remove(itemName, amount)
     }
 
     fun clear() {
