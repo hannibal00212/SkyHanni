@@ -67,7 +67,7 @@ class PestTrapConfig {
 
         @Expose
         @ConfigOption(name = "Warning Interval", desc = "Reminder interval for messages in seconds.")
-        @ConfigEditorSlider(minValue = 1f, minStep = 1f, maxValue = 300f)
-        var warningIntervalSeconds: Property<Int> = Property.of(0)
+        @ConfigEditorSlider(minValue = 10f, minStep = 5f, maxValue = 300f)
+        var warningIntervalSeconds: Property<Int> = Property.of(30)
     }
 }
