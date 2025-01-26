@@ -21,11 +21,11 @@ object AcceptLastPartyInvite {
     /**
      * REGEX-TEST: §r§b[MVP§r§c+§r§b] STPREAPER §r§ehas invited you to join their party!
      * REGEX-TEST: §r§a[VIP] VrxyOwnsYou_ §r§ehas invited you to join their party!
-     * REGEX-TEST: TutaoOakley §r§ehas invited you to join their party!
+     * REGEX-TEST: §r§7SkyLime1213 §r§ehas invited you to join their party!
      */
     private val inviteReceivedPattern by patternGroup.pattern(
         "received",
-        "§r§.(?:\\[.*?] )?(?<player>\\w+) §r§ehas invited you to join their party!",
+        "§r§.(?:\\[.*].)?(?<player>\\S+) §r§ehas invited you to join their party!",
     )
 
     /**
@@ -35,7 +35,7 @@ object AcceptLastPartyInvite {
      */
     private val inviteExpiredPattern by patternGroup.pattern(
         "expired",
-        "§eThe party invite from (?:§r§.\\[.*?] )?(?<player>\\w+) §r§ehas expired\\.",
+        "§eThe party invite from §r§.(?:\\[.*].)?(?<player>\\S+) §r§ehas expired\\.",
     )
 
     private var lastInviter = ""
