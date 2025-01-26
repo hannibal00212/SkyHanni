@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.pests.PestProfitTrackerConfig
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
@@ -289,8 +291,13 @@ object PestProfitTracker {
         }
     }
 
-    fun resetCommand() {
-        tracker.resetCommand()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetpestprofittracker") {
+            description = "Resets the Pest Profit Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
 
     @HandleEvent

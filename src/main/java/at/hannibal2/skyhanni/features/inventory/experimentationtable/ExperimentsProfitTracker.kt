@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
@@ -256,8 +258,13 @@ object ExperimentsProfitTracker {
         }
     }
 
-    fun resetCommand() {
-        tracker.resetCommand()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetexperimentsprofittracker") {
+            description = "Resets the Experiments Profit Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
 
     private fun handleExpBottles(addToTracker: Boolean) {
