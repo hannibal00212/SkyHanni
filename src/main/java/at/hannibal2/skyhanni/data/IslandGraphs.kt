@@ -5,12 +5,12 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.repo.RepoUtils
-import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -36,7 +36,6 @@ import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
@@ -103,7 +102,6 @@ object IslandGraphs {
 
     private var pathfindClosestNode: GraphNode? = null
     var closestNode: GraphNode? = null
-    private var secondClosestNode: GraphNode? = null
 
     private var currentTarget: LorenzVec? = null
     private var currentTargetNode: GraphNode? = null
@@ -136,22 +134,21 @@ object IslandGraphs {
         "Glacite Tunnels|Dwarven Base Camp|Great Glacite Lake|Fossil Research Center",
     )
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRepoReload(event: RepositoryReloadEvent) {
-        if (!LorenzUtils.inSkyBlock) return
 
         loadIsland(LorenzUtils.skyBlockIsland)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (currentIslandGraph != null) return
         if (event.newIsland == IslandType.NONE) return
         loadIsland(event.newIsland)
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         currentIslandGraph = null
         if (currentTarget != null) {
             "§e[SkyHanni] Navigation stopped because of world switch!".asComponent().send(PATHFIND_ID)
@@ -227,8 +224,8 @@ object IslandGraphs {
         closestNode = null
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (currentIslandGraph == null) return
         if (event.isMod(2)) {
             handleTick()
@@ -251,13 +248,11 @@ object IslandGraphs {
         }
 
         val graph = currentIslandGraph ?: return
-        val sortedNodes = graph.sortedBy { it.position.distanceSqToPlayer() }
-        val newClosest = sortedNodes.first()
+        val newClosest = graph.minBy { it.position.distanceSqToPlayer() }
         if (pathfindClosestNode == newClosest) return
         val newPath = !onCurrentPath()
 
         closestNode = newClosest
-        secondClosestNode = sortedNodes.getOrNull(1)
         onNewNode()
         if (newClosest == prevClosest) return
         if (newPath) {
@@ -277,9 +272,6 @@ object IslandGraphs {
         val newNodes = path.drop(index)
         val newGraph = Graph(newNodes)
         fastestPath = skipIfCloser(newGraph)
-        newNodes.getOrNull(1)?.let {
-            secondClosestNode = it
-        }
         setFastestPath(newGraph to newGraph.totalLenght(), setPath = false)
         return true
     }
@@ -477,8 +469,8 @@ object IslandGraphs {
         componentText.send(PATHFIND_ID)
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (currentIslandGraph == null) return
         val path = fastestPath ?: return
 

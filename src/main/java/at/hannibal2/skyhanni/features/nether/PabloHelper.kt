@@ -1,19 +1,19 @@
 package at.hannibal2.skyhanni.features.nether
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.GetFromSackAPI
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.api.GetFromSackApi
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 
 // https://wiki.hypixel.net/Pablo
@@ -42,8 +42,8 @@ object PabloHelper {
 
     private var lastSentMessage = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         if (lastSentMessage.passedSince() < 5.minutes) return
         val itemName = patterns.matchMatchers(event.message.removeColor()) {
@@ -53,7 +53,7 @@ object PabloHelper {
         if (InventoryUtils.countItemsInLowerInventory { it.name.contains(itemName) } > 0) return
 
         DelayedRun.runNextTick {
-            GetFromSackAPI.getFromChatMessageSackItems(
+            GetFromSackApi.getFromChatMessageSackItems(
                 itemName.toInternalName().makePrimitiveStack(),
                 "Click here to grab an $itemName from sacks!",
             )

@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ModGuiSwitcherJson
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -31,7 +32,7 @@ object QuickModMenuSwitch {
     private var currentlyOpeningMod = ""
     private var lastGuiOpen = 0L
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val modsJar = event.getConstant<ModGuiSwitcherJson>("ModGuiSwitcher")
         mods = modsJar.mods.filter { mod ->
@@ -41,8 +42,8 @@ object QuickModMenuSwitch {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
 
         if (event.isMod(5)) {
@@ -162,9 +163,9 @@ object QuickModMenuSwitch {
         GlStateManager.popMatrix()
     }
 
-    fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.QUICK_MOD_MENU_SWITCH.isSelected()) && config.enabled
+    fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSBFeature.QUICK_MOD_MENU_SWITCH.isSelected()) && config.enabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dev.modMenuLog", "dev.debug.modMenuLog")
     }

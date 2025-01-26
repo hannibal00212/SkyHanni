@@ -5,26 +5,25 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
+import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object RiftGunthersRace {
 
-    private val config get() = RiftAPI.config.area.westVillage.gunthersRace
+    private val config get() = RiftApi.config.area.westVillage.gunthersRace
     private var parkourHelper: ParkourHelper? = null
 
     private val patternGroup = RepoPattern.group("rift.area.westvillage.riftrace")
@@ -34,7 +33,7 @@ object RiftGunthersRace {
      */
     private val raceStartedPattern by patternGroup.pattern(
         "start",
-        "§3§lRIFT RACING §r§eRace started! Good luck!"
+        "§3§lRIFT RACING §r§eRace started! Good luck!",
     )
 
     /**
@@ -43,7 +42,7 @@ object RiftGunthersRace {
      */
     private val raceFinishedPattern by patternGroup.pattern(
         "finish",
-        "§3§lRIFT RACING §r§eRace finished in (?:§.)*\\d+:\\d+.\\d+(?:§.)*!.*"
+        "§3§lRIFT RACING §r§eRace finished in (?:§.)*\\d+:\\d+.\\d+(?:§.)*!.*",
     )
 
     /**
@@ -53,20 +52,20 @@ object RiftGunthersRace {
      */
     private val raceCancelledPattern by patternGroup.pattern(
         "cancel",
-        "§3§lRIFT RACING §r§cRace cancelled!.*"
+        "§3§lRIFT RACING §r§cRace cancelled!.*",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         parkourHelper?.reset()
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
-        RiftAPI.inRiftRace = false
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
+        RiftApi.inRiftRace = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ParkourJson>("rift/RiftRace")
         parkourHelper = ParkourHelper(
@@ -78,7 +77,7 @@ object RiftGunthersRace {
         updateConfig()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.rainbowColor, config.monochromeColor, config.lookAhead) {
             updateConfig()
@@ -93,20 +92,20 @@ object RiftGunthersRace {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         raceStartedPattern.matchMatcher(event.message) {
-            RiftAPI.inRiftRace = true
+            RiftApi.inRiftRace = true
         }
         raceCancelledPattern.matchMatcher(event.message) {
             parkourHelper?.reset()
-            RiftAPI.inRiftRace = false
+            RiftApi.inRiftRace = false
         }
         raceFinishedPattern.matchMatcher(event.message) {
             parkourHelper?.reset()
-            RiftAPI.inRiftRace = false
+            RiftApi.inRiftRace = false
         }
     }
 
@@ -114,21 +113,21 @@ object RiftGunthersRace {
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         if (!isEnabled()) return
         if (!config.hidePlayers) return
-        if (!RiftAPI.inRiftRace) return
+        if (!RiftApi.inRiftRace) return
 
         val entity = event.entity
-        if (entity is EntityOtherPlayerMP && !entity.isNPC()) {
+        if (entity is EntityOtherPlayerMP && !entity.isNpc()) {
             event.cancel()
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!isEnabled() || !RiftAPI.inRiftRace) return
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+        if (!isEnabled() || !RiftApi.inRiftRace) return
 
         parkourHelper?.render(event)
     }
 
     fun isEnabled() =
-        RiftAPI.inRift() && RiftAPI.inWestVillage() && config.enabled
+        RiftApi.inRift() && RiftApi.inWestVillage() && config.enabled
 }

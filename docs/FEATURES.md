@@ -58,6 +58,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Filters for rare dungeon chest rewards and sacrifice messages from other players.
 + Add config option to hide achievement spam on Alpha. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2076)
 + Added chat compacting for 'items in stash' warnings. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2639)
++ Added Sound Responses. - Thunderblade73 & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2222)
+    + Plays meow sound when 'meow' appears in chat.
+    + Plays bark sound when 'woof' appears in chat.
++ Added option to shorten coin amounts in chat messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3231)
 
 </details>
 <details open><summary>
@@ -236,9 +240,14 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     +  Options to highlight good rolls in different colors, show only certain attributes, etc.
 + Added helpers for Essence Shops and Carnival Event Upgrade Shops. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2423)
     +  Assists with maxing upgrades.
-+ Added New Year Cake Tracker. - Daveed. (https://github.com/hannibal002/SkyHanni/pull/2237)
++ Added New Year Cake Tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2237)
     +  Highlights unowned cakes in AH.
     +  Displays a list of missing cake years.
++ Added commands "/bp -", "/ec -" and "/shlastopened" to reopen last opened storage pages. - aphased (https://github.com/hannibal002/SkyHanni/pull/2900)
++ Added reminders for Enchanted Clock boosts. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3051)
++ Added XP in Inventory. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3253)
+    + Showing current XP in item lore of XP-dependent menus (e.g., Experimentation Table, Anvil, Hex).
+    + This ensures XP visibility even when replaced by the SkyBlock XP bar.
 
 </details>
 <details open><summary>
@@ -302,6 +311,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Minion name display with minion tier.
 - **Minion Craft Helper** - Show how many more items you need to upgrade the minion in your inventory. Especially useful
   for bingo.
++ Added Minion Upgrade Helper. - Ovi_1 (https://github.com/hannibal002/SkyHanni/pull/2589)
+    + Added a button in the Minion menu to obtain required items for the next upgrade from Sacks or Bazaar.
+    + Opens Bazaar if items aren't found in Sacks.
+    + Shows the cost of required items and total upgrade cost.
 
 + Shows how much skill experience you will get when picking up items from the minion storage. - Thunderblade73
 
@@ -510,6 +523,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Blaze Slayer fire pillar display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1766)
     + Shows a large display with a timer when the Fire Pillar is about to explode.
     + Also displays for other players' bosses.
++ Added blocking for slayers that cannot spawn in the current dimension to prevent Maddox's menu from closing. - Luna (https://github.com/hannibal002/SkyHanni/pull/3211)
 
 </details>
 <details open><summary>
@@ -772,6 +786,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Removed the chat message "There are no Pests on your Garden!".
 + Added No Pests Title. - saga (https://github.com/hannibal002/SkyHanni/pull/1957)
     + Shows a title when you use the Pest Tracker without any pests to clear.
++ Added Carrolyn Fetch Helper to fetch items for permanent farming buffs. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3096)
 
 </details>
 <details open><summary>
@@ -861,6 +876,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Using pathfinding to guide the player to the nearest spot with unpressed buttons and highlights them.
 + Added a route helper for Gunther's Rift Race in the West Village. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2616)
 + Added the ability to mute Wilted Berberis sounds when not farming. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2616)
++ Added Bacte Phase Display to the Damage Indicator. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2322)
++ Added waypoints for Bacte's Tentacles with hit counts. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2322)
+    + Shows hit counts instead of HP display due to varying max health values.
 
 </details>
 <details open><summary>
@@ -930,6 +948,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added highlighting boxes to Crystal Nucleus crystals during Hoppity's Hunt. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2598)
 + Added Flowstate Helper. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2561)
     +  Displays stats for the Flowstate enchantment on mining tools.
++ Added a chat filter, profit per run, and profit tracker for Crystal Nucleus runs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2285)
 
 </details>
 <details open><summary>
@@ -1043,6 +1062,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Hitman slot tracking to display the most recent rabbits you obtained. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
     + Displays slots with an active cooldown.
 + Added an option to show the Hoppity Event Card only while on islands where eggs spawn. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
++ Added the ability to recolor chocolate gains from duplicate rabbits when the Time Tower is active. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2805)
++ Added Hitman statistics to Chocolate Factory stats. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2991)
+    + Allows to view remaining time for full and 28 claimable slots.
++ Added party mode for Chocolate Factory. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3054)
+    + Using it is not recommended.
 
 ### The Carnival
 
@@ -1353,6 +1377,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
   + Added the current minister to the calendar. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2342)
   + Allowed the use of the Custom Scoreboard outside of SkyBlock, but only on Hypixel. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1881)
   + Added an option to disable custom lines in the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1881)
++ Added SkyBlock Level to Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2895)
 + No Bits Available Warning. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
     + Warns when you run out of available bits to generate.
 + Added Display for Bits on Cookie buy. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2265)
@@ -1365,7 +1390,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Quiver Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1190)
     + Only shows the type of arrow when wearing a Skeleton Master Chestplate.
 + Low Quiver Reminder at the end of Dungeon/Kuudra run. - Empa (https://github.com/hannibal002/SkyHanni/pull/1190)
-+ party chat commands. - !nea (https://github.com/hannibal002/SkyHanni/pull/1433)
++ party chat commands. - nea (https://github.com/hannibal002/SkyHanni/pull/1433)
     + Added `!pt` (and aliases) as a command that allows others to transfer the party to themselves.
     + Added `!pw` (and aliases) as a command that allows others to request a warp.
 + Option to highlight Zealots holding Chests in a different color. - Luna (https://github.com/hannibal002/SkyHanni/pull/1347)
@@ -1455,6 +1480,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Automatically tracks coins received from customers via `/trade`.
 + Added Draconic Sacrifice Tracker. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2077)
     +  Tracks items and profit while using the Draconic Altar in the End.
++ Added Frog Mask Display. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2542)
+    + Displays current buffed region and duration until next change.
++ Added option to display Skyblock XP on the Minecraft XP bar. - j10a1n1 (https://github.com/hannibal002/SkyHanni/pull/2886)
++ Added automatic SkyBlock joining when connecting to Hypixel. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/2745)
 
 </details>
 <details open><summary>

@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.events.ActionBarValueUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -26,15 +25,16 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object RiftTimer {
 
-    private val config get() = RiftAPI.config.timer
+    private val config get() = RiftApi.config.timer
 
-    private val repoGroup = RepoPattern.group("rift.everywhere")
+    private val patternGroup = RepoPattern.group("rift.everywhere")
+
     /**
      * REGEX-TEST: 3150 §aф
      */
-    private val nametagPattern by repoGroup.pattern(
+    private val nametagPattern by patternGroup.pattern(
         "nametag.timer",
-        "(?<time>\\d+) §aф"
+        "(?<time>\\d+) §aф",
     )
 
     private var display = emptyList<String>()
@@ -43,8 +43,8 @@ object RiftTimer {
     private var latestTime = 0.seconds
     private val changes = mutableMapOf<Long, String>()
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         display = emptyList()
         maxTime = 0.seconds
         latestTime = 0.seconds
@@ -54,7 +54,7 @@ object RiftTimer {
     @HandleEvent
     fun onActionBarValueUpdate(event: ActionBarValueUpdateEvent) {
         if (event.updated != ActionBarStatsData.RIFT_TIME) return
-        if (!isEnabled() || RiftAPI.inRiftRace) return
+        if (!isEnabled() || RiftApi.inRiftRace) return
 
         val newTime = TimeUtils.getDuration(event.updated.value.replace("m", "m "))
         if (newTime > maxTime) {
@@ -66,9 +66,9 @@ object RiftTimer {
 
     // prevents rift time from pausing during Rift Race
     // (hypixel hides the action bar during the race)
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled() || !RiftAPI.inRiftRace) return
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
+        if (!isEnabled() || !RiftApi.inRiftRace) return
         if (!event.isMod(5)) return
         val newTime = TimeUtils.getDuration(Minecraft.getMinecraft().thePlayer.experienceLevel.toString() + " s")
         currentTime = newTime
@@ -111,7 +111,7 @@ object RiftTimer {
         changes[System.currentTimeMillis()] = diffFormat
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(
             config.percentage,
@@ -123,22 +123,22 @@ object RiftTimer {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (RiftAPI.inMirrorVerse) return
+        if (RiftApi.inMirrorVerse) return
 
         config.timerPosition.renderStrings(display, posLabel = "Rift Timer")
     }
 
     @HandleEvent
     fun onEntityHealthDisplay(event: EntityHealthDisplayEvent) {
-        if (!RiftAPI.inRift() || !config.nametag) return
+        if (!RiftApi.inRift() || !config.nametag) return
         val time = nametagPattern.matchMatcher(event.text) {
             group("time")?.toIntOrNull()
         } ?: return
         event.text = "${time.seconds.format()} §aф"
     }
 
-    fun isEnabled() = RiftAPI.inRift() && config.enabled
+    fun isEnabled() = RiftApi.inRift() && config.enabled
 }

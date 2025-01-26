@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -18,7 +19,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
 import java.util.Queue
 import kotlin.reflect.KMutableProperty0
@@ -82,20 +82,30 @@ object ChatUtils {
         prefix: Boolean = true,
         prefixColor: String = "§e",
         replaceSameMessage: Boolean = false,
+        onlySendOnce: Boolean = false,
     ) {
 
         if (prefix) {
-            internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage)
+            internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage, onlySendOnce)
         } else {
-            internalChat(message, replaceSameMessage)
+            internalChat(message, replaceSameMessage, onlySendOnce)
         }
     }
+
+    private val messagesThatAreOnlySentOnce = mutableListOf<String>()
 
     private fun internalChat(
         message: String,
         replaceSameMessage: Boolean,
+        onlySendOnce: Boolean = false,
     ): Boolean {
         val text = ChatComponentText(message)
+        if (onlySendOnce) {
+            if (message in messagesThatAreOnlySentOnce) {
+                return false
+            }
+            messagesThatAreOnlySentOnce.add(message)
+        }
 
         return if (replaceSameMessage) {
             text.send(getUniqueMessageIdForString(message))
@@ -161,13 +171,16 @@ object ChatUtils {
         }
     }
 
-    val uniqueMessageIdStorage = mutableMapOf<String, Int>()
+    private val uniqueMessageIdStorage = mutableMapOf<String, Int>()
 
-    fun getUniqueMessageIdForString(string: String) = uniqueMessageIdStorage.getOrPut(string) { getUniqueMessageId() }
+    // TODO kill Detekt's Missing newline after "{" check and then format this function in a kotlin typical way again
+    private fun getUniqueMessageIdForString(string: String): Int {
+        return uniqueMessageIdStorage.getOrPut(string) { getUniqueMessageId() }
+    }
 
-    var lastUniqueMessageId = 123242
+    private var lastUniqueMessageId = 123242
 
-    fun getUniqueMessageId() = lastUniqueMessageId++
+    private fun getUniqueMessageId() = lastUniqueMessageId++
 
     /**
      * Sends a message to the user that they can click and run a command
@@ -251,8 +264,8 @@ object ChatUtils {
     fun getTimeWhenNewlyQueuedMessageGetsExecuted() =
         (lastMessageSent + sendQueue.size * messageDelay).takeIf { !it.isInPast() } ?: SimpleTimeMark.now()
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         val player = Minecraft.getMinecraft().thePlayer
         if (player == null) {
             sendQueue.clear()

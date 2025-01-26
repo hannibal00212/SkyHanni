@@ -1,10 +1,11 @@
 package at.hannibal2.skyhanni.features.combat.mobs
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.SlayerAPI
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -23,7 +23,7 @@ object AreaMiniBossFeatures {
     private var miniBossType: AreaMiniBossType? = null
     private var respawnCooldown = 11.seconds
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         val type = AreaMiniBossType.entries.find { it.displayName == event.mob.name } ?: return
         miniBossType = type
@@ -38,9 +38,9 @@ object AreaMiniBossFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!SlayerAPI.isInAnyArea) return
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+        if (!SlayerApi.isInAnyArea) return
         if (!config.areaBossRespawnTimer) return
 
         val miniBoss = miniBossType ?: return
@@ -59,8 +59,8 @@ object AreaMiniBossFeatures {
         return color.getChatColor() + format
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         miniBossType = null
     }
 

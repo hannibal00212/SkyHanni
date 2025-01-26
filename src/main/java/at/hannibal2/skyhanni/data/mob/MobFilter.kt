@@ -4,11 +4,11 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData.MobResult
 import at.hannibal2.skyhanni.data.mob.MobData.MobResult.Companion.makeMobResult
 import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
-import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
+import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -52,14 +52,14 @@ import net.minecraft.entity.player.EntityPlayer
 @SkyHanniModule
 object MobFilter {
 
-    private val repoGroup = RepoPattern.group("mob.detection")
+    private val patternGroup = RepoPattern.group("mob.detection")
 
     /** REGEX-TEST: Wither Husk 500M❤ */
-    val mobNameFilter by repoGroup.pattern(
+    val mobNameFilter by patternGroup.pattern(
         "filter.basic",
         "(?:\\[\\w+(?<level>\\d+)\\] )?(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,❤]+",
     )
-    val slayerNameFilter by repoGroup.pattern("filter.slayer", "^. (?<name>.*) (?<tier>[IV]+) \\d+.*")
+    val slayerNameFilter by patternGroup.pattern("filter.slayer", "^. (?<name>.*) (?<tier>[IV]+) \\d+.*")
 
     /** REGEX-TEST: ﴾ Storm ﴿
      *  REGEX-TEST: ﴾ [Lv200] aMage Outlawa 70M/70M❤ ﴿
@@ -71,43 +71,43 @@ object MobFilter {
      *  REGEX-TEST: ﴾ [Lv100] Endstone Protector 4.6M/5M❤ ﴿
      *  REGEX-TEST: ﴾ [Lv400] Thunder 29M/35M❤ ﴿
      *  */
-    val bossMobNameFilter by repoGroup.pattern(
+    val bossMobNameFilter by patternGroup.pattern(
         "filter.boss",
         "^. (?:\\[Lv(?<level>\\d+)\\] )?(?<name>[^ᛤ\n]*?)(?: ᛤ)?(?: [\\d\\/BMk.,❤]+| █+)? .$",
     )
-    val dungeonNameFilter by repoGroup.pattern(
+    val dungeonNameFilter by patternGroup.pattern(
         "filter.dungeon",
         "^(?:(?<star>✯)\\s)?(?:(?<attribute>${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(?<name>[^ᛤ]+)(?: ᛤ)?\\s[^\\s]+$",
     )
-    val summonFilter by repoGroup.pattern(
+    val summonFilter by patternGroup.pattern(
         "filter.summon",
         "^(?<owner>\\w+)'s (?<name>.*) \\d+.*",
     )
-    val dojoFilter by repoGroup.pattern(
+    val dojoFilter by patternGroup.pattern(
         "filter.dojo",
         "^(?:(?<points>\\d+) pts|(?<empty>\\w+))$",
     )
-    val jerryPattern by repoGroup.pattern(
+    val jerryPattern by patternGroup.pattern(
         "jerry",
         "(?:\\[\\w+(?<level>\\d+)\\] )?(?<owner>\\w+)'s (?<name>\\w+ Jerry) \\d+ Hits",
     )
-    val petCareNamePattern by repoGroup.pattern(
+    val petCareNamePattern by patternGroup.pattern(
         "pattern.petcare",
         "^\\[\\w+ (?<level>\\d+)\\] (?<name>.*)",
     )
-    val wokeSleepingGolemPattern by repoGroup.pattern(
+    val wokeSleepingGolemPattern by patternGroup.pattern(
         "pattern.dungeon.woke.golem",
         "(?:§c§lWoke|§5§lSleeping) Golem§r",
     )
-    val jerryMagmaCubePattern by repoGroup.pattern(
+    val jerryMagmaCubePattern by patternGroup.pattern(
         "pattern.jerry.magma.cube",
         "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c❤",
     )
-    val summonOwnerPattern by repoGroup.pattern(
+    val summonOwnerPattern by patternGroup.pattern(
         "pattern.summon.owner",
         ".*Spawned by: (?<name>.*).*",
     )
-    val heavyPearlPattern by repoGroup.pattern(
+    val heavyPearlPattern by patternGroup.pattern(
         "pattern.heavypearl.collect",
         "§.§lCOLLECT!",
     )
@@ -119,7 +119,7 @@ object MobFilter {
      * REGEX-TEST: §8[§7Lv49§8] §ePig
      * REGEX-TEST: §8[§7Lv64§8] §eRat
      */
-    val illegalEntitiesPattern by repoGroup.pattern(
+    val illegalEntitiesPattern by patternGroup.pattern(
         "pattern.pet.entities",
         "^§8\\[§7Lv\\d+§8] §.(?<name>Horse|Armadillo|Skeleton Horse|Pig|Rat)$",
     )
@@ -150,17 +150,17 @@ object MobFilter {
         }
     }
 
-    private val extraDisplayNPCByName = setOf(
+    private val extraDisplayNpcByName = setOf(
         "Guy ", // Guy NPC (but only as visitor)
         "vswiblxdxg", // Mayor Cole
         "anrrtqytsl", // Weaponsmith
     )
 
-    private val displayNPCCompressedNamePattern by repoGroup.pattern("displaynpc.name", "[a-z0-9]{10}")
+    private val displayNpcCompressedNamePattern by patternGroup.pattern("displaynpc.name", "[a-z0-9]{10}")
 
-    private fun displayNPCNameCheck(name: String) = name.startsWith('§') ||
-        displayNPCCompressedNamePattern.matches(name) ||
-        extraDisplayNPCByName.contains(name)
+    private fun displayNpcNameCheck(name: String) = name.startsWith('§') ||
+        displayNpcCompressedNamePattern.matches(name) ||
+        extraDisplayNpcByName.contains(name)
 
     private val listOfClickArmorStand = setOf(
         "§e§lCLICK",
@@ -175,26 +175,26 @@ object MobFilter {
         this !is EntityLivingBase -> false
         this is EntityArmorStand -> false
         this is EntityPlayer && this.isRealPlayer() -> false
-        this.isDisplayNPC() -> false
+        this.isDisplayNpc() -> false
         this is EntityWither && this.entityId < 0 -> false
         else -> true
     }
 
     fun EntityPlayer.isRealPlayer() = uniqueID?.let { it.version() == 4 } ?: false
 
-    fun EntityLivingBase.isDisplayNPC() =
-        (this is EntityPlayer && isNPC() && displayNPCNameCheck(this.name)) ||
+    fun EntityLivingBase.isDisplayNpc() =
+        (this is EntityPlayer && isNpc() && displayNpcNameCheck(this.name)) ||
             (this is EntityVillager && this.maxHealth == 20.0f) || // Villager NPCs in the Village
             (this is EntityWitch && this.entityId <= 500) || // Alchemist NPC
             (this is EntityCow && this.entityId <= 500) || // Shania NPC (in Rift and Outside)
             (this is EntitySnowman && this.entityId <= 500) // Sherry NPC (in Jerry Island)
 
-    fun createDisplayNPC(entity: EntityLivingBase): Boolean {
+    fun createDisplayNpc(entity: EntityLivingBase): Boolean {
         val clickArmorStand = MobUtils.getArmorStandByRangeAll(entity, 1.5).firstOrNull { armorStand ->
             listOfClickArmorStand.contains(armorStand.name)
         } ?: return false
         val armorStand = MobUtils.getArmorStand(clickArmorStand, -1) ?: return false
-        MobEvent.Spawn.DisplayNPC(MobFactories.displayNPC(entity, armorStand, clickArmorStand)).postAndCatch()
+        MobEvent.Spawn.DisplayNpc(MobFactories.displayNpc(entity, armorStand, clickArmorStand)).post()
         return true
     }
 
@@ -238,7 +238,7 @@ object MobFilter {
         MobFactories.summon(baseEntity, armorStand, extraEntityList)
             ?: MobFactories.slayer(baseEntity, armorStand, extraEntityList)
             ?: MobFactories.boss(baseEntity, armorStand, extraEntityList)
-            ?: if (DungeonAPI.inDungeon()) MobFactories.dungeon(
+            ?: if (DungeonApi.inDungeon()) MobFactories.dungeon(
                 baseEntity,
                 armorStand,
                 extraEntityList,
@@ -323,7 +323,7 @@ object MobFilter {
         baseEntity: EntityLivingBase,
         extraEntityList: List<EntityLivingBase>,
     ): MobResult? =
-        if (DungeonAPI.inDungeon()) {
+        if (DungeonApi.inDungeon()) {
             when {
                 (baseEntity is EntityEnderman || baseEntity is EntityGiantZombie) &&
                     extraEntityList.lastOrNull()?.name == "§e﴾ §c§lLivid§r§r §a7M§c❤ §e﴿" -> MobResult.illegal // Livid Start Animation
@@ -374,7 +374,7 @@ object MobFilter {
             MobFactories.basic(
                 baseEntity,
                 when {
-                    DungeonAPI.inDungeon() -> "Dungeon Secret Bat"
+                    DungeonApi.inDungeon() -> "Dungeon Secret Bat"
                     IslandType.PRIVATE_ISLAND.isInIsland() -> "Private Island Bat"
                     else -> "Mega Bat"
                 },

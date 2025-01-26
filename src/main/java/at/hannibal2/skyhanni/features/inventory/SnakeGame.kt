@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -13,7 +14,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -48,25 +48,19 @@ object SnakeGame {
             if (key?.isKeyHeld() == false) continue
             event.cancel()
 
-            Minecraft.getMinecraft().playerController.windowClick(
-                chest.inventorySlots.windowId,
-                slot,
-                2,
-                3,
-                Minecraft.getMinecraft().thePlayer,
-            )
+            InventoryUtils.clickSlot(slot, chest.inventorySlots.windowId, 2, 3)
 
             lastClick = SimpleTimeMark.now()
             break
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         inInventory = pattern.matches(event.inventoryName)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }

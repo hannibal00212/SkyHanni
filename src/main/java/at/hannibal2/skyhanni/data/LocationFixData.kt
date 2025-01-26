@@ -1,12 +1,11 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.LocationFixJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object LocationFixData {
@@ -16,7 +15,7 @@ object LocationFixData {
     private data class LocationFix(val area: AxisAlignedBB, val realLocation: String)
 
     // priority set to low so that IslandType can load their island names from repo earlier
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @HandleEvent(priority = HandleEvent.LOW)
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<LocationFixJson>("LocationFix")
         locationFixes.clear()

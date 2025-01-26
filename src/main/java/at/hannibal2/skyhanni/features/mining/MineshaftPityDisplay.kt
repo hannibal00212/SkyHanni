@@ -5,12 +5,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.HotmReward
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPity
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPityBlock
@@ -20,6 +19,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -31,7 +31,6 @@ import net.minecraft.block.BlockStone
 import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object MineshaftPityDisplay {
@@ -83,7 +82,7 @@ object MineshaftPityDisplay {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onOreMined(event: OreMinedEvent) {
-        if (!MiningAPI.inGlacialTunnels()) return
+        if (!MiningApi.inGlacialTunnels()) return
 
         val originalOre = event.originalOre
         originalOre?.getPityBlock()?.let { it.blocksBroken++ }
@@ -98,9 +97,9 @@ object MineshaftPityDisplay {
         update()
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!MiningAPI.inGlacialTunnels()) return
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
+        if (!MiningApi.inGlacialTunnels()) return
         if (MiningNotifications.mineshaftSpawn.matches(event.message)) {
             val pityCounter = calculateCounter()
             val chance = calculateChance(pityCounter)
@@ -150,7 +149,7 @@ object MineshaftPityDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isDisplayEnabled()) return
         update()
@@ -196,7 +195,6 @@ object MineshaftPityDisplay {
             }
         }
 
-
         val neededToPityRenderable = Renderable.verticalContainer(
             listOf(
                 Renderable.string("§3Needed to pity:"),
@@ -231,15 +229,19 @@ object MineshaftPityDisplay {
         display = config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] }
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isDisplayEnabled()) return
-        display.ifEmpty { update() }
-        if (display.isEmpty()) return
-        config.position.renderRenderables(
-            listOf(Renderable.verticalContainer(display, 2)),
-            posLabel = "Mineshaft Pity Display",
-        )
+    init {
+        RenderDisplayHelper(
+            condition = { isDisplayEnabled() },
+            outsideInventory = true,
+        ) {
+            display.ifEmpty { update() }
+            if (display.isNotEmpty()) {
+                config.position.renderRenderables(
+                    listOf(Renderable.verticalContainer(display, 2)),
+                    posLabel = "Mineshaft Pity Display",
+                )
+            }
+        }
     }
 
     private fun resetCounter() {
@@ -257,14 +259,14 @@ object MineshaftPityDisplay {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.MINESHAFT || event.oldIsland == IslandType.MINESHAFT) {
             resetCounter()
         }
     }
 
-    private fun isDisplayEnabled() = (MiningAPI.inGlacialTunnels() || MiningAPI.inDwarvenBaseCamp()) && config.enabled
+    private fun isDisplayEnabled() = (MiningApi.inGlacialTunnels() || MiningApi.inDwarvenBaseCamp()) && config.enabled
 
     enum class MineshaftPityLine(private val display: String, val shouldDisplay: () -> Boolean = { true }) {
         TITLE("§3§lMineshaft Pity Counter"),

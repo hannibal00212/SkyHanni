@@ -51,19 +51,24 @@ public class MiningEventConfig {
         DWARVEN("Dwarven Mines Only"),
         CURRENT("Current Island Only");
 
-        private final String str;
+        private final String displayName;
 
-        ShowType(String str) {
-            this.str = str;
+        ShowType(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
     @Expose
     @ConfigLink(owner = MiningEventConfig.class, field = "enabled")
     public Position position = new Position(200, 60, false, true);
+
+    @Expose
+    @ConfigOption(name = "Sharing Event Data", desc = "Sending Mining Event data to a server. This allows everyone to see more precise mining event timings. Thanks for your help!")
+    @ConfigEditorBoolean
+    public boolean allowDataSharing = true;
 }

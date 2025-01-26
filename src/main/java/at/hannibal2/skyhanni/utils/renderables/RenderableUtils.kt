@@ -111,20 +111,25 @@ internal object RenderableUtils {
             }
         }
         add(
-            Renderable.horizontalContainer(
-                buildList {
-                    addString(prefix)
-                    addString("§a[")
-                    if (tips.isEmpty()) {
-                        add(Renderable.link("§e$getName", false, onClick))
-                    } else {
-                        add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
-                    }
-                    addString("§a]")
-                },
-            ).toSearchable(),
+            Renderable.line {
+                addString(prefix)
+                addString("§a[")
+                if (tips.isEmpty()) {
+                    add(Renderable.link("§e$getName", false, onClick))
+                } else {
+                    add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
+                }
+                addString("§a]")
+            }.toSearchable(),
         )
     }
+
+    fun MutableList<Renderable>.addCenteredString(string: String) =
+        this.add(Renderable.string(string, horizontalAlign = HorizontalAlignment.CENTER))
+}
+
+fun MutableList<Renderable>.addLine(builderAction: MutableList<Renderable>.() -> Unit) {
+    add(Renderable.horizontalContainer(buildList { builderAction() }))
 }
 
 internal abstract class RenderableWrapper internal constructor(protected val content: Renderable) : Renderable {

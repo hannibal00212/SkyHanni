@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -13,11 +14,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object FarmingPersonalBestGain {
-    private val config get() = GardenAPI.config.personalBests
+    private val config get() = GardenApi.config.personalBests
     private val patternGroup = RepoPattern.group("garden.contest.personal.best")
     private var personalBestIncrements = mapOf<CropType, Int>()
 
@@ -52,19 +52,19 @@ object FarmingPersonalBestGain {
     var crop: String? = null
     var cropType: CropType? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         personalBestIncrements = data.personalBestIncrement
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(68, "garden.contestPersonalBestIncreaseFF", "garden.personalBests.increaseFF")
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         newPattern.matchMatcher(event.message) {
@@ -79,9 +79,11 @@ object FarmingPersonalBestGain {
         newFFPattern.matchMatcher(event.message) {
             val cropName = group("crop")
             newFF = group("ff").formatDouble()
+            val newFF = newFF ?: return
             crop = cropName
             cropType = CropType.getByName(cropName)
-            GardenAPI.storage?.let {
+            val cropType = cropType ?: return
+            GardenApi.storage?.let {
                 it.personalBestFF[cropType] = newFF
             }
             checkDelayed()
@@ -114,5 +116,5 @@ object FarmingPersonalBestGain {
         }
     }
 
-    fun isEnabled() = GardenAPI.inGarden() && config.increaseFF
+    fun isEnabled() = GardenApi.inGarden() && config.increaseFF
 }

@@ -7,13 +7,12 @@ import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
-import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
@@ -28,12 +27,14 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlinx.coroutines.launch
+import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -45,10 +46,10 @@ object IslandAreas {
     var display: Renderable? = null
     private var targetNode: GraphNode? = null
     var currentAreaName = ""
-    private val textInput = TextInput()
+    private val textInput = SearchTextInput()
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         nodes = emptyMap()
         display = null
         targetNode = null
@@ -85,8 +86,8 @@ object IslandAreas {
 
     private var hasMoved = false
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (event.isMod(2) && hasMoved) {
             updatePosition()
@@ -105,21 +106,25 @@ object IslandAreas {
         display = buildDisplay().buildSearchBox(textInput)
     }
 
-    @SubscribeEvent
-    fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!config.pathfinder.enabled) return
         if (!config.pathfinder.showAlways) return
+        val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
+        if (isInOwnInventory) return
 
         display?.let {
             config.pathfinder.position.renderRenderable(it, posLabel = "Island Areas")
         }
     }
 
-    @SubscribeEvent
-    fun onOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!config.pathfinder.enabled) return
+        val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
+        if (!isInOwnInventory) return
 
         display?.let {
             config.pathfinder.position.renderRenderable(it, posLabel = "Island Areas")
@@ -238,8 +243,8 @@ object IslandAreas {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.inWorld) return
         for ((node, distance) in nodes) {
@@ -254,7 +259,7 @@ object IslandAreas {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.pathfinder.color) {
             targetNode?.let {

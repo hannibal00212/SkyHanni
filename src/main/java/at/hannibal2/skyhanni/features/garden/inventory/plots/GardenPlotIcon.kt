@@ -4,26 +4,24 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.editItemInfo
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object GardenPlotIcon {
 
-    private val config get() = GardenAPI.config.plotIcon
-    private val plotList get() = GardenAPI.storage?.plotIcon?.plotList
+    private val config get() = GardenApi.config.plotIcon
+    private val plotList get() = GardenApi.storage?.plotIcon?.plotList
     private var inInventory = false
     private var copyStack: ItemStack? = null
 
@@ -38,10 +36,10 @@ object GardenPlotIcon {
 
     var hardReset = false
 
-    fun isEnabled() = GardenAPI.inGarden() && config.enabled && inInventory
+    fun isEnabled() = GardenApi.inGarden() && config.enabled && inInventory
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent(priority = HandleEvent.HIGHEST)
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inInventory = event.inventoryName == "Configure Plots"
         if (!isEnabled()) return
 
@@ -56,7 +54,7 @@ object GardenPlotIcon {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         editMode = 0
@@ -81,12 +79,12 @@ object GardenPlotIcon {
                     lastClickedSlotId = -1
                     return
                 }
-                event.replace(cachedStack[event.slot])
+                cachedStack[event.slot]?.let { event.replace(it) }
             }
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         lastClickedSlotId = event.slotId
@@ -130,8 +128,8 @@ object GardenPlotIcon {
         }
     }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onToolTip(event: ToolTipEvent) {
         if (!isEnabled()) return
         val plotList = plotList ?: return
         val list = event.toolTip

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -24,9 +25,8 @@ object MiscFeatures {
         event.isCanceled = true
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.misc.hideExplosions) return
 
         when (event.type) {
@@ -49,7 +49,7 @@ object MiscFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "mobs", "combat.mobs")
     }

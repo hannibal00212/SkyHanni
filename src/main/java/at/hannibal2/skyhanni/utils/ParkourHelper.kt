@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourShortCut
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -42,7 +42,7 @@ class ParkourHelper(
         visible = false
     }
 
-    fun render(event: LorenzRenderWorldEvent) {
+    fun render(event: SkyHanniRenderWorldEvent) {
         if (locations.isEmpty()) {
             ErrorManager.logErrorWithData(
                 IllegalArgumentException("locations is empty"),
