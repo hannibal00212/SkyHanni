@@ -2,12 +2,13 @@ package at.hannibal2.skyhanni.features.fishing.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
-import at.hannibal2.skyhanni.features.fishing.FishingAPI
+import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -179,17 +180,25 @@ object SeaCreatureTracker {
         tracker.firstUpdate()
     }
 
+    init {
+        tracker.initRenderer(config.position) { shouldShowDisplay() }
+    }
+
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        if (!FishingApi.isFishing(checkRodInHand = false)) return false
+
+        return true
+    }
+
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (!FishingAPI.isFishing(checkRodInHand = false)) return
-
-        tracker.renderDisplay(config.position)
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetseacreaturetracker") {
+            description = "Resets the Sea Creature Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
 
-    fun resetCommand() {
-        tracker.resetCommand()
-    }
-
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !FishingAPI.wearingTrophyArmor && !LorenzUtils.inKuudraFight
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !FishingApi.wearingTrophyArmor && !LorenzUtils.inKuudraFight
 }

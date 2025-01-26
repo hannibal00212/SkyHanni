@@ -3,11 +3,13 @@ package at.hannibal2.skyhanni.features.bingo.card
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.bingo.BingoCardUpdateEvent
-import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -46,10 +48,10 @@ object BingoCardDisplay {
     }
 
     private fun reload() {
-        BingoAPI.bingoGoals.clear()
+        BingoApi.bingoGoals.clear()
     }
 
-    fun toggleCommand() {
+    private fun toggleCommand() {
         if (!LorenzUtils.isBingoProfile) {
             ChatUtils.userError("This command only works on a bingo profile!")
             return
@@ -82,7 +84,7 @@ object BingoCardDisplay {
     private fun drawDisplay(): MutableList<Renderable> {
         val newList = mutableListOf<Renderable>()
 
-        if (BingoAPI.bingoGoals.isEmpty()) {
+        if (BingoApi.bingoGoals.isEmpty()) {
             newList.add(Renderable.string("§6Bingo Goals:"))
             newList.add(
                 Renderable.clickAndHover(
@@ -104,7 +106,7 @@ object BingoCardDisplay {
 
     private fun MutableList<Renderable>.addCommunityGoals() {
         add(Renderable.string("§6Community Goals:"))
-        val goals = BingoAPI.communityGoals.toMutableList()
+        val goals = BingoApi.communityGoals.toMutableList()
         var hiddenGoals = 0
         for (goal in goals.toList()) {
             if (goal.hiddenGoalData.unknownTip) {
@@ -127,11 +129,11 @@ object BingoCardDisplay {
     }
 
     private fun percentageFormat(it: BingoGoal) = it.communtyGoalPercentage?.let {
-        " " + BingoAPI.getCommunityPercentageColor(it)
+        " " + BingoApi.getCommunityPercentageColor(it)
     }.orEmpty()
 
     private fun MutableList<Renderable>.addPersonalGoals() {
-        val todo = BingoAPI.personalGoals.filter { !it.done }.toMutableList()
+        val todo = BingoApi.personalGoals.filter { !it.done }.toMutableList()
         val done = MAX_PERSONAL_GOALS - todo.size
         add(Renderable.string("§6Personal Goals: ($done/$MAX_PERSONAL_GOALS done)"))
 
@@ -158,7 +160,7 @@ object BingoCardDisplay {
         }
         hasHiddenPersonalGoals = config.nextTipDuration.get() && nextTip != 14.days
         if (hasHiddenPersonalGoals) {
-            val nextTipTime = BingoAPI.lastBingoCardOpenTime + nextTip
+            val nextTipTime = BingoApi.lastBingoCardOpenTime + nextTip
             if (nextTipTime.isInPast()) {
                 add(Renderable.string("§eThe next hint got unlocked already!"))
                 add(Renderable.string("§eOpen the bingo card to update!"))
@@ -266,5 +268,14 @@ object BingoCardDisplay {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "bingo", "event.bingo")
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shbingotoggle") {
+            description = "Toggle the bingo card display mode"
+            category = CommandCategory.USERS_ACTIVE
+            callback { toggleCommand() }
+        }
     }
 }

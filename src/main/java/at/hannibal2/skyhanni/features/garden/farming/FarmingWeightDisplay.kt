@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteLeaderboardJson
@@ -11,16 +13,16 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.ElitePlayerWeightJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.UpcomingLeaderboardPlayer
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.APIUtils
+import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -37,7 +39,6 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -59,7 +60,7 @@ object FarmingWeightDisplay {
     }
 
     private fun shouldShowDisplay(): Boolean {
-        if (GardenAPI.hideExtraGuis()) return false
+        if (GardenApi.hideExtraGuis()) return false
 
         return true
     }
@@ -86,8 +87,8 @@ object FarmingWeightDisplay {
         rankGoal = -1
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
         update()
@@ -116,7 +117,7 @@ object FarmingWeightDisplay {
         event.move(34, "garden.eliteFarmingWeights.ETAGoalRank", "garden.eliteFarmingWeights.etaGoalRank")
     }
 
-    private val config get() = GardenAPI.config.eliteFarmingWeights
+    private val config get() = GardenApi.config.eliteFarmingWeights
     private val localCounter = mutableMapOf<CropType, Long>()
 
     private var display = emptyList<Renderable>()
@@ -253,7 +254,7 @@ object FarmingWeightDisplay {
             ChatUtils.chatAndOpenConfig(
                 "Invalid Farming Weight Overtake Goal! Click here to edit the Overtake Goal config value " +
                     "to a valid number [1-10000] to use this feature!",
-                GardenAPI.config.eliteFarmingWeights::etaGoalRank,
+                GardenApi.config.eliteFarmingWeights::etaGoalRank,
             )
             config.etaGoalRank = goal.toString()
         } else {
@@ -294,7 +295,7 @@ object FarmingWeightDisplay {
             } else {
                 leaderboardPosition--
             }
-            GardenAPI.storage?.farmingWeight?.lastFarmingWeightLeaderboard =
+            GardenApi.storage?.farmingWeight?.lastFarmingWeightLeaderboard =
                 leaderboardPosition
 
             // Remove passed player to present the next one
@@ -373,8 +374,8 @@ object FarmingWeightDisplay {
     }
 
     private fun isEnabled() = config.display && (outsideEnabled() || inGardenEnabled())
-    private fun outsideEnabled() = OutsideSbFeature.FARMING_WEIGHT.isSelected() && !LorenzUtils.inSkyBlock
-    private fun inGardenEnabled() = (LorenzUtils.inSkyBlock && GardenAPI.inGarden()) || config.showOutsideGarden
+    private fun outsideEnabled() = OutsideSBFeature.FARMING_WEIGHT.isSelected() && !LorenzUtils.inSkyBlock
+    private fun inGardenEnabled() = (LorenzUtils.inSkyBlock && GardenApi.inGarden()) || config.showOutsideGarden
 
     private fun isEtaEnabled() = config.overtakeETA
 
@@ -414,7 +415,7 @@ object FarmingWeightDisplay {
             if (wasNotLoaded && config.showLbChange) {
                 checkOffScreenLeaderboardChanges()
             }
-            GardenAPI.storage?.farmingWeight?.lastFarmingWeightLeaderboard =
+            GardenApi.storage?.farmingWeight?.lastFarmingWeightLeaderboard =
                 leaderboardPosition
             lastLeaderboardUpdate = SimpleTimeMark.now()
             isLoadingLeaderboard = false
@@ -454,7 +455,7 @@ object FarmingWeightDisplay {
         val atRank = if (isEtaEnabled() && goalRank != 10001) "&atRank=$goalRank" else ""
 
         val url = "https://api.elitebot.dev/leaderboard/rank/farmingweight/$uuid/$profileId$includeUpcoming$atRank"
-        val apiResponse = APIUtils.getJSONResponse(url)
+        val apiResponse = ApiUtils.getJSONResponse(url)
 
         try {
             val apiData = toEliteLeaderboardJson(apiResponse).data
@@ -484,7 +485,7 @@ object FarmingWeightDisplay {
     private fun loadWeight(localProfile: String) {
         val uuid = LorenzUtils.getPlayerUuid()
         val url = "https://api.elitebot.dev/weight/$uuid"
-        val apiResponse = APIUtils.getJSONResponse(url)
+        val apiResponse = ApiUtils.getJSONResponse(url)
 
         var error: Throwable? = null
 
@@ -556,7 +557,7 @@ object FarmingWeightDisplay {
         return cropWeight[this] ?: backupCropWeights[this] ?: error("Crop $this not in backupFactors!")
     }
 
-    fun lookUpCommand(it: Array<String>) {
+    private fun lookUpCommand(it: Array<String>) {
         val name = if (it.size == 1) it[0] else LorenzUtils.getPlayerName()
         openWebsite(name, ignoreCooldown = true)
     }
@@ -580,7 +581,7 @@ object FarmingWeightDisplay {
         if (attemptingCropWeightFetch || hasFetchedCropWeights) return
         attemptingCropWeightFetch = true
         val url = "https://api.elitebot.dev/weights/all"
-        val apiResponse = APIUtils.getJSONResponse(url)
+        val apiResponse = ApiUtils.getJSONResponse(url)
 
         try {
             val apiData = eliteWeightApiGson.fromJson<EliteWeightsJson>(apiResponse)
@@ -612,5 +613,14 @@ object FarmingWeightDisplay {
             CropType.COCOA_BEANS to 267_174.04,
             CropType.CACTUS to 177_254.45,
         )
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shfarmingprofile") {
+            description = "Look up the farming profile from yourself or another player on elitebot.dev"
+            category = CommandCategory.USERS_ACTIVE
+            callback { lookUpCommand(it) }
+        }
     }
 }

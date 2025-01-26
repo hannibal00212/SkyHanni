@@ -2,11 +2,12 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ElectionAPI.getElectionYear
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.ElectionApi.getElectionYear
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
+import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -93,7 +95,7 @@ object MythologicalCreatureTracker {
     fun onChat(event: SkyHanniChatEvent) {
         for (creatureType in MythologicalCreatureType.entries) {
             if (!creatureType.pattern.matches(event.message)) continue
-            BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
+            BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             tracker.modify {
                 it.count.addOrPut(creatureType, 1)
 
@@ -132,20 +134,29 @@ object MythologicalCreatureTracker {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!config.enabled) return
-        val spadeInHand = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
-        if (!DianaAPI.isDoingDiana() && !spadeInHand) return
-        if (spadeInHand) {
-            tracker.firstUpdate()
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = { config.enabled },
+            onRender = {
+                val spadeInHand = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
+                if (!DianaApi.isDoingDiana() && !spadeInHand) return@RenderDisplayHelper
+                if (spadeInHand) {
+                    tracker.firstUpdate()
+                }
+
+                tracker.renderDisplay(config.position)
+            },
+        )
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetmythologicalcreaturetracker") {
+            description = "Resets the Mythological Creature Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
         }
-
-        tracker.renderDisplay(config.position)
     }
-
-    fun resetCommand() {
-        tracker.resetCommand()
-    }
-
 }

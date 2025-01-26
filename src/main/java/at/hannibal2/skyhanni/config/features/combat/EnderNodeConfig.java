@@ -102,17 +102,17 @@ public class EnderNodeConfig {
         ENDERMAN_PET("§f10§7-§a8§7-§93§7-§52§7-§61 §fEnderman Pet", 23),
         ;
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        EnderNodeDisplayEntry(String str, int legacyId) {
-            this.str = str;
+        EnderNodeDisplayEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        EnderNodeDisplayEntry(String str) {
-            this(str, -1);
+        EnderNodeDisplayEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -122,7 +122,7 @@ public class EnderNodeConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -90,7 +90,7 @@ object BactePhase {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onWorldRender(event: RenderWorldEvent) {
+    fun onWorldRender(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (currentPhase == BactePhase.NOT_ACTIVE) return
         val bacte = bacte ?: return
@@ -101,6 +101,6 @@ object BactePhase {
         )
     }
 
-    private fun isEnabled() = RiftAPI.inColosseum() && SkyHanniMod.feature.rift.area.colosseum.showBactePhase
+    private fun isEnabled() = RiftApi.inColosseum() && SkyHanniMod.feature.rift.area.colosseum.showBactePhase
 
 }
