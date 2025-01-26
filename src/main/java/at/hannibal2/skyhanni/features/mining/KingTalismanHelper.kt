@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -202,8 +202,8 @@ object KingTalismanHelper {
 
     private fun getKingTimes(): MutableMap<String, Long> {
         val currentOffset = getCurrentOffset() ?: 0
-        val oneSbDay = 1000 * 60 * 20
-        val oneCircleTime = oneSbDay * kingCircles.size
+        val oneSBDay = 1000 * 60 * 20
+        val oneCircleTime = oneSBDay * kingCircles.size
         val kingTime = mutableMapOf<String, Long>()
         for ((index, king) in kingCircles.withIndex()) {
 //             val startTime = SkyBlockTime(day = index + 2 - kingCircles.size)
@@ -231,7 +231,7 @@ object KingTalismanHelper {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        if (!MiningAPI.inDwarvenMines) return
+        if (!MiningApi.inDwarvenMines) return
 
         if (talismanPattern.matches(event.message)) {
             storage?.kingsTalkedTo = kingCircles.toMutableList()

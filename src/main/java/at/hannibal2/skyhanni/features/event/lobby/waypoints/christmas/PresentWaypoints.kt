@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.features.event.lobby.waypoints.christmas
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.WinterAPI
+import at.hannibal2.skyhanni.data.WinterApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EventWaypointsJson
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.EventWaypoint
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.loadEventWaypoints
@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // todo: create abstract class for this and BasketWaypoints
 @SkyHanniModule
@@ -90,8 +89,8 @@ object PresentWaypoints {
 
     // </editor-fold>
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled() && config.onlyClosest && HypixelData.locrawData != null && closest == null) return
         val notFoundPresents = presentSet?.filterNot { it.isFound }
         if (notFoundPresents?.isEmpty() == true) return
@@ -99,13 +98,13 @@ object PresentWaypoints {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         presentSet?.let { event.drawWaypoints(it, config.allWaypoints, LorenzColor.GOLD, "§6") }
         presentEntranceSet?.let { event.drawWaypoints(it, config.allEntranceWaypoints, LorenzColor.YELLOW, "§e") }
     }
 
-    private fun RenderWorldEvent.drawWaypoints(
+    private fun SkyHanniRenderWorldEvent.drawWaypoints(
         waypoints: Set<EventWaypoint>, shouldDraw: Boolean, color: LorenzColor, prefix: String,
     ) {
         if (!shouldDraw) return
@@ -126,5 +125,5 @@ object PresentWaypoints {
     }
 
     private fun isEnabled(): Boolean =
-        LorenzUtils.inHypixelLobby && (config.allWaypoints || config.allEntranceWaypoints) && WinterAPI.isDecember()
+        LorenzUtils.inHypixelLobby && (config.allWaypoints || config.allEntranceWaypoints) && WinterApi.isDecember()
 }

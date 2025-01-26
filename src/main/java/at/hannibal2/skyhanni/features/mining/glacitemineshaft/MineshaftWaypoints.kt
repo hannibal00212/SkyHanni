@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -73,7 +73,7 @@ object MineshaftWaypoints {
 
         val message = "x: $x, y: $y, z: $z | ($type)"
 
-        if (PartyAPI.partyMembers.isNotEmpty()) {
+        if (PartyApi.partyMembers.isNotEmpty()) {
             HypixelCommands.partyChat(message)
         } else {
             HypixelCommands.allChat(message)
@@ -81,7 +81,7 @@ object MineshaftWaypoints {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (waypoints.isEmpty()) return
 
         waypoints

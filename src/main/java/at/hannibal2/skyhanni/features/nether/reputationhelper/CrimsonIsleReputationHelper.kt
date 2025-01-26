@@ -10,10 +10,10 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.QuestLoader
 import at.hannibal2.skyhanni.features.nether.reputationhelper.kuudra.DailyKuudraBossHelper
@@ -23,15 +23,13 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
@@ -105,9 +103,8 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
+    fun onTick(event: SkyHanniTickEvent) {
         if (!config.enabled.get()) return
         if (!dirty && display.isEmpty()) {
             dirty = true
@@ -162,7 +159,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
             it == null || it is GuiInventory
         }
         if (!isAllowedGui) return false
-        if (NEUItems.neuHasFocus()) return false
+        if (NeuItems.neuHasFocus()) return false
 
         return config.hotkey.isKeyHeld()
     }

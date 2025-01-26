@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.bookPattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.ultraRarePattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.bookPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.ultraRarePattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils
@@ -90,5 +90,5 @@ object UltraRareBookAlert {
     }
 
     private fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.ultraRareBookAlert && ExperimentationTableAPI.getCurrentExperiment() != null
+        LorenzUtils.inSkyBlock && config.ultraRareBookAlert && ExperimentationTableApi.getCurrentExperiment() != null
 }

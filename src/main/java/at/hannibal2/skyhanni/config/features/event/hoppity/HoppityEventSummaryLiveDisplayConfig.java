@@ -37,15 +37,15 @@ public class HoppityEventSummaryLiveDisplayConfig {
         NEXT_EVENT("Next Event"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        HoppityDateTimeDisplayType(String str) {
-            this.str = str;
+        HoppityDateTimeDisplayType(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -65,15 +65,15 @@ public class HoppityEventSummaryLiveDisplayConfig {
         ABSOLUTE("Absolute"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        HoppityDateTimeFormat(String str) {
-            this.str = str;
+        HoppityDateTimeFormat(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -107,15 +107,15 @@ public class HoppityEventSummaryLiveDisplayConfig {
         MEAL_EGGS("Meal Eggs"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        HoppityLiveDisplayInventoryType(String str) {
-            this.str = str;
+        HoppityLiveDisplayInventoryType(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

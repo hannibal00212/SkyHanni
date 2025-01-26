@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -55,7 +55,7 @@ object FrogMaskDisplay {
         val helmet = InventoryUtils.getHelmet() ?: return
         if (helmet.getInternalName() != "FROG_MASK".toInternalName()) return
 
-        display = activeRegionPattern.matchAll(helmet.getLore()) {
+        display = activeRegionPattern.firstMatcher(helmet.getLore()) {
             val currentRegion = group("region")
             val now = SkyBlockTime.now()
             val timeRemaining = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).asTimeMark()

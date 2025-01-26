@@ -271,5 +271,5 @@ object SoopyGuessBurrow {
         }
     }
 
-    private fun isEnabled() = DianaAPI.isDoingDiana() && SkyHanniMod.feature.event.diana.burrowsSoopyGuess
+    private fun isEnabled() = DianaApi.isDoingDiana() && SkyHanniMod.feature.event.diana.burrowsSoopyGuess
 }

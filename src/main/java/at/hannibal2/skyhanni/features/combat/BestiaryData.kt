@@ -11,13 +11,13 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addButton
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -77,7 +77,7 @@ object BestiaryData {
         "^(?:\\(\\d+\\/\\d+\\) )?(?<title>Bestiary|.+) ➜ .+\$",
     )
 
-    private var display = emptyList<List<Any>>()
+    private var display = emptyList<Renderable>()
     private val mobList = mutableListOf<BestiaryMob>()
     private val stackList = mutableMapOf<Int, ItemStack>()
     private val catList = mutableListOf<Category>()
@@ -95,8 +95,8 @@ object BestiaryData {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (inInventory) {
-            config.position.renderStringsAndItems(
-                display, extraSpace = -1, itemScale = 0.7, posLabel = "Bestiary Data",
+            config.position.renderRenderables(
+                display, extraSpace = -1, posLabel = "Bestiary Data",
             )
         }
     }
@@ -237,27 +237,23 @@ object BestiaryData {
         }
     }
 
-    private fun drawDisplay(): List<List<Any>> {
-        val newDisplay = mutableListOf<List<Any>>()
-
+    private fun drawDisplay() = buildList {
         if (!overallProgressEnabled) {
-            newDisplay.addAsSingletonList("§7Bestiary Data")
-            newDisplay.addAsSingletonList(" §cPlease enable Overall Progress")
-            newDisplay.addAsSingletonList(" §cUsing the Eye of Ender highlighted in red.")
-            return newDisplay
+            addString("§7Bestiary Data")
+            addString(" §cPlease enable Overall Progress")
+            addString(" §cUsing the Eye of Ender highlighted in red.")
+            return@buildList
         }
 
         init()
 
-        addCategories(newDisplay)
+        addCategories()
 
-        if (mobList.isEmpty()) return newDisplay
+        if (mobList.isEmpty()) return@buildList
 
-        addList(newDisplay)
+        addList()
 
-        addButtons(newDisplay)
-
-        return newDisplay
+        addButtons()
     }
 
     private fun sortMobList(): MutableList<BestiaryMob> {
@@ -275,26 +271,21 @@ object BestiaryData {
         return sortedMobList
     }
 
-    private fun addList(newDisplay: MutableList<List<Any>>) {
+    private fun MutableList<Renderable>.addList() {
         val sortedMobList = sortMobList()
 
-        newDisplay.addAsSingletonList("§7Bestiary Data")
+        addString("§7Bestiary Data")
         for (mob in sortedMobList) {
             val isUnlocked = mob.actualRealTotalKill != 0.toLong()
             val isMaxed = mob.percentToMax() >= 1
             if (!isUnlocked) {
-                newDisplay.add(
-                    buildList {
-                        add(" §7- ")
-                        add("${mob.name}: §cNot unlocked!")
-                    },
-                )
+                addString(" §7- ${mob.name}: §cNot unlocked!")
                 continue
             }
             if (isMaxed && config.hideMaxed) continue
             val text = getMobLine(mob, isMaxed)
             val tips = getMobHover(mob)
-            newDisplay.addAsSingletonList(Renderable.hoverTips(text, tips) { true })
+            add(Renderable.hoverTips(text, tips) { true })
         }
     }
 
@@ -356,28 +347,27 @@ object BestiaryData {
         return text
     }
 
-    private fun addButtons(newDisplay: MutableList<List<Any>>) {
-        newDisplay.addButton(
+    // TODO: Avoid ordinal
+    private fun MutableList<Renderable>.addButtons() {
+        addButton(
             prefix = "§7Number Format: ",
-            getName = FormatType.entries[config.numberFormat.ordinal].type, // todo: avoid ordinal
+            getName = FormatType.entries[config.numberFormat.ordinal].type,
             onChange = {
-                // todo: avoid ordinal
                 config.numberFormat = BestiaryConfig.NumberFormatEntry.entries[(config.numberFormat.ordinal + 1) % 2]
                 update()
             },
         )
 
-        newDisplay.addButton(
+        addButton(
             prefix = "§7Display Type: ",
-            getName = DisplayType.entries[config.displayType.ordinal].type, // todo: avoid ordinal
+            getName = DisplayType.entries[config.displayType.ordinal].type,
             onChange = {
-                // todo: avoid ordinal
                 config.displayType = DisplayTypeEntry.entries[(config.displayType.ordinal + 1) % 8]
                 update()
             },
         )
 
-        newDisplay.addButton(
+        addButton(
             prefix = "§7Number Type: ",
             getName = NumberType.entries[if (config.replaceRoman) 0 else 1].type,
             onChange = {
@@ -386,7 +376,7 @@ object BestiaryData {
             },
         )
 
-        newDisplay.addButton(
+        addButton(
             prefix = "§7Hide Maxed: ",
             getName = HideMaxed.entries[if (config.hideMaxed) 1 else 0].type,
             onChange = {
@@ -396,25 +386,21 @@ object BestiaryData {
         )
     }
 
-    private fun addCategories(newDisplay: MutableList<List<Any>>) {
+    private fun MutableList<Renderable>.addCategories() {
         if (catList.isEmpty()) return
-        newDisplay.addAsSingletonList("§7Category")
+        addString("§7Category")
         for (cat in catList) {
-            newDisplay.add(
-                buildList {
-                    add(" §7- ${cat.name}§7: ")
-                    val element = when {
-                        cat.familiesCompleted == cat.totalFamilies -> "§c§lCompleted!"
-                        cat.familiesFound == cat.totalFamilies -> "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
-                        cat.familiesFound < cat.totalFamilies ->
-                            "§b${cat.familiesFound}§7/§b${cat.totalFamilies} §7found, " +
-                                "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
+            val info = when {
+                cat.familiesCompleted == cat.totalFamilies -> "§c§lCompleted!"
+                cat.familiesFound == cat.totalFamilies -> "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
+                cat.familiesFound < cat.totalFamilies ->
+                    "§b${cat.familiesFound}§7/§b${cat.totalFamilies} §7found, " +
+                        "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
 
-                        else -> continue
-                    }
-                    add(element)
-                },
-            )
+                else -> continue
+            }
+
+            addString(" §7- ${cat.name}§7: $info")
         }
     }
 

@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature;
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature;
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
 import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig;
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig;
@@ -137,7 +137,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Show Outside SkyBlock", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
-    public Property<List<OutsideSbFeature>> showOutsideSB = Property.of(new ArrayList<>());
+    public Property<List<OutsideSBFeature>> showOutsideSB = Property.of(new ArrayList<>());
 
     @Expose
     @ConfigOption(name = "Auto Join Skyblock", desc = "Automatically join Skyblock when you join Hypixel.")
@@ -180,10 +180,11 @@ public class MiscConfig {
     @SearchTag("skyblockxp")
     @ConfigEditorBoolean
     @FeatureToggle
+    // TODO rename to skyblockXPBar
     public boolean skyblockXpBar = false;
 
     @Expose
-    @ConfigOption(name = "Xp in Inventory", desc = "Show your current XP in inventories that would use your XP.")
+    @ConfigOption(name = "XP in Inventory", desc = "Show your current XP in inventories that would use your XP.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean xpInInventory = true;
