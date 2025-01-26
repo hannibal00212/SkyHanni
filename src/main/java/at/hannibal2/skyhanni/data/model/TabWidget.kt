@@ -273,7 +273,7 @@ enum class TabWidget(
          * REGEX-TEST: §r§fFull Traps: §r§7None
          */
         // language=RegExp
-        "(?:§.)*Full Traps: (?:§.)*(None|§r§a#(?<one>\\d)(?:§r§7, §r§a#(?<two>\\d)(?:§r§7, §r§a#(?<three>\\d))?)?)",
+        "(?:§.)*Full Traps: (?:§.)*(?:None|§r§a#(?<one>\\d)(?:§r§7, §r§a#(?<two>\\d)(?:§r§7, §r§a#(?<three>\\d))?)?)",
     ),
     NO_BAIT(
         /**
@@ -283,7 +283,7 @@ enum class TabWidget(
          * REGEX-TEST: §r§fNo Bait: §r§7None
          */
         // language=RegExp
-        "(?:§.)*No Bait: (?:§.)*(None|§r§c#(?<one>\\d)(?:§r§7, §r§c#(?<two>\\d)(?:§r§7, §r§c#(?<three>\\d))?)?)"
+        "(?:§.)*No Bait: (?:§.)*(?:None|§r§c#(?<one>\\d)(?:§r§7, §r§c#(?<two>\\d)(?:§r§7, §r§c#(?<three>\\d))?)?)"
     ),
     VISITORS(
         // language=RegExp

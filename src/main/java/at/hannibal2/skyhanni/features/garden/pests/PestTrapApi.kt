@@ -53,17 +53,34 @@ object PestTrapApi {
         @Expose var plotName: String? = null,
         @Expose var location: LorenzVec? = null,
         @Expose var trapType: PestTrapType? = PestTrapType.PEST_TRAP,
-        @Expose var count: Int = 0,
+        @Expose var pestCount: Int = 0,
+        @Expose var pestType: MutableList<PestType?> = MutableList(MAX_PEST_COUNT_PER_TRAP) { null },
         @Expose var baitCount: Int = -1,
         @Expose var baitType: SprayType? = null,
     ) {
         val index get() = number - 1
-        val isFull get() = count >= MAX_PEST_COUNT_PER_TRAP
+        val isFull get() = pestCount >= MAX_PEST_COUNT_PER_TRAP
         val noBait get() = baitCount == 0
-        val plot get() = plotName?.let {
-            GardenPlotApi.getPlotByName(it)
-        } ?: location?.let {
-            GardenPlotApi.closestPlot(it)
+        val plot
+            get() = plotName?.let {
+                GardenPlotApi.getPlotByName(it)
+            } ?: location?.let {
+                GardenPlotApi.closestPlot(it)
+            }
+
+        fun affirmNoPests() {
+            pestCount = 0
+            pestType = MutableList(MAX_PEST_COUNT_PER_TRAP) { null }
+        }
+
+        fun affirmHasUnknownBait() {
+            baitCount = -1
+            baitType = null
+        }
+
+        fun affirmNoBait() {
+            baitCount = 0
+            baitType = null
         }
     }
 
@@ -83,6 +100,7 @@ object PestTrapApi {
 
     private val patternGroup = RepoPattern.group("garden.pests.trap")
     private val storage get() = GardenApi.storage
+
     // Todo: Use this in the future to tell the user to enable the widget if it's disabled
     private val widgetEnabledAndVisible: TimeLimitedCache<TabWidget, Boolean> = baseWidgetStatus()
     private val widgetErrors: MutableMap<TabWidget, Long> = enumMapOf()
@@ -112,12 +130,8 @@ object PestTrapApi {
      */
     private val caughtChatPattern by patternGroup.pattern(
         "chat.caught",
-        "(?:§.)+GOTCHA! §7Your traps caught a §.Pest §7in §.Plot (?:§.)+.*(?:§.)+!"
+        "(?:§.)+GOTCHA! §7Your traps caught a §.Pest §7in §.Plot (?:§.)+.*(?:§.)+!",
     )
-
-    private val tabListPestTrapsPattern = TabWidget.PEST_TRAPS.pattern
-    private val tabListFullTrapsPattern = TabWidget.FULL_TRAPS.pattern
-    private val tabListNoBaitPattern = TabWidget.NO_BAIT.pattern
 
     /**
      * REGEX-TEST: Bait: §aTasty Cheese
@@ -125,12 +139,7 @@ object PestTrapApi {
      */
     private val entityBaitPattern by patternGroup.pattern(
         "entity.bait",
-        "Bait: (?:§.)+(?:NO BAIT|(?<bait>.+))"
-    )
-
-    private val entityFullTrapPattern by patternGroup.pattern(
-        "entity.full",
-        "§c§lFULL"
+        "Bait: (?:§.)+(?:NO BAIT|(?<bait>.+))",
     )
 
     /**
@@ -139,7 +148,7 @@ object PestTrapApi {
      */
     private val pestTrapInventoryNamePattern by patternGroup.pattern(
         "inventory.name",
-        "(?<type>Mouse|Pest) Trap"
+        "(?<type>Mouse|Pest) Trap",
     )
 
     /**
@@ -148,21 +157,37 @@ object PestTrapApi {
      */
     private val trapRemovedChatPattern by patternGroup.pattern(
         "chat.removed",
-        "(?:§.)*You removed a (?:§.)*(?<type>Pest|Mouse) Trap(?:§.)*\\. (?:§.)*\\(\\d+/\\d+\\)"
+        "(?:§.)*You removed a (?:§.)*(?<type>Pest|Mouse) Trap(?:§.)*\\. (?:§.)*\\(\\d+/\\d+\\)",
+    )
+
+    /**
+     * REGEX-TEST: §2Slug
+     * REGEX-TEST: §2Mite
+     */
+    private val pestSlotPestPattern by patternGroup.pattern(
+        "inventory.pest.some",
+        "(?:§.)*(?<type>.+)",
     )
 
     private val trapBaitItemPattern by patternGroup.pattern(
         "inventory.bait.none",
-        "§6Trap Bait"
+        "§6Trap Bait",
     )
     private val pestSlotItemPattern by patternGroup.pattern(
         "inventory.pest.none",
-        "§aPest Slot"
+        "§aPest Slot",
     )
     private val noneToReleasePattern by patternGroup.pattern(
         "inventory.release.none",
-        "§cThere are no §2Pests §cto release!"
+        "§cThere are no §2Pests §cto release!",
     )
+    private val entityFullTrapPattern by patternGroup.pattern(
+        "entity.full",
+        "§c§lFULL",
+    )
+    private val tabListPestTrapsPattern = TabWidget.PEST_TRAPS.pattern
+    private val tabListFullTrapsPattern = TabWidget.FULL_TRAPS.pattern
+    private val tabListNoBaitPattern = TabWidget.NO_BAIT.pattern
     // </editor-fold>
 
     @HandleEvent
@@ -195,19 +220,29 @@ object PestTrapApi {
         if (!PestApi.isNearPestTrap()) return
         if (lastClickedIndex == -1) return
         inIndex = lastClickedIndex
+        val storage = storage ?: return
+        val activeTrap = storage.pestTrapStatus.getOrNull(inIndex) ?: return
         pestTrapInventoryNamePattern.matchMatcher(event.inventoryName) {
             val inventoryTrapType = this.extractTrapType() ?: return
-            val storage = storage ?: return
             val baitStack = event.inventoryItems[BAIT_SLOT]?.takeIf {
-                trapBaitItemPattern.matches(it.displayName)
+                !trapBaitItemPattern.matches(it.displayName)
+            }
+            event.inventoryItems.onEach { (slot, stack) ->
+                val slotIndex = PEST_SLOTS.indexOf(slot).takeIf { it != -1 } ?: return@onEach
+                pestSlotPestPattern.matchMatcher(stack.displayName) {
+                    val slotPestType = groupOrNull("type")?.let { PestType.getByNameOrNull(it) } ?: return@onEach
+                    activeTrap.apply {
+                        pestType[slotIndex] = slotPestType
+                    }
+                }
             }
             val baitInternalName = baitStack?.getInternalNameOrNull()
-            storage.pestTrapStatus[lastClickedIndex].apply {
+            activeTrap.apply {
                 trapType = inventoryTrapType
                 baitType = baitInternalName?.let { SprayType.getByInternalName(baitInternalName) }
                 baitCount = baitStack?.stackSize ?: 0
-                count = PEST_SLOTS.count { slotNumber ->
-                    pestSlotItemPattern.matches(event.inventoryItems[slotNumber]?.displayName)
+                pestCount = PEST_SLOTS.count { slotNumber ->
+                    !pestSlotItemPattern.matches(event.inventoryItems[slotNumber]?.displayName)
                 }
             }
         }
@@ -222,19 +257,20 @@ object PestTrapApi {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (inIndex == -1 || !canReleasePest()) return
         val storage = storage ?: return
-        val trap = storage.pestTrapStatus[inIndex].takeIf { it.count > 0 } ?: return
+        val trap = storage.pestTrapStatus[inIndex].takeIf { it.pestCount > 0 } ?: return
         val stack = event.slot?.stack ?: return
         when (event.slot.slotNumber) {
-            in PEST_SLOTS -> if (pestSlotItemPattern.matches(stack.displayName)) trap.apply { count-- }
+            in PEST_SLOTS -> if (pestSlotItemPattern.matches(stack.displayName)) trap.apply { pestCount-- }
             RELEASE_ALL_SLOT -> {
-                if (!stack.canReleaseAll() || !canReleasePest(trap.count)) return
+                if (!stack.canReleaseAll() || !canReleasePest(trap.pestCount)) return
                 val existingPests = PestApi.scoreboardPests.takeIf { it < MAX_RELEASED_PESTS } ?: return
-                val pestsToRelease = min(trap.count, MAX_RELEASED_PESTS - existingPests)
+                val pestsToRelease = min(trap.pestCount, MAX_RELEASED_PESTS - existingPests)
                 @Suppress("UnnecessaryApply")
                 trap.apply {
-                    count -= pestsToRelease
+                    pestCount -= pestsToRelease
                 }
             }
+
             else -> return
         }
     }
@@ -307,7 +343,7 @@ object PestTrapApi {
         val trap = storage.pestTrapStatus.firstOrNull { trap ->
             trap.location?.isBottomToTop(entity.getLorenzVec()) ?: false
         } ?: return
-        trap.count = MAX_PEST_COUNT_PER_TRAP
+        trap.pestCount = MAX_PEST_COUNT_PER_TRAP
     }
 
     private fun LorenzVec.isBottomToTop(other: LorenzVec) = (this.y < other.y) &&
@@ -320,9 +356,9 @@ object PestTrapApi {
         caughtChatPattern.matchMatcher(event.message) {
             val plotName = groupOrNull("plot") ?: return
             storage.pestTrapStatus.filter {
-                it.plotName == plotName && it.count < MAX_PEST_COUNT_PER_TRAP
+                it.plotName == plotName && it.pestCount < MAX_PEST_COUNT_PER_TRAP
             }.onEach {
-                it.count++
+                it.pestCount++
                 it.baitCount =
                     if (it.baitCount == -1) -1
                     else (it.baitCount - 1).coerceAtLeast(0)
@@ -358,7 +394,7 @@ object PestTrapApi {
     }
 
     private fun String.updateDataFromTitle(
-        storage: ProfileSpecificStorage.GardenStorage
+        storage: ProfileSpecificStorage.GardenStorage,
     ) = tabListPestTrapsPattern.matchMatcher(this@updateDataFromTitle) {
         widgetEnabledAndVisible[TabWidget.PEST_TRAPS] = true
         val thisHash = this@updateDataFromTitle.hashCode().takeIf { it != lastTitleHash } ?: return@matchMatcher
@@ -373,38 +409,35 @@ object PestTrapApi {
         storage.pestTrapStatus = storage.pestTrapStatus.take(numberToTrack).toMutableList()
     }
 
-    private fun Matcher.extractTrapList(): List<String?>? = listOf(
-        groupOrNull("one"),
-        groupOrNull("two"),
-        groupOrNull("three"),
-    ).takeIf { it.any { group -> group != null } }
+    private val trapGroups = listOf("one", "two", "three")
+    private fun Matcher.getTrapIndexSet(): Set<Int>? = trapGroups.map {
+        val trapNumber = groupOrNull(it)?.toIntOrNull() ?: return@map null
+        trapNumber - 1
+    }.takeIf { it.any { group -> group != null } }?.filterNotNull()?.toSet()
 
     private fun String.updateDataFromFull(
-        storage: ProfileSpecificStorage.GardenStorage
+        storage: ProfileSpecificStorage.GardenStorage,
     ) = tabListFullTrapsPattern.matchMatcher(this@updateDataFromFull) {
         widgetEnabledAndVisible[TabWidget.FULL_TRAPS] = true
         lastFullHash = this@updateDataFromFull.hashCode().takeIf { it != lastFullHash } ?: return@matchMatcher
 
-        val fullTraps = extractTrapList() ?: return@matchMatcher
-        storage.pestTrapStatus.filter {
-            fullTraps[it.index] != null
-        }.onEach {
-            it.count = MAX_PEST_COUNT_PER_TRAP
+        val fullTraps = getTrapIndexSet()
+        storage.pestTrapStatus.let { data ->
+            if (fullTraps.isNullOrEmpty()) data.filter { it.isFull }.forEach { it.affirmNoPests() }
+            else data.onEachInIndexSet(fullTraps) { pestCount = MAX_PEST_COUNT_PER_TRAP }
         }
     }
 
     private fun String.updateDataFromNoBait(
-        storage: ProfileSpecificStorage.GardenStorage
+        storage: ProfileSpecificStorage.GardenStorage,
     ) = tabListNoBaitPattern.matchMatcher(this@updateDataFromNoBait) {
         widgetEnabledAndVisible[TabWidget.NO_BAIT] = true
         lastNoBaitHash = this@updateDataFromNoBait.hashCode().takeIf { it != lastNoBaitHash } ?: return@matchMatcher
 
-        val noBaitTraps = extractTrapList() ?: return@matchMatcher
-        storage.pestTrapStatus.filter {
-            noBaitTraps[it.index] != null
-        }.onEach {
-            it.baitType = null
-            it.baitCount = 0
+        val noBaitTraps = getTrapIndexSet()
+        storage.pestTrapStatus.let { data ->
+            if (noBaitTraps.isNullOrEmpty()) data.filter { it.noBait }.forEach { it.affirmHasUnknownBait() }
+            else data.onEachInIndexSet(noBaitTraps) { affirmNoBait() }
         }
     }
 
@@ -414,6 +447,10 @@ object PestTrapApi {
         removalListener = { key, _, removalCause ->
             if (removalCause != EXPIRED) return@TimeLimitedCache
             widgetErrors.addOrPut(key ?: return@TimeLimitedCache, 1)
-        }
+        },
     )
+
+    private fun List<PestTrapData>.onEachInIndexSet(indexSet: Set<Int>, action: PestTrapData.() -> Unit) {
+        this.filterIndexed { index, _ -> index in indexSet }.onEach(action)
+    }
 }

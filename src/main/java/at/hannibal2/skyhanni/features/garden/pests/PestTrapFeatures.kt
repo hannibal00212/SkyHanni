@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.audio.ISound
 import kotlin.time.Duration.Companion.seconds
 
@@ -29,29 +30,32 @@ private typealias WarningDisplayType = PestTrapConfig.WarningConfig.WarningDispl
 object PestTrapFeatures {
 
     private val config get() = SkyHanniMod.feature.garden.pests.pestTrap
-    private val warningConfig get() = config.warningConfig
-    private val enabledTypes get() = warningConfig.warningDisplayType
-    private val reminderInterval get() = warningConfig.warningIntervalSeconds.get()
-    private val userEnabledWarnings get() = warningConfig.enabledWarnings.get()
-    private val chatWarnEnabled get() = enabledTypes in listOf(WarningDisplayType.CHAT, WarningDisplayType.BOTH)
-    private val titleWarnEnabled get() = enabledTypes in listOf(WarningDisplayType.TITLE, WarningDisplayType.BOTH)
+    private val enabledTypes get(): WarningDisplayType = config.warningConfig.warningDisplayType
+    private val userEnabledWarnings: List<WarningReason> get() = config.warningConfig.enabledWarnings.get()
+    private val chatWarnEnabled: Boolean get() = enabledTypes in listOf(WarningDisplayType.CHAT, WarningDisplayType.BOTH)
+    private val titleWarnEnabled: Boolean get() = enabledTypes in listOf(WarningDisplayType.TITLE, WarningDisplayType.BOTH)
+    private val reminderInterval: Property<Int> get() = config.warningConfig.warningIntervalSeconds
+    private val soundString get(): String = config.warningConfig.warningSound.get()
 
     private var data: List<PestTrapData> = emptyList()
     private var lastDataHash: Int = 0
     private var warningSound: ISound? = refreshSound()
     private var activeWarning: Pair<String, GardenPlotApi.Plot?> = "" to null
-    private var nextWarning: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var nextWarningMark: SimpleTimeMark = SimpleTimeMark.farPast()
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(warningConfig.warningSound) {
+        ConditionalUtils.onToggle(config.warningConfig.warningSound) {
             warningSound = refreshSound()
+        }
+        ConditionalUtils.onToggle(reminderInterval) {
+            nextWarningMark = getNextWarningMark()
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (nextWarning.isInFuture()) return
+        if (nextWarningMark.isInFuture()) return
         val (finalWarning, actionPlot) = activeWarning.takeIf {
             it.first.isNotEmpty()
         } ?: return PestTrapApi.releaseCache()
@@ -60,7 +64,7 @@ object PestTrapFeatures {
         tryWarnChat(finalWarning, actionPlot)
         tryWarnTitle(finalWarning)
 
-        nextWarning = SimpleTimeMark.now() + reminderInterval.seconds
+        nextWarningMark = getNextWarningMark()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -71,7 +75,7 @@ object PestTrapFeatures {
     }
 
     private fun List<PestTrapData>.hash(): Int = map { data ->
-        data.number to data.count to data.isFull to data.baitCount to data.noBait
+        data.number to data.pestCount to data.isFull to data.baitCount to data.noBait
     }.hashCode()
 
     private fun handleDataUpdate() {
@@ -83,7 +87,8 @@ object PestTrapFeatures {
         activeWarning = finalWarning to actionPlot
     }
 
-    private fun refreshSound() = warningConfig.warningSound.get().takeIf(String::isNotEmpty)?.let { SoundUtils.createSound(it, 1f) }
+    private fun getNextWarningMark() = SimpleTimeMark.now() + reminderInterval.get().toInt().seconds
+    private fun refreshSound() = soundString.takeIf(String::isNotEmpty)?.let { SoundUtils.createSound(it, 1f) }
     private fun List<PestTrapData>.joinPlots(): String = this.joinToString("§8, ") { "§a#${it.number}" }
 
     private fun generateWarning(reason: WarningReason, data: List<PestTrapData>): Pair<String, GardenPlotApi.Plot?>? {
