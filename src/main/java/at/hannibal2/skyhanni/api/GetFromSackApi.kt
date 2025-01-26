@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Deque
 import java.util.LinkedList
 import kotlin.time.Duration.Companion.seconds
@@ -89,9 +88,8 @@ object GetFromSackApi {
 
     private fun addToInventory(items: List<PrimitiveItemStack>, slotId: Int) = inventoryMap.put(slotId, items)
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTick(event: SkyHanniTickEvent) {
         if (queue.isNotEmpty() && lastTimeOfCommand.passedSince() >= minimumDelay) {
             val item = queue.poll()
             // TODO find a better workaround

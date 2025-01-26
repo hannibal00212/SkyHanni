@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.combat.endernodetracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -283,7 +285,12 @@ object EnderNodeTracker {
         return newList
     }
 
-    fun resetCommand() {
-        tracker.resetCommand()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetendernodetracker") {
+            description = "Resets the Ender Node Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
 }

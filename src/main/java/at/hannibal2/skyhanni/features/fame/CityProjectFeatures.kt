@@ -15,8 +15,6 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -35,11 +33,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.renderables.Container
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -53,7 +51,7 @@ object CityProjectFeatures {
 
     private val config get() = SkyHanniMod.feature.event.cityProject
 
-    private var display = emptyList<Renderable>()
+    private var display: Renderable? = null
     private var inInventory = false
     private var lastReminderSend = SimpleTimeMark.farPast()
 
@@ -118,7 +116,7 @@ object CityProjectFeatures {
                 fetchMaterials(item, materials)
             }
 
-            display = buildList(materials)
+            display = buildDisplay(materials)
         }
 
         if (config.showReady) {
@@ -152,45 +150,47 @@ object CityProjectFeatures {
         return true
     }
 
-    private fun buildList(materials: MutableMap<NeuInternalName, Int>) = buildList {
-        addString("§7City Project Materials")
+    private fun buildDisplay(materials: MutableMap<NeuInternalName, Int>) = Container.vertical {
+        string("§7City Project Materials")
 
         if (materials.isEmpty()) {
-            addString("§cNo Materials to contribute.")
-            return@buildList
-        }
-
-        for ((internalName, amount) in materials) {
-            val stack = internalName.getItemStack()
-            val name = internalName.itemName
-            addLine {
-                addString(" §7- ")
-                addItemStack(stack)
-
-                add(
-                    Renderable.optionalLink(
-                        "$name §ex${amount.addSeparators()}",
-                        {
-                            if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                                LorenzUtils.setTextIntoSign("$amount")
-                            } else {
-                                BazaarApi.searchForBazaarItem(name, amount)
-                            }
-                        },
-                    ) { inInventory && !NeuItems.neuHasFocus() },
-                )
-
-                val price = internalName.getPrice() * amount
-                val format = price.shortFormat()
-                addString(" §7(§6$format§7)")
+            string("§cNo Materials to contribute.")
+        } else {
+            for ((internalName, amount) in materials) {
+                renderable(materialRow(internalName, amount))
             }
         }
+
     }
+
+    private fun materialRow(internalName: NeuInternalName, amount: Int): Renderable {
+        val stack = internalName.getItemStack()
+        val name = internalName.itemName
+        val price = internalName.getPrice() * amount
+
+        return Container.horizontal {
+            string(" §7- ")
+            item(stack)
+            renderable(materialLink(name, amount))
+            string(" §7(§6${price.shortFormat()}§7)")
+        }
+    }
+
+    private fun materialLink(name: String, amount: Int): Renderable = Renderable.optionalLink(
+        "$name §ex${amount.addSeparators()}",
+        {
+            if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+                LorenzUtils.setTextIntoSign("$amount")
+            } else {
+                BazaarApi.searchForBazaarItem(name, amount)
+            }
+        },
+    ) { inInventory && !NeuItems.neuHasFocus() }
 
     private fun fetchMaterials(item: ItemStack, materials: MutableMap<NeuInternalName, Int>) {
         var next = false
         val lore = item.getLore()
-        val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } == true
+        val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
         if (completed) return
         // TODO: Refactor this loop to not have so many jumps
         @Suppress("LoopWithTooManyJumpStatements")
@@ -214,7 +214,7 @@ object CityProjectFeatures {
         if (!config.showMaterials) return
         if (!inInventory) return
 
-        config.pos.renderRenderables(display, posLabel = "City Project Materials")
+        config.pos.renderRenderable(display, posLabel = "City Project Materials")
     }
 
     @HandleEvent(onlyOnSkyblock = true)

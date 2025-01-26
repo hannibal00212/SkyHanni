@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropInfo
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropsJson
@@ -177,7 +179,12 @@ object ArmorDropTracker {
         }
     }
 
-    fun resetCommand() {
-        tracker.resetCommand()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetarmordroptracker") {
+            description = "Resets the Armor Drop Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
 }

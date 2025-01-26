@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.config.features.rift.motes.RiftInventoryValueConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.RiftApi.motesNpcPrice
@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ShowMotesNpcSellPrice {
@@ -56,8 +55,8 @@ object ShowMotesNpcSellPrice {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isInventoryValueEnabled()) return
         if (!event.isMod(10, 1)) return
         processItems()

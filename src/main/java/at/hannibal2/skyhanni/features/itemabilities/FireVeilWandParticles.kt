@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.config.features.itemability.FireVeilWandConfig.Disp
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -50,7 +50,7 @@ object FireVeilWandParticles {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (config.display != DisplayEntry.LINE) return
         if (lastClick.passedSince() > 5.5.seconds) return
 

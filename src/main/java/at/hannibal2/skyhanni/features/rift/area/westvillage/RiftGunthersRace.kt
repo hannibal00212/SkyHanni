@@ -7,12 +7,12 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
+import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
@@ -116,13 +116,13 @@ object RiftGunthersRace {
         if (!RiftApi.inRiftRace) return
 
         val entity = event.entity
-        if (entity is EntityOtherPlayerMP && !entity.isNPC()) {
+        if (entity is EntityOtherPlayerMP && !entity.isNpc()) {
             event.cancel()
         }
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled() || !RiftApi.inRiftRace) return
 
         parkourHelper?.render(event)

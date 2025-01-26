@@ -2,10 +2,12 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 // This entire file was taken from SkyblockAddons code, ported to SkyHanni
 
-import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
-import at.hannibal2.skyhanni.SkyHanniMod.Companion.feature
+import at.hannibal2.skyhanni.SkyHanniMod.coroutineScope
+import at.hannibal2.skyhanni.SkyHanniMod.feature
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.LineEntry
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry
 import at.hannibal2.skyhanni.data.HypixelData
@@ -13,11 +15,11 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -34,7 +36,6 @@ import com.jagrosh.discordipc.entities.RichPresence
 import com.jagrosh.discordipc.entities.RichPresenceButton
 import com.jagrosh.discordipc.entities.pipe.PipeStatus
 import kotlinx.coroutines.launch
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -184,8 +185,8 @@ object DiscordRPCManager : IPCListener {
 
     private fun isEnabled() = config.enabled.get()
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         // The mod has already started the connection process. This variable is my way of running a function when
         // the player joins SkyBlock but only running it again once they join and leave.
         if (started || !isEnabled()) return
@@ -211,7 +212,7 @@ object DiscordRPCManager : IPCListener {
         stop()
     }
 
-    fun startCommand() {
+    private fun startCommand() {
         if (!isEnabled()) {
             ChatUtils.userError("Discord Rich Presence is disabled. Enable it in the config §e/sh discord")
             return
@@ -283,4 +284,13 @@ object DiscordRPCManager : IPCListener {
     }
 
     private fun PriorityEntry.isSelected() = config.autoPriority.contains(this)
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shrpcstart") {
+            description = "Manually starts the Discord Rich Presence feature"
+            category = CommandCategory.USERS_ACTIVE
+            callback { startCommand() }
+        }
+    }
 }
