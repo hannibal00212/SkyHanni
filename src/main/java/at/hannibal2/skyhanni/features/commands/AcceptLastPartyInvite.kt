@@ -1,15 +1,15 @@
 package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object AcceptLastPartyInvite {
@@ -25,7 +25,7 @@ object AcceptLastPartyInvite {
      */
     private val inviteReceivedPattern by patternGroup.pattern(
         "received",
-        "§r§.(?:\\[.*?] )?(?<player>\\w+) §r§ehas invited you to join their party!"
+        "§r§.(?:\\[.*?] )?(?<player>\\w+) §r§ehas invited you to join their party!",
     )
 
     /**
@@ -35,13 +35,13 @@ object AcceptLastPartyInvite {
      */
     private val inviteExpiredPattern by patternGroup.pattern(
         "expired",
-        "§eThe party invite from (?:§r§.\\[.*?] )?(?<player>\\w+) §r§ehas expired\\."
+        "§eThe party invite from (?:§r§.\\[.*?] )?(?<player>\\w+) §r§ehas expired\\.",
     )
 
     private var lastInviter = ""
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!config.acceptLastInvite) return
         inviteReceivedPattern.findMatcher(event.message) {
             lastInviter = group("player")
@@ -55,15 +55,16 @@ object AcceptLastPartyInvite {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.acceptLastInvite) return
         if (event.senderIsSkyhanni()) return
         if (!event.message.startsWith("/party accept", ignoreCase = true) &&
-            !event.message.startsWith("/p accept", ignoreCase = true)) {
+            !event.message.startsWith("/p accept", ignoreCase = true)
+        ) {
             return
         }
-        event.isCanceled = true
+        event.cancel()
         if (lastInviter == "") {
             ChatUtils.chat("There is no party invite to accept!")
             return
