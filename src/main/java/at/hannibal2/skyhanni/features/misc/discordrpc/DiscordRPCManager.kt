@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.SkyHanniMod.coroutineScope
 import at.hannibal2.skyhanni.SkyHanniMod.feature
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.LineEntry
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry
 import at.hannibal2.skyhanni.data.HypixelData
@@ -210,7 +212,7 @@ object DiscordRPCManager : IPCListener {
         stop()
     }
 
-    fun startCommand() {
+    private fun startCommand() {
         if (!isEnabled()) {
             ChatUtils.userError("Discord Rich Presence is disabled. Enable it in the config §e/sh discord")
             return
@@ -282,4 +284,13 @@ object DiscordRPCManager : IPCListener {
     }
 
     private fun PriorityEntry.isSelected() = config.autoPriority.contains(this)
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shrpcstart") {
+            description = "Manually starts the Discord Rich Presence feature"
+            category = CommandCategory.USERS_ACTIVE
+            callback { startCommand() }
+        }
+    }
 }
