@@ -6,7 +6,10 @@ import at.hannibal2.skyhanni.utils.NeuItems
 class ShoppingListItem(
     val name: NeuInternalName,
     var amount: Int = 1,
-) : ShoppingListElement {
+    val isToplevelItem: Boolean = true,
+) {
+
+    var hidden = false
 
     private val subItems = mutableListOf<ShoppingListItem>()
 
@@ -18,8 +21,10 @@ class ShoppingListItem(
         }
     }
 
-    fun showRecipe() {
+    fun getRecipe() {
         val allRecipes = NeuItems.getRecipes(name)
+
+
     }
 
     fun changeAmountBy(amount: Int) {
