@@ -61,9 +61,9 @@ class RescueMissionWaypoints(private val reputationHelper: CrimsonIsleReputation
             tier = group("tier").toLetter()
         }
 
-        if (tier == null || tier == "") return
+        if (tier.isNullOrEmpty()) return
 
-        parkourHelper = when(reputationHelper.factionType) {
+        parkourHelper = when (reputationHelper.factionType) {
             FactionType.MAGE -> data!!.mage[tier]?.let {
                 ParkourHelper(
                     it,
@@ -137,7 +137,7 @@ class RescueMissionWaypoints(private val reputationHelper: CrimsonIsleReputation
     }
 
     private fun String.toLetter(): String {
-        return when(this) {
+        return when (this) {
             "Ⓐ" -> "A"
             "Ⓑ" -> "B"
             "Ⓒ" -> "C"
