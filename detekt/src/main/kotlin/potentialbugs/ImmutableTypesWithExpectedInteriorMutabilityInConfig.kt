@@ -23,7 +23,7 @@ class ImmutableTypesWithExpectedInteriorMutabilityInConfig(config: Config) : Sky
 		get() = Issue(
 			"ImmutableTypesWithExpectedInteriorMutabilityInConfig",
 			Severity.Defect,
-			"Disallow using types which may disallow MoulConfig from mutating them, due to the ",
+			"Disallow using types which may disallow MoulConfig from mutating them, due to the lack of interior mutability",
 			Debt.FIVE_MINS,
 		)
 
