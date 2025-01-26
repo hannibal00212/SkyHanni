@@ -8,11 +8,11 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.graph.GraphEditor.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -40,7 +40,7 @@ object LivingCaveSnakeFeatures {
         var lastBreakTime: SimpleTimeMark = SimpleTimeMark.farPast(),
         var invalidHeadSince: SimpleTimeMark? = null,
     ) {
-        fun invalidSize(): Boolean = blocks.zipWithNext().any { (a, b) ->
+        fun invalidSize(): Boolean = blocks.isEmpty() || blocks.zipWithNext().any { (a, b) ->
             a.distance(b) > 3
         }
 
@@ -87,13 +87,10 @@ object LivingCaveSnakeFeatures {
             snakes = emptyList()
         }
 
-        val distance = 5
 
         if (new == Blocks.lapis_block) {
-            val snake = snakes.filter { it.blocks.isNotEmpty() && it.blocks.last().distance(location) < distance }
-                .minByOrNull { it.blocks.last().distance(location) }
+            val snake = fixCollisions(findNearbySnakeHeads(location))
             if (snake != null) {
-
                 // hypixel is sometimes funny
                 if (location in snake.blocks) return
 
@@ -104,7 +101,6 @@ object LivingCaveSnakeFeatures {
                 snakes = snakes.editCopy { add(Snake(listOf(location))) }
             }
             originalBlocks[location] = old
-
         }
         for (snake in snakes) {
             if (location !in snake.blocks) continue
@@ -121,6 +117,21 @@ object LivingCaveSnakeFeatures {
 
             originalBlocks[location] = old
         }
+    }
+
+    private fun findNearbySnakeHeads(location: LorenzVec): List<Snake> =
+        snakes.filter { it.blocks.isNotEmpty() && it.blocks.last().distance(location) < 1.42 }
+            .sortedBy { it.blocks.last().distance(location) }
+
+    private fun fixCollisions(foundSnakes: List<Snake>): Snake? = if (foundSnakes.size > 1) {
+        val filtered = foundSnakes.filter { it.state != State.CALM }
+        if (filtered.size < foundSnakes.size && filtered.isNotEmpty()) {
+            filtered.firstOrNull()
+        } else {
+            foundSnakes.firstOrNull()
+        }
+    } else {
+        foundSnakes.firstOrNull()
     }
 
     private fun getClosest(): Snake? {
