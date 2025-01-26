@@ -278,7 +278,7 @@ object PestTrapApi {
             trap.baitCount = 0
             return
         }
-        val sprayType = SprayType.getByName(baitString) ?: return
+        val sprayType = SprayType.getByNameOrNull(baitString) ?: return
         trap.baitType = sprayType
     }
 

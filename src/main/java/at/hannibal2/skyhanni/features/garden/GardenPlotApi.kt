@@ -260,7 +260,7 @@ object GardenPlotApi {
             val plotName = group("plot")
 
             val plot = getPlotByName(plotName)
-            val spray = SprayType.getByName(sprayName) ?: return
+            val spray = SprayType.getByNameOrNull(sprayName) ?: return
 
             plot?.setSpray(spray, 30.minutes)
         }
