@@ -32,7 +32,6 @@ import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
-import at.hannibal2.skyhanni.features.inventory.shoppinglist.ShoppingList
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
@@ -486,11 +485,6 @@ object Commands {
             description = "Manually saving the config"
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "manual-command") }
-        }
-        event.register("shtestshoppinglist") {
-            description = "Test the shopping list feature"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { ShoppingList.test() }
         }
     }
 

@@ -2,13 +2,15 @@ package at.hannibal2.skyhanni.features.inventory.shoppinglist
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 
@@ -21,7 +23,7 @@ object ShoppingList {
     private var display = listOf<Renderable>()
 
     // all the functions for interacting with the shopping list come here
-    fun add(itemName: NEUInternalName, amount: Int = 1, categoryName: String? = null) {
+    fun add(itemName: NeuInternalName, amount: Int = 1, categoryName: String? = null) {
         // TODO: shouldn't happen @Thunderblade73
         if (!isEnabled()) return
 
@@ -83,15 +85,27 @@ object ShoppingList {
         }
     }
 
-    @HandleEvent
-    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent){
-        config.position.renderRenderables(display, posLabel = "Shopping List")
-    }
-
-    @HandleEvent
-    fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent){
-        config.position.renderRenderables(display, posLabel = "Shopping List")
-    }
-
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+
+    // all events come here
+    @HandleEvent
+    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        config.position.renderRenderables(display, posLabel = "Shopping List")
+    }
+
+    @HandleEvent
+    fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        config.position.renderRenderables(display, posLabel = "Shopping List")
+    }
+
+    // this event should be last
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtestshoppinglist") {
+            description = "Test the shopping list feature"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { test() }
+        }
+    }
+
 }
