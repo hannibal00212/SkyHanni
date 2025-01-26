@@ -217,6 +217,40 @@ object LivingCaveSnakeFeatures {
         LorenzVec(0, 0, -1),
     )
 
+    val edges = generateCubeEdges()
+
+    fun generateCubeEdges(): List<Pair<LorenzVec, LorenzVec>> {
+        // List of all vertices (corners) of the cube
+        val vertices = listOf(
+            LorenzVec(0, 0, 0), LorenzVec(0, 0, 1),
+            LorenzVec(0, 1, 0), LorenzVec(0, 1, 1),
+            LorenzVec(1, 0, 0), LorenzVec(1, 0, 1),
+            LorenzVec(1, 1, 0), LorenzVec(1, 1, 1),
+        )
+
+        val edges = listOf(
+            vertices[0] to vertices[1], // Edge along z-axis
+            vertices[0] to vertices[2], // Edge along y-axis
+            vertices[0] to vertices[4], // Edge along x-axis
+
+            vertices[1] to vertices[3], // Edge along y-axis
+            vertices[1] to vertices[5], // Edge along x-axis
+
+            vertices[2] to vertices[3], // Edge along z-axis
+            vertices[2] to vertices[6], // Edge along x-axis
+
+            vertices[3] to vertices[7], // Edge along x-axis
+            vertices[4] to vertices[5], // Edge along z-axis
+
+            vertices[4] to vertices[6], // Edge along y-axis
+            vertices[5] to vertices[7], // Edge along y-axis
+            vertices[6] to vertices[7], // Edge along z-axis
+        )
+
+
+        return edges
+    }
+
     private fun LorenzVec.isNotTouchingAir(): Boolean = directions.none { plus(it).getBlockAt() == Blocks.air }
 
     @HandleEvent
@@ -259,8 +293,10 @@ object LivingCaveSnakeFeatures {
                     }
                 }
             }
-            for ((a, b) in blocks.zipWithNext()) {
-                event.draw3DLine(a.add(0.5, 0.5, 0.5), b.add(0.5, 0.5, 0.5), color, 3, !seeThroughBlocks)
+            for (block in blocks) {
+                for ((x, y) in edges) {
+                    event.draw3DLine(block + x, block + y, color, 3, !seeThroughBlocks)
+                }
             }
         }
     }
