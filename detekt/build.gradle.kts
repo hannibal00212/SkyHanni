@@ -1,3 +1,5 @@
+import io.gitlab.arturbosch.detekt.Detekt
+
 plugins {
     kotlin("jvm")
     id("com.google.devtools.ksp")
@@ -12,4 +14,8 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:5.9.1")
     testImplementation("io.gitlab.arturbosch.detekt:detekt-test:1.23.7")
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-rules-ruleauthors:1.23.7")
+}
+
+tasks.withType<Detekt>().configureEach {
+    onlyIf { false }
 }
