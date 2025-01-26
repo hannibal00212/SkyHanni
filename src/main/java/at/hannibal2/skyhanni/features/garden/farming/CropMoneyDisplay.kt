@@ -45,13 +45,6 @@ import kotlinx.coroutines.launch
 object CropMoneyDisplay {
 
     var multipliers = mapOf<NeuInternalName, Int>()
-    private var showCalculation = false
-
-    fun toggleShowCalculation() {
-        showCalculation = !showCalculation
-        ChatUtils.chat("Show crop money calculation: " + if (showCalculation) "enabled" else "disabled")
-        update()
-    }
 
     private var display: Renderable? = null
     private val config get() = GardenApi.config.moneyPerHours

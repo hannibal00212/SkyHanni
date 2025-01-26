@@ -344,11 +344,6 @@ object Commands {
             category = CommandCategory.DEVELOPER_DEBUG
             callback { InquisitorWaypointShare.test() }
         }
-        event.register("shshowcropmoneycalculation") {
-            description = "Show the calculation of the crop money"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { CropMoneyDisplay.toggleShowCalculation() }
-        }
         event.register("shcropspeedmeter") {
             description = "Debugs how many crops you collect over time"
             category = CommandCategory.DEVELOPER_DEBUG
