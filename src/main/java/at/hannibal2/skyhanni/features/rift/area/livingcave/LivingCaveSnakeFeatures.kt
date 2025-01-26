@@ -48,7 +48,7 @@ object LivingCaveSnakeFeatures {
             a.distance(b) > 3
         }
 
-        fun invalidHeadRightNow(): Boolean = blocks.last().getBlockAt() != Blocks.lapis_block
+        fun invalidHeadRightNow(): Boolean = blocks.first().getBlockAt() != Blocks.lapis_block
 
         fun invalidHead(): Boolean = invalidHeadSince?.let { it.passedSince() > 1.seconds } ?: false
 
@@ -98,7 +98,7 @@ object LivingCaveSnakeFeatures {
                 // hypixel is sometimes funny
                 if (location in snake.blocks) return
 
-                snake.blocks = snake.blocks.editCopy { add(location) }
+                snake.blocks = snake.blocks.editCopy { add(0, location) }
                 snake.lastAddTime = SimpleTimeMark.now()
                 snake.invalidHeadSince = null
             } else {
@@ -126,8 +126,8 @@ object LivingCaveSnakeFeatures {
 
     // sqrt(3) =~ 1.73
     private fun findNearbySnakeHeads(location: LorenzVec): List<Snake> =
-        snakes.filter { it.blocks.isNotEmpty() && it.blocks.last().distance(location) < 1.74 }
-            .sortedBy { it.blocks.last().distance(location) }
+        snakes.filter { it.blocks.isNotEmpty() && it.blocks.first().distance(location) < 1.74 }
+            .sortedBy { it.blocks.first().distance(location) }
 
     private fun fixCollisions(found: List<Snake>): Snake? = if (found.size > 1) {
         val filtered = found.filter { it.state != State.CALM }
@@ -227,8 +227,8 @@ object LivingCaveSnakeFeatures {
             if (blocks.isEmpty()) continue
             val interaction = snake.getInteraction()
             if (LorenzUtils.debug) {
-                event.drawString(blocks.last().add(0.5, 0.8, 0.5), "§fstate = ${snake.state}", seeThroughBlocks)
-                event.drawString(blocks.last().add(0.5, 1.1, 0.5), "§finteraction = $interaction", seeThroughBlocks)
+                event.drawString(blocks.first().add(0.5, 0.8, 0.5), "§fstate = ${snake.state}", seeThroughBlocks)
+                event.drawString(blocks.first().add(0.5, 1.1, 0.5), "§finteraction = $interaction", seeThroughBlocks)
             }
 
             val remainingSize = blocks.size
@@ -236,7 +236,7 @@ object LivingCaveSnakeFeatures {
 
 
             if (blocks.size > 1 && snake.state == State.CALM && interaction != Interaction.CALMING) {
-                blocks.first().let {
+                blocks.last().let {
                     val lastBrokenBlock = snake.lastBrokenBlock
                     val location = if (interaction == Interaction.BREAKING && lastBrokenBlock != null) {
                         LocationUtils.slopeOverTime(snake.lastRemoveTime, 300.milliseconds, lastBrokenBlock, it)
@@ -253,7 +253,7 @@ object LivingCaveSnakeFeatures {
                 }
             }
             if (interaction != Interaction.BREAKING || blocks.size == 1) {
-                blocks.last().let {
+                blocks.first().let {
                     event.drawWaypointFilled(it, color, seeThroughBlocks)
                     val headColor = if (snake.state == State.NOT_TOUCHING_AIR) "§c" else "§e"
                     event.drawString(it.add(0.5, 0.5, 0.5), "${headColor}Head", seeThroughBlocks)
