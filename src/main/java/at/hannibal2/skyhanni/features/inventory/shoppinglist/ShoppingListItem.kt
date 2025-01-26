@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.inventory.shoppinglist
 
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 
 class ShoppingListItem(
-    val name: NEUInternalName,
+    val name: NeuInternalName,
     var amount: Int = 1,
 ) : ShoppingListElement {
 
@@ -19,7 +19,7 @@ class ShoppingListItem(
     }
 
     fun showRecipe() {
-        val allRecipes = NEUItems.getRecipes(name)
+        val allRecipes = NeuItems.getRecipes(name)
     }
 
     fun changeAmountBy(amount: Int) {
