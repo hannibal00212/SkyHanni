@@ -86,13 +86,9 @@ object LivingCaveSnakeFeatures {
         val old = event.oldState.block
         val new = event.newState.block
 
-        if (LorenzUtils.debug) {
-            if (Minecraft.getMinecraft().thePlayer.isSneaking) {
-                if (snakes.isNotEmpty()) {
-                    snakes = emptyList()
-                    ChatUtils.debug("Snakes reset.")
-                }
-            }
+        if (LorenzUtils.debug && Minecraft.getMinecraft().thePlayer.isSneaking && snakes.isNotEmpty()) {
+            snakes = emptyList()
+            ChatUtils.debug("Snakes reset.", replaceSameMessage = true)
         }
 
 
