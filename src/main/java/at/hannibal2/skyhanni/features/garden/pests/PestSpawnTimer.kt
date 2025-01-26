@@ -1,18 +1,22 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -33,12 +37,20 @@ object PestSpawnTimer {
 
     private val pestCooldownPattern by patternGroup.pattern(
         "cooldown",
-        "\\sCooldown: §r§.(?:§.)?(?<minutes>\\d+m)? ?(?<seconds>\\d+s)?(?<ready>READY)?(?<maxPests>MAX PESTS)?",
+        "\\sCooldown: §r§.(?:§.)?(?:(?<minutes>\\d+)m)? ?(?:(?<seconds>\\d+)s)?(?<ready>READY)?(?<maxPests>MAX PESTS)?.*",
     )
+
+    private val pestSpawnTimes: MutableList<Int> = mutableListOf()
+
+    private var averageSpawnTime: Int = pestSpawnTimes.average().toInt()
 
     var lastSpawnTime = SimpleTimeMark.farPast()
 
     private var pestCooldownEndTime: SimpleTimeMark? = null
+
+    private var lastCropBrokenTime = SimpleTimeMark.farPast()
+
+    private var longestCropBrokenTime: Duration = 0.seconds
 
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
@@ -46,7 +58,7 @@ object PestSpawnTimer {
         pestCooldownPattern.firstMatcher(event.widget.lines) {
             val minutes = group("minutes")?.toInt()
             val seconds = group("seconds")?.toInt()
-            val ready = group("cooldown") != null
+            val ready = group("ready") != null
             val maxPests = group("maxPests") != null
 
             if (ready) {
@@ -79,7 +91,25 @@ object PestSpawnTimer {
 
     @HandleEvent
     fun onPestSpawn(event: PestSpawnEvent) {
+        val spawnTime = lastSpawnTime.passedSince()
+
+        if (!lastSpawnTime.isFarPast()) {
+            if (longestCropBrokenTime.inWholeSeconds.toInt() <= config.averagePestSpawnTimeout) {
+                pestSpawnTimes.add(spawnTime.inWholeSeconds.toInt())
+                ChatUtils.debug("Added time!")
+            }
+
+            if (config.pestSpawnChatMessage) {
+                ChatUtils.chat("Pests spawned in §b${spawnTime.format()}")
+            }
+        }
+
+        longestCropBrokenTime = 0.seconds
+
+        averageSpawnTime = pestSpawnTimes.average().toInt()
+
         lastSpawnTime = SimpleTimeMark.now()
+
     }
 
     @HandleEvent
@@ -87,9 +117,19 @@ object PestSpawnTimer {
         if (!isEnabled()) return
         if (config.onlyWithVacuum && !PestApi.hasVacuumInHand()) return
 
-        val display = drawDisplay()
+        config.position.renderRenderables(drawDisplay(), posLabel = "Pest Spawn Timer")
+    }
 
-        config.position.renderRenderables(display, posLabel = "Pest Spawn Timer")
+    @HandleEvent
+    fun onCropBreak(event: CropClickEvent) {
+        if (event.clickType != ClickType.LEFT_CLICK) return
+        val timeDiff = lastCropBrokenTime.passedSince()
+
+        if (timeDiff > longestCropBrokenTime) {
+            longestCropBrokenTime = timeDiff
+        }
+
+        lastCropBrokenTime = SimpleTimeMark.now()
     }
 
     private fun shouldSetCooldown(tabCooldownEnd: SimpleTimeMark, minutes: Int?, seconds: Int?): Boolean {
@@ -111,7 +151,7 @@ object PestSpawnTimer {
             "§cNo pest spawned since joining."
         } else {
             val timeSinceLastPest = lastSpawnTime.passedSince().format()
-            "§eLast pest spawned §b$timeSinceLastPest ago"
+            "§eLast pest spawned: §b$timeSinceLastPest ago"
         }
 
         add(Renderable.string(lastPestSpawned))
@@ -119,11 +159,19 @@ object PestSpawnTimer {
         val pestCooldown = if (!TabWidget.PESTS.isActive) {
             "§cPests Widget not detected! Enable via /widget!"
         } else {
-            val cooldownValue = pestCooldownEndTime?.passedSince()?.format() ?: "§cUnknown"
+            var cooldownValue = pestCooldownEndTime?.timeUntil()?.format() ?: "§cUnknown"
+            if (cooldownValue == "Soon") cooldownValue = "§aReady!"
+
             "§ePest Cooldown: §b$cooldownValue"
         }
 
-        add(Renderable.string(pestCooldown))
+        if (config.pestSpawnCooldown) add(Renderable.string(pestCooldown))
+
+        val averageSpawn = averageSpawnTime.seconds.format()
+
+        if (config.averagePestSpawnTime && averageSpawnTime != 0) {
+            add(Renderable.string("§eAverage time to spawn: §b$averageSpawn"))
+        }
     }
 
     fun isEnabled() = GardenApi.inGarden() && config.enabled
