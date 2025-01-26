@@ -9,12 +9,14 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
@@ -84,9 +86,13 @@ object LivingCaveSnakeFeatures {
         val old = event.oldState.block
         val new = event.newState.block
 
-        // TODO remove
-        if (Minecraft.getMinecraft().thePlayer.isSneaking) {
-            snakes = emptyList()
+        if (LorenzUtils.debug) {
+            if (Minecraft.getMinecraft().thePlayer.isSneaking) {
+                if (snakes.isNotEmpty()) {
+                    snakes = emptyList()
+                    ChatUtils.debug("Snakes reset.")
+                }
+            }
         }
 
 
@@ -177,7 +183,13 @@ object LivingCaveSnakeFeatures {
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
 
-        snakes = snakes.filter { !it.invalidSize() && !it.invalidHead() }
+        snakes = snakes.filter {
+            val invalidSize = it.invalidSize()
+            val invalidHead = it.invalidHead()
+            if (invalidSize && LorenzUtils.debug) ChatUtils.chat("invalidSize")
+            if (invalidHead && LorenzUtils.debug) ChatUtils.chat("invalidHead")
+            !invalidSize && !invalidHead
+        }
         for (snake in snakes) {
             if (snake.invalidHeadRightNow()) {
                 if (snake.invalidHeadSince == null) {
@@ -218,8 +230,10 @@ object LivingCaveSnakeFeatures {
             val blocks = snake.blocks
             if (blocks.isEmpty()) continue
             val interaction = snake.getInteraction()
-            event.drawString(blocks.last().add(0.5, 0.8, 0.5), "§fstate = ${snake.state}", seeThroughBlocks)
-            event.drawString(blocks.last().add(0.5, 1.1, 0.5), "§finteraction = $interaction", seeThroughBlocks)
+            if (LorenzUtils.debug) {
+                event.drawString(blocks.last().add(0.5, 0.8, 0.5), "§fstate = ${snake.state}", seeThroughBlocks)
+                event.drawString(blocks.last().add(0.5, 1.1, 0.5), "§finteraction = $interaction", seeThroughBlocks)
+            }
 
             val remainingSize = blocks.size
             val color = snake.state.color.toColor()
