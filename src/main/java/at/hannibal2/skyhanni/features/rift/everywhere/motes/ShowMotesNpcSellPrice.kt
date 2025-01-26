@@ -13,9 +13,6 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.RiftApi.motesNpcPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
-import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSelector
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -24,9 +21,9 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.renderables.Container
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -39,7 +36,7 @@ object ShowMotesNpcSellPrice {
         ".*(?:§\\w)+You have (?:§\\w)+(?<amount>\\d) Grubber Stacks.*",
     )
 
-    private var display = emptyList<Renderable>()
+    private var display: Renderable? = null
     private val itemMap = mutableMapOf<NeuInternalName, Pair<MutableList<Int>, Double>>()
     private var inInventory = false
     private val slotList = mutableListOf<Int>()
@@ -48,10 +45,7 @@ object ShowMotesNpcSellPrice {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isInventoryValueEnabled()) return
         if (inInventory) {
-            config.inventoryValue.position.renderRenderables(
-                display,
-                posLabel = "Inventory Motes Value",
-            )
+            display?.let { config.inventoryValue.position.renderRenderable(it, posLabel = "Inventory Motes Value") }
         }
     }
 
@@ -132,8 +126,8 @@ object ShowMotesNpcSellPrice {
         display = drawDisplay()
     }
 
-    private fun drawDisplay() = buildList<Renderable> {
-        addString("§7Item Values:")
+    private fun drawDisplay() = Container.vertical {
+        string("§7Item Values:")
         val sorted = itemMap.toList().sortedByDescending { it.second.second }.toMap().toMutableMap()
 
         for ((internalName, pair) in sorted) {
@@ -141,17 +135,17 @@ object ShowMotesNpcSellPrice {
             val stack = internalName.getItemStack()
             val valuePer = stack.motesNpcPrice() ?: continue
             val price = value.formatPrice()
-            addLine {
-                addString("  §7- ")
-                addItemStack(stack)
+            horizontal {
+                string(" §7- ")
+                item(stack)
                 val tips = buildList {
                     add("§6Item: ${stack.displayName}")
                     add("§6Value per: §d$valuePer Motes")
                     add("§6Total in chest: §d${(value / valuePer).toInt()}")
                     add("")
-                    add("§6Total value: §d$price coins")
+                    add("§6Total value: §d$price Motes")
                 }
-                add(
+                renderable(
                     Renderable.hoverTips(
                         "§6${stack.displayName}: §b$price",
                         tips,
@@ -162,10 +156,10 @@ object ShowMotesNpcSellPrice {
             }
         }
         val total = itemMap.values.fold(0.0) { acc, pair -> acc + pair.second }.formatPrice()
-        addString("§7Total price: §b$total")
+        string("§7Total price: §b$total")
         val name = FormatType.entries[config.inventoryValue.formatType.ordinal].type // todo avoid ordinal
-        addString("§7Price format: §c$name")
-        addSelector<FormatType>(
+        string("§7Price format: §c$name")
+        selector<FormatType>(
             " ",
             getName = { type -> type.type },
             isCurrent = { it.ordinal == config.inventoryValue.formatType.ordinal }, // todo avoid ordinal

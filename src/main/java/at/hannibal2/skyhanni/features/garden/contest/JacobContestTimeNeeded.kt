@@ -8,17 +8,14 @@ import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.getLatestTrue
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getLatestBlocksPerSecond
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSelector
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.renderables.Container
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.addLine
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -28,7 +25,7 @@ import kotlin.time.Duration.Companion.seconds
 object JacobContestTimeNeeded {
 
     private val config get() = GardenApi.config
-    private var display = emptyList<Renderable>()
+    private var display: Renderable? = null
     private var currentBracket = ContestBracket.GOLD
 
     @HandleEvent(priority = HandleEvent.LOW)
@@ -45,10 +42,10 @@ object JacobContestTimeNeeded {
             testCrop(crop, sorted, map)
         }
 
-        display = buildList {
-            addString("§e§lTime Needed for ${currentBracket.displayName} §eMedal!")
+        display = Container.vertical {
+            string("§e§lTime Needed for ${currentBracket.displayName} §eMedal!")
 
-            addSelector<ContestBracket>(
+            selector<ContestBracket>(
                 "§7Bracket: ",
                 getName = { type -> type.name.lowercase() },
                 isCurrent = { it == currentBracket },
@@ -57,12 +54,12 @@ object JacobContestTimeNeeded {
                     update()
                 },
             )
-            addString("")
+            spacer()
             for (crop in sorted.sorted().keys) {
                 val text = map[crop]!!
-                addLine {
-                    addItemStack(crop.icon)
-                    add(text)
+                horizontal {
+                    item(crop.icon)
+                    renderable(text)
                 }
             }
         }
@@ -197,7 +194,7 @@ object JacobContestTimeNeeded {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!FarmingContestApi.inInventory) return
-        config.jacobContestTimesPosition.renderRenderables(display, posLabel = "Jacob Contest Time Needed")
+        display?.let { config.jacobContestTimesPosition.renderRenderable(it, posLabel = "Jacob Contest Time Needed") }
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.jacobContestTimes

@@ -9,17 +9,15 @@ import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.getLatestTrue
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getLatestBlocksPerSecond
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.renderables.Container
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.addLine
 import net.minecraft.item.ItemStack
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
@@ -28,9 +26,9 @@ import kotlin.time.Duration.Companion.milliseconds
 object JacobContestFFNeededDisplay {
 
     private val config get() = GardenApi.config
-    private var display = emptyList<Renderable>()
+    private var display: Renderable? = null
     private var lastToolTipTime = SimpleTimeMark.farPast()
-    private val cache = mutableMapOf<ItemStack, List<Renderable>>()
+    private val cache = mutableMapOf<ItemStack, Renderable?>()
 
     @HandleEvent
     fun onRenderItemTooltip(event: RenderItemTooltipEvent) {
@@ -60,74 +58,74 @@ object JacobContestFFNeededDisplay {
         cache.clear()
     }
 
-    private fun drawDisplay(contest: FarmingContest) = buildList<Renderable> {
-        addString("§6Minimum Farming Fortune needed")
-        addString("")
+    private fun drawDisplay(contest: FarmingContest) = Container.vertical {
+        string("§6Minimum Farming Fortune needed")
+        spacer()
 
         val crop = contest.crop
-        addLine {
-            addString("§7For this ")
-            addItemStack(crop.icon)
-            addString("§7${crop.cropName} contest:")
+        horizontal {
+            string("§7For this ")
+            item(crop.icon)
+            string("§7${crop.cropName} contest:")
         }
         for (bracket in ContestBracket.entries) {
-            addString(getLine(bracket, contest.brackets, crop))
+            string(getLine(bracket, contest.brackets, crop))
         }
-        addString("")
+        spacer()
 
         val (size, averages) = FarmingContestApi.calculateAverages(crop)
-        addLine {
-            addString("§7For the last §e$size ")
-            addItemStack(crop.icon)
-            addString("§7${crop.cropName} contests:")
+        horizontal {
+            string("§7For the last §e$size ")
+            item(crop.icon)
+            string("§7${crop.cropName} contests:")
         }
         for (bracket in ContestBracket.entries) {
-            addString(getLine(bracket, averages, crop))
+            string(getLine(bracket, averages, crop))
         }
-        addString("")
+        spacer()
 
         var blocksPerSecond = crop.getLatestBlocksPerSecond()
         if (blocksPerSecond == null) {
-            addLine {
-                addString("§cNo ")
-                addItemStack(crop.icon)
-                addString("§cblocks/second data,")
+            horizontal {
+                string("§cNo ")
+                item(crop.icon)
+                string("§cblocks/second data,")
             }
-            addString("§cassuming 19.9 instead.")
+            string("§cassuming 19.9 instead.")
         } else {
             if (blocksPerSecond < 15.0) {
                 val formatted = blocksPerSecond.roundTo(2)
-                addLine {
-                    addString("§cYour latest ")
-                    addItemStack(crop.icon)
-                    addString("§cblocks/second: §e$formatted")
+                horizontal {
+                    string("§cYour latest ")
+                    item(crop.icon)
+                    string("§cblocks/second: §e$formatted")
                 }
-                addString("§cThis is too low, showing 19.9 Blocks/second instead!")
+                string("§cThis is too low, showing 19.9 Blocks/second instead!")
                 blocksPerSecond = 19.9
             }
         }
-        addString("")
+        spacer()
 
         val trueFF = crop.getLatestTrueFarmingFortune()
         if (trueFF == null) {
-            addString("§cNo latest true FF saved!")
+            string("§cNo latest true FF saved!")
         } else {
             val farmingFortune = formatFarmingFortune(trueFF)
-            addLine {
-                addString("§6Your latest ")
-                addItemStack(crop.icon)
-                addString("§6FF: $farmingFortune")
+            horizontal {
+                string("§6Your latest ")
+                item(crop.icon)
+                string("§6FF: $farmingFortune")
             }
         }
-        addString("")
+        spacer()
         if (blocksPerSecond == null || trueFF == null) {
-            addString("§cMissing data from above!")
+            string("§cMissing data from above!")
         } else {
             val predictedScore = ((100.0 + trueFF) * blocksPerSecond * crop.baseDrops * 20 * 60 / 100).toInt().addSeparators()
-            addLine {
-                addString("§6Predicted ")
-                addItemStack(crop.icon)
-                addString("§6crops: $predictedScore")
+            horizontal {
+                string("§6Predicted ")
+                item(crop.icon)
+                string("§6crops: $predictedScore")
             }
         }
     }
@@ -148,7 +146,7 @@ object JacobContestFFNeededDisplay {
         if (!isEnabled()) return
         if (!FarmingContestApi.inInventory) return
         if (lastToolTipTime.passedSince() > 200.milliseconds) return
-        config.farmingFortuneForContestPos.renderRenderables(display, posLabel = "Jacob Contest Crop Data")
+        display?.let { config.farmingFortuneForContestPos.renderRenderable(it, posLabel = "Jacob Contest Crop Data") }
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.farmingFortuneForContest

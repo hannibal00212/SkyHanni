@@ -26,8 +26,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
@@ -56,15 +54,16 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.renderables.Container
 import at.hannibal2.skyhanni.utils.renderables.DragNDrop
 import at.hannibal2.skyhanni.utils.renderables.Droppable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
-import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.renderables.toDragItem
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
@@ -82,7 +81,7 @@ object SkyHanniDebugsAndTests {
     private val config get() = SkyHanniMod.feature.dev
     private val debugConfig get() = config.debug
     var displayLine = ""
-    var displayList = emptyList<Renderable>()
+    var displayList: Renderable? = null
 
     var globalRender = true
 
@@ -218,34 +217,34 @@ object SkyHanniDebugsAndTests {
     }
 
     fun testGardenVisitors() {
-        if (displayList.isNotEmpty()) {
-            displayList = mutableListOf()
+        if (displayList != null) {
+            displayList = null
             return
         }
 
         var errors = 0
 
-        displayList = buildList {
+        displayList = Container.vertical {
             for (item in GardenVisitorColorNames.visitorItems) {
                 val name = item.key
 
-                addLine {
+                horizontal {
                     val coloredName = GardenVisitorColorNames.getColoredName(name)
-                    addString("$coloredName§7 (")
+                    string("$coloredName§7 (")
 
                     for (itemName in item.value) {
                         try {
                             val internalName = NeuInternalName.fromItemName(itemName)
-                            addItemStack(internalName.getItemStack())
+                            item(internalName.getItemStack())
                         } catch (e: Error) {
                             ChatUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
                             errors++
                         }
                     }
                     if (item.value.isEmpty()) {
-                        addString("Any")
+                        string("Any")
                     }
-                    addString("§7) ")
+                    string("§7) ")
                 }
             }
         }
@@ -535,7 +534,7 @@ object SkyHanniDebugsAndTests {
         if (displayLine.isNotEmpty()) {
             config.debugPos.renderString("test: $displayLine", posLabel = "Test")
         }
-        config.debugPos.renderRenderables(displayList, posLabel = "Test Display")
+        displayList?.let { config.debugPos.renderRenderable(it, posLabel = "Test Display") }
     }
 
     @HandleEvent

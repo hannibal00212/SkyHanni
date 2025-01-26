@@ -6,15 +6,15 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.renderables.Container
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -35,7 +35,7 @@ object CruxTalismanDisplay {
     )
 
     private const val PARTIAL_NAME = "CRUX_TALISMAN"
-    private var display = emptyList<Renderable>()
+    private var display: Renderable? = null
     private val cruxes = mutableListOf<Crux>()
     private val bonusesLine = mutableListOf<String>()
     private var maxed = false
@@ -44,23 +44,20 @@ object CruxTalismanDisplay {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.position.renderRenderables(
-            display,
-            posLabel = "Crux Talisman Display",
-        )
+        display?.let { config.position.renderRenderable(it, posLabel = "Crux Talisman Display") }
     }
 
     private fun update() {
         display = drawDisplay()
     }
 
-    private fun drawDisplay() = buildList {
+    private fun drawDisplay() = Container.vertical {
         var showAsMaxed = maxed
         if (!config.compactWhenMaxed && maxed) showAsMaxed = false
 
         var percent = 0
         if (cruxes.isNotEmpty()) {
-            addString("§7Crux Talisman Progress: ${if (showAsMaxed) "§a§lMAXED!" else "§a$percentValue%"}")
+            string("§7Crux Talisman Progress: ${if (showAsMaxed) "§a§lMAXED!" else "§a$percentValue%"}")
             if (!showAsMaxed) {
                 for (line in cruxes) {
                     percent += if (config.compactWhenMaxed) {
@@ -74,15 +71,15 @@ object CruxTalismanDisplay {
                             "(?<progress>\\d+)/\\d+".toRegex().find(line.progress.removeColor())?.groupValues?.get(1)?.toInt() ?: 0
                         }
                     }
-                    addString("  ${line.tier} ${line.name}: ${line.progress}")
+                    string("  ${line.tier} ${line.name}: ${line.progress}")
                 }
             }
         }
         val totalPercentage = cruxes.size * 100
         percentValue = ((percent.toDouble() / totalPercentage) * 100).roundTo(1)
         if (bonusesLine.isNotEmpty() && config.showBonuses.get()) {
-            addString("§7Bonuses:")
-            bonusesLine.forEach { addString("  $it") }
+            string("§7Bonuses:")
+            bonusesLine.forEach { string("  $it") }
         }
     }
 
