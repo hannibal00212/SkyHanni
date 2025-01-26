@@ -175,12 +175,11 @@ object PestTrapApi {
         val entityLocation = armorStandEntity.getLorenzVec()
 
         // Find the closest trap to the clicked entity
-        val closestTrap = storage?.pestTrapStatus?.minByOrNull {
+        lastClickedIndex = storage?.pestTrapStatus?.minByOrNull {
             it.location?.distance(entityLocation)?.takeIf { distance ->
                 distance < 2.0
             } ?: Double.MAX_VALUE
-        } ?: return
-        lastClickedIndex = closestTrap.index
+        } ?.index ?: return
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

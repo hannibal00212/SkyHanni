@@ -55,7 +55,7 @@ object PestTrapFeatures {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
         val (finalWarning, actionPlot) = activeWarning
-        if (nextWarning.isInFuture() ||  finalWarning.isEmpty()) return
+        if (nextWarning.isInFuture() || finalWarning.isEmpty()) return
 
         tryWarnSound()
         tryWarnChat(finalWarning, actionPlot)
