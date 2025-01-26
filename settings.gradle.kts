@@ -4,8 +4,8 @@ import at.skyhanni.sharedvariables.ProjectTarget
 pluginManagement {
     includeBuild("sharedVariables")
     repositories {
-        mavenLocal()
         mavenCentral()
+        mavenLocal()
         gradlePluginPortal()
         maven("https://oss.sonatype.org/content/repositories/snapshots")
         maven("https://maven.architectury.dev/")
