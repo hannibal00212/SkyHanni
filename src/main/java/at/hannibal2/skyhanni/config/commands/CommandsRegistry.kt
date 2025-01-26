@@ -8,7 +8,7 @@ import net.minecraftforge.client.ClientCommandHandler
 @SkyHanniModule
 object CommandsRegistry {
 
-    val commandList = mutableListOf<CommandBuilder>()
+    private val commandList = mutableListOf<CommandBuilder>()
 
     fun registry(name: String, block: CommandBuilder.() -> Unit) {
         val command = CommandBuilder(name).apply(block)
@@ -20,6 +20,10 @@ object CommandsRegistry {
         }
         ClientCommandHandler.instance.registerCommand(command.toSimpleCommand())
         commandList.add(command)
+    }
+
+    interface CommandListGetter {
+        fun getCommandList() = commandList
     }
 
     @HandleEvent
