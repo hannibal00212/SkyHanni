@@ -126,15 +126,9 @@ object LivingCaveSnakeFeatures {
 
     private fun fixCollisions(found: List<Snake>): Snake? = if (found.size > 1) {
         val filtered = found.filter { it.state != State.CALM }
-        val debug = selectedSnake in found
-        if (debug) println(" ")
-        if (debug) println("found: ${found.size}")
-        if (debug) println("filtered: ${filtered.size}")
         if (filtered.size < found.size && filtered.isNotEmpty()) {
-            if (debug) println("return filtered")
             filtered.firstOrNull()
         } else {
-            if (debug) println("return foundSnakes")
             found.firstOrNull()
         }
     } else {
