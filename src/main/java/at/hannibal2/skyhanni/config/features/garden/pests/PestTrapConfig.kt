@@ -32,9 +32,9 @@ class PestTrapConfig {
 
     class WarningConfig {
 
-        enum class WarningReason(val displayName: String) {
-            TRAP_FULL("§cTrap Full§r"),
-            NO_BAIT("§eNo Bait§r"),
+        enum class WarningReason(private val displayName: String, val warningString: String) {
+            TRAP_FULL("§cTrap Full§r", "§cTrap Full: "),
+            NO_BAIT("§eNo Bait§r", "§eNo Bait: "),
             ;
 
             override fun toString() = displayName

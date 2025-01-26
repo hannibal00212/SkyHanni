@@ -97,6 +97,14 @@ object PestTrapApi {
     private var inIndex: Int = -1
     private var timeEnteredGarden: SimpleTimeMark? = null
 
+    fun releaseCache() {
+        lastTabHash = 0
+        lastTitleHash = 0
+        lastFullHash = 0
+        lastNoBaitHash = 0
+        lastTotalHash = 0
+    }
+
     // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: §2§lGOTCHA! §7Your traps caught a §2Pest §7in §aPlot §r§bM4§r§r§7!

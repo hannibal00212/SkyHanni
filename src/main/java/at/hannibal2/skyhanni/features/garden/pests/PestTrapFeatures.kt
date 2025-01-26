@@ -35,11 +35,9 @@ object PestTrapFeatures {
     private val userEnabledWarnings get() = warningConfig.enabledWarnings.get()
     private val chatWarnEnabled get() = enabledTypes in listOf(WarningDisplayType.CHAT, WarningDisplayType.BOTH)
     private val titleWarnEnabled get() = enabledTypes in listOf(WarningDisplayType.TITLE, WarningDisplayType.BOTH)
-    private val warnReasonFormatMap: Map<WarningReason, Map<Int, String>> = mapOf(
-        WarningReason.TRAP_FULL to mapOf(1 to "§cFull: ", 2 to "§cPest Traps Full! "),
-        WarningReason.NO_BAIT to mapOf(1 to "§cNo Bait: ", 2 to "§cNo Bait in Pest Traps! "),
-    )
 
+    private var data: List<PestTrapData> = emptyList()
+    private var lastDataHash: Int = 0
     private var warningSound: ISound? = refreshSound()
     private var activeWarning: Pair<String, GardenPlotApi.Plot?> = "" to null
     private var nextWarning: SimpleTimeMark = SimpleTimeMark.farPast()
@@ -53,8 +51,10 @@ object PestTrapFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
-        val (finalWarning, actionPlot) = activeWarning
-        if (nextWarning.isInFuture() || finalWarning.isEmpty()) return
+        if (nextWarning.isInFuture()) return
+        val (finalWarning, actionPlot) = activeWarning.takeIf {
+            it.first.isNotEmpty()
+        } ?: return PestTrapApi.releaseCache()
 
         warningSound?.playSound()
         tryWarnChat(finalWarning, actionPlot)
@@ -65,7 +65,17 @@ object PestTrapFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPestTrapDataUpdate(event: PestTrapDataUpdatedEvent) {
-        val warnings = userEnabledWarnings.mapNotNull { generateWarning(it, event.data) }
+        data = event.data.takeIf { it.hash() != lastDataHash } ?: return
+        lastDataHash = data.hash()
+        handleDataUpdate()
+    }
+
+    private fun List<PestTrapData>.hash(): Int = map { data ->
+        data.number to data.count to data.isFull to data.baitCount to data.noBait
+    }.hashCode()
+
+    private fun handleDataUpdate() {
+        val warnings = userEnabledWarnings.mapNotNull { generateWarning(it, data) }
 
         val finalWarning = warnings.joinToString(" §8| ") { it.first }
         val actionPlot = warnings.firstOrNull()?.second
@@ -78,9 +88,7 @@ object PestTrapFeatures {
 
     private fun generateWarning(reason: WarningReason, data: List<PestTrapData>): Pair<String, GardenPlotApi.Plot?>? {
         val dataSet = data.getTrapReport(reason).takeIfNotEmpty()?.toList() ?: return null
-        val format = dataSet.joinPlots()
-        val preFormat = warnReasonFormatMap[reason]?.get(dataSet.size) ?: return null
-        return "$preFormat$format" to dataSet.firstOrNull()?.plot
+        return "${reason.warningString}${dataSet.joinPlots()}" to dataSet.firstOrNull()?.plot
     }
 
     private fun tryWarnChat(finalWarning: String, actionPlot: GardenPlotApi.Plot?) {
