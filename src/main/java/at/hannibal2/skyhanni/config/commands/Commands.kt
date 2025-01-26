@@ -376,7 +376,7 @@ object Commands {
         event.register("shdebugscoreboard") {
             description =
                 "Monitors the scoreboard changes: " +
-                    "Prints the raw scoreboard lines in the console after each update, with time since last update."
+                "Prints the raw scoreboard lines in the console after each update, with time since last update."
             category = CommandCategory.DEVELOPER_DEBUG
             callback { ScoreboardData.toggleMonitor() }
         }
