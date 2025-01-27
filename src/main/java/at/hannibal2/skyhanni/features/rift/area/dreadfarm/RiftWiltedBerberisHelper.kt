@@ -26,9 +26,11 @@ import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumParticleTypes
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object RiftWiltedBerberisHelper {
@@ -36,7 +38,7 @@ object RiftWiltedBerberisHelper {
     private val config get() = RiftApi.config.area.dreadfarm.wiltedBerberis
     private var isOnFarmland = false
     private var hasFarmingToolInHand = false
-    private var berberisList = listOf<LorenzVec>()
+    private var berberisLocationList = listOf<LorenzVec>()
     private var lastSpawn = SimpleTimeMark.now()
     private var lastSyncedAt = SimpleTimeMark.now()
     private var lastUpdated = SimpleTimeMark.now()
@@ -51,13 +53,16 @@ object RiftWiltedBerberisHelper {
         Plot(LorenzVec(-42, 72, -155), LorenzVec(-22, 70, -126)),
     )
 
+    val plotCenters = arrayListOf(LorenzVec(0, 0, 0))
+
+
     private var closestPlot = 0
     private var oldClosest = 0
     private var fallback = false
 
     data class Plot(var a: LorenzVec, var b: LorenzVec)
 
-    private var list = listOf<WiltedBerberis>()
+    private var altBerberisLocationList = listOf<WiltedBerberis>()
 
     data class WiltedBerberis(var currentParticles: LorenzVec) {
         var previous: LorenzVec? = null
@@ -67,13 +72,20 @@ object RiftWiltedBerberisHelper {
     }
 
     @SubscribeEvent
+    fun onLoad(event: WorldEvent.Load) {
+        for (i in 0..5) {
+            plotCenters[i] = plots[i].a.middle(plots[i].b)
+        }
+    }
+
+    @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
 
         getClosestPlot()
         updateBerberisList()
-        sync()
+        getIfHelperCorrect()
 
         hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftApi.farmingTool
 
@@ -105,7 +117,7 @@ object RiftWiltedBerberisHelper {
         }
 
         if (berberis == null) {
-            list = list.editCopy { add(WiltedBerberis(location)) }
+            altBerberisLocationList = altBerberisLocationList.editCopy { add(WiltedBerberis(location)) }
             return
         }
 
@@ -147,20 +159,20 @@ object RiftWiltedBerberisHelper {
         if (!hasFarmingToolInHand) return
         if (config.onlyOnFarmland && !isOnFarmland) return
 
-        if (fallback) fallbackRender(event)
-        else primaryRender(event)
+        if (fallback) renderFallbackHelper(event)
+        else renderHelper(event)
     }
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(71, "rift.area.dreadfarm.wiltedBerberis.hideparticles", "rift.area.dreadfarm.wiltedBerberis.hideParticles")
+        event.move(60, "rift.area.dreadfarm.wiltedBerberis.hideparticles", "rift.area.dreadfarm.wiltedBerberis.hideParticles")
     }
 
     private fun getClosestPlot() {
         // calculates the player's distance to the center of each plot, then sets closestPlot to the smallest
         val plotDistances = arrayListOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
         for (i in 0..5) {
-            val plotCenter = plots[i].a.middle(plots[i].b)
+            val plotCenter = plotCenters[i]
             plotDistances[i] = LocationUtils.playerLocation().distance(plotCenter)
         }
         for (i in 0..5) if (plotDistances[i] < plotDistances[closestPlot]) closestPlot = i
@@ -168,15 +180,16 @@ object RiftWiltedBerberisHelper {
 
     private fun updateBerberisList() {
         // if the player enters a new plot, clear the list of berberis locations
-        if (closestPlot != oldClosest) berberisList = berberisList.editCopy { clear() }
+        if (closestPlot != oldClosest) berberisLocationList = berberisLocationList.editCopy { clear() }
         oldClosest = closestPlot
 
         // when a berberis grows in the current plot, add its location to the end of the list
         val plotCornerA = plots[closestPlot].a.toBlockPos()
         val plotCornerB = plots[closestPlot].b.toBlockPos()
         for (block in BlockPos.getAllInBox(plotCornerA, plotCornerB)) {
-            if (block.toLorenzVec().getBlockAt() == Blocks.deadbush && !berberisList.contains(block.toLorenzVec())) {
-                berberisList = berberisList.editCopy { add(block.toLorenzVec()) }
+            var blockLocation = block.toLorenzVec()
+            if (blockLocation.getBlockAt() == Blocks.deadbush && !berberisLocationList.contains(blockLocation)) {
+                berberisLocationList = berberisLocationList.editCopy { add(blockLocation) }
                 lastSpawn = SimpleTimeMark.now()
                 lastUpdated = SimpleTimeMark.now()
             }
@@ -184,21 +197,21 @@ object RiftWiltedBerberisHelper {
 
         // remove first berberis from list if broken and no berberis have grown in the last 1/4 seccond
         // (to stop you from breaking it before they all spawn in)
-        while (berberisList.isNotEmpty() && berberisList[0].getBlockAt() != Blocks.deadbush && lastSpawn.passedSince() > 250.milliseconds) {
-            berberisList = berberisList.editCopy { removeFirst() }
+        while (berberisLocationList.isNotEmpty() && berberisLocationList[0].getBlockAt() != Blocks.deadbush && lastSpawn.passedSince() > 250.milliseconds) {
+            berberisLocationList = berberisLocationList.editCopy { removeFirst() }
             lastUpdated = SimpleTimeMark.now()
         }
 
         // update the berberis list for the original system
-        list = list.editCopy { removeIf { it.lastTime.passedSince() > 500.milliseconds } }
+        altBerberisLocationList = altBerberisLocationList.editCopy { removeIf { it.lastTime.passedSince() > 500.milliseconds } }
     }
 
-    private fun sync() {
+    private fun getIfHelperCorrect() {
         // check if the new system is right about which bush to break. If the particle is still moving, assume it's right for now
-        for (berberis in list) {
+        for (berberis in altBerberisLocationList) {
             with(berberis) {
                 // if there is a particle in the same place as where the new helper thinks the next bush is,
-                if (berberisList.isNotEmpty() && (currentParticles.distance(berberisList[0])) < 1.3 &&
+                if (berberisLocationList.isNotEmpty() && (currentParticles.distance(berberisLocationList[0])) < 1.3 &&
                     currentParticles.distanceToPlayer() <= 20 && y != 0.0
                 ) {
                     lastSyncedAt = SimpleTimeMark.now()
@@ -212,12 +225,12 @@ object RiftWiltedBerberisHelper {
 
         // if we've been desynced (new system wrong) for more than 2 secconds and the list hasn't updated in that time,
         // switch to fallback mode. switch off of fallback once the plot is cleared
-        if (lastSyncedAt.passedSince() > 1000.milliseconds && lastUpdated.passedSince() > 1000.milliseconds) fallback = true
-        if (berberisList.isEmpty()) fallback = false
+        if (lastSyncedAt.passedSince() > 1.seconds && lastUpdated.passedSince() > 1.seconds) fallback = true
+        if (berberisLocationList.isEmpty()) fallback = false
     }
 
-    private fun fallbackRender(event: RenderWorldEvent) {
-        for (berberis in list) {
+    private fun renderFallbackHelper(event: RenderWorldEvent) {
+        for (berberis in altBerberisLocationList) {
             with(berberis) {
                 if (currentParticles.distanceToPlayer() > 20) continue
                 if (y == 0.0) continue
@@ -237,22 +250,23 @@ object RiftWiltedBerberisHelper {
         }
     }
 
-    private fun primaryRender(event: RenderWorldEvent) {
-        if (berberisList.isEmpty()) return
+    private fun renderHelper(event: RenderWorldEvent) {
+        if (berberisLocationList.isEmpty()) return
         var alpha = 0.8f
         var previousBerberis: LorenzVec? = null
-        event.drawDynamicText(berberisList[0].up(), "§eWilted Berberis", 1.5, ignoreBlocks = false)
+        var highlightColor = config.highlightColor.toSpecialColor()
+        event.drawDynamicText(berberisLocationList[0].up(), "§eWilted Berberis", 1.5, ignoreBlocks = false)
 
-        berberisList.take(config.previewCount + 1).forEachIndexed { i, loc ->
+        berberisLocationList.take(config.previewCount + 1).forEachIndexed { i, loc ->
             // box it with half the opacity of the previous box, first in list is highlighted
-            if (i == 0) event.drawBox(loc, config.highlightColor.toSpecialColor(), alpha)
+            if (i == 0) event.drawBox(loc, highlightColor, alpha)
             else event.drawBox(loc, Color.WHITE, alpha)
             alpha *= 0.6f
 
             // if there's a previous berberis, draw a line to it. The line from the 2nd to the 1st should be highlighted
             if (i == 1) {
                 previousBerberis?.let {
-                    event.draw3DLine(loc.add(0.5, 0.5, 0.5), it.add(0.5, 0.5, 0.5), config.highlightColor.toSpecialColor(), 4, false)
+                    event.draw3DLine(loc.add(0.5, 0.5, 0.5), it.add(0.5, 0.5, 0.5), highlightColor, 4, false)
                 }
             } else {
                 previousBerberis?.let {
@@ -265,7 +279,7 @@ object RiftWiltedBerberisHelper {
     }
 
     private fun nearestBerberis(location: LorenzVec): WiltedBerberis? =
-        list.filter { it.currentParticles.distanceSq(location) < 8 }
+        altBerberisLocationList.filter { it.currentParticles.distanceSq(location) < 8 }
             .minByOrNull { it.currentParticles.distanceSq(location) }
 
     private fun LorenzVec.fixLocation(wiltedBerberis: WiltedBerberis): LorenzVec {
