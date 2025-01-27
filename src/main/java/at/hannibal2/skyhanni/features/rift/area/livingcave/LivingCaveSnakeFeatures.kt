@@ -36,43 +36,28 @@ object LivingCaveSnakeFeatures {
     private var snakes = emptyList<Snake>()
     private val edges = LocationUtils.generateCubeEdges(0.005)
 
-    class Snake(
-        var blocks: List<LorenzVec>,
-        var lastRemoveTime: SimpleTimeMark = SimpleTimeMark.farPast(),
-        var lastAddTime: SimpleTimeMark = SimpleTimeMark.farPast(),
-        var state: State = State.SPAWNING,
-        var lastCalmTime: SimpleTimeMark = SimpleTimeMark.farPast(),
-        var lastHitTime: SimpleTimeMark = SimpleTimeMark.farPast(),
-        var invalidHeadSince: SimpleTimeMark? = null,
-        var lastBrokenBlock: LorenzVec? = null,
-    ) {
-        val head get() = blocks.first()
-        val tail get() = blocks.last()
-
-        fun invalidSize(): Boolean = blocks.isEmpty() || blocks.zipWithNext().any { (a, b) ->
-            a.distance(b) > 3
-        }
-
-        fun invalidHeadRightNow(): Boolean = head.getBlockAt() != Blocks.lapis_block
-
-        fun invalidHead(): Boolean = invalidHeadSince?.let { it.passedSince() > 1.seconds } ?: false
-
-        fun isNotTouchingAir(): Boolean = blocks.any { it.isNotTouchingAir() }
-    }
-
-    enum class State(val color: LorenzColor, label: String) {
-        SPAWNING(LorenzColor.AQUA, "Spawning"),
-        ACTIVE(LorenzColor.YELLOW, "Active"),
-        NOT_TOUCHING_AIR(LorenzColor.RED, "Not touching air"),
-        CALM(LorenzColor.GREEN, "Calm"),
-        ;
-
-        val display = "${color.getChatColor()}$label Snake"
-    }
-
     private val originalBlocks = mutableMapOf<LorenzVec, Block>()
 
     private var selectedSnake: Snake? = null
+
+    private val directions = setOf(
+        LorenzVec(1, 0, 0),
+        LorenzVec(-1, 0, 0),
+        LorenzVec(0, 1, 0),
+        LorenzVec(0, -1, 0),
+        LorenzVec(0, 0, 1),
+        LorenzVec(0, 0, -1),
+    )
+
+    // TODO maybe move this in repo
+    private val pickaxes = setOf(
+        "SELF_RECURSIVE_PICKAXE",
+        "ANTI_SENTIENT_PICKAXE",
+        "EON_PICKAXE",
+        "CHRONO_PICKAXE",
+    ).map { it.toInternalName() }
+
+    private var currentRole: Role? = null
 
     @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
@@ -118,47 +103,6 @@ object LivingCaveSnakeFeatures {
             originalBlocks[location] = old
         }
     }
-
-    // sqrt(3) =~ 1.73
-    private fun findNearbySnakeHeads(location: LorenzVec): List<Snake> =
-        snakes.filter { it.blocks.isNotEmpty() && it.head.distance(location) < 1.74 }
-            .sortedBy { it.head.distance(location) }
-
-    private fun fixCollisions(found: List<Snake>): Snake? = if (found.size > 1) {
-        val filtered = found.filter { it.state != State.CALM }
-        if (filtered.size < found.size && filtered.isNotEmpty()) {
-            filtered.firstOrNull()
-        } else {
-            found.firstOrNull()
-        }
-    } else {
-        found.firstOrNull()
-    }
-
-    private fun getClosest(): Snake? {
-        if (snakes.isEmpty()) return null
-        val snakeDistances = mutableMapOf<Snake, Double>()
-        for (snake in snakes) {
-            val d = snake.blocks.minOfOrNull { it.distanceSqToPlayer() } ?: Double.MAX_VALUE
-            snakeDistances[snake] = d
-        }
-        return snakeDistances.sorted().keys.first()
-    }
-
-    // TODO maybe move this in repo
-    private val pickaxes = setOf(
-        "SELF_RECURSIVE_PICKAXE",
-        "ANTI_SENTIENT_PICKAXE",
-        "EON_PICKAXE",
-        "CHRONO_PICKAXE",
-    ).map { it.toInternalName() }
-
-    enum class Role {
-        BREAK,
-        CALM,
-    }
-
-    private var currentRole: Role? = null
 
     @HandleEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
@@ -216,30 +160,43 @@ object LivingCaveSnakeFeatures {
         }
     }
 
-    private val directions = setOf(
-        LorenzVec(1, 0, 0),
-        LorenzVec(-1, 0, 0),
-        LorenzVec(0, 1, 0),
-        LorenzVec(0, -1, 0),
-        LorenzVec(0, 0, 1),
-        LorenzVec(0, 0, -1),
-    )
-
-    private fun LorenzVec.isNotTouchingAir(): Boolean = directions.none { plus(it).getBlockAt() == Blocks.air }
-
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (currentRole == null) return
 
-        for (snake in snakes) {
-            snake.render(event)
-        }
+        snakes.forEach { it.render(event) }
     }
 
-    private fun Snake.render(
-        event: SkyHanniRenderWorldEvent,
-    ) {
+    // sqrt(3) =~ 1.73
+    private fun findNearbySnakeHeads(location: LorenzVec): List<Snake> =
+        snakes.filter { it.blocks.isNotEmpty() && it.head.distance(location) < 1.74 }
+            .sortedBy { it.head.distance(location) }
+
+    private fun fixCollisions(found: List<Snake>): Snake? = if (found.size > 1) {
+        val filtered = found.filter { it.state != State.CALM }
+        if (filtered.size < found.size && filtered.isNotEmpty()) {
+            filtered.firstOrNull()
+        } else {
+            found.firstOrNull()
+        }
+    } else {
+        found.firstOrNull()
+    }
+
+    private fun getClosest(): Snake? {
+        if (snakes.isEmpty()) return null
+        val snakeDistances = mutableMapOf<Snake, Double>()
+        for (snake in snakes) {
+            val d = snake.blocks.minOfOrNull { it.distanceSqToPlayer() } ?: Double.MAX_VALUE
+            snakeDistances[snake] = d
+        }
+        return snakeDistances.sorted().keys.first()
+    }
+
+    private fun LorenzVec.isNotTouchingAir(): Boolean = directions.none { plus(it).getBlockAt() == Blocks.air }
+
+    private fun Snake.render(event: SkyHanniRenderWorldEvent) {
         if (blocks.isEmpty()) return
         if (LorenzUtils.debug) {
             event.drawString(head.add(0.5, 0.8, 0.5), "§fstate = $state", this == selectedSnake)
@@ -273,13 +230,51 @@ object LivingCaveSnakeFeatures {
         location: LorenzVec,
     ) {
         val isSelected = this == selectedSnake
-        val size = blocks.size
         event.drawColor(location, state.color.toColor(), alpha = 1f, seeThroughBlocks = isSelected)
         if (isSelected) {
             event.drawString(location.add(0.5, 0.5, 0.5), state.display, seeThroughBlocks = true)
-            event.drawString(location.add(0.5, 0.2, 0.5), "§b$size blocks", seeThroughBlocks = true)
+            event.drawString(location.add(0.5, 0.2, 0.5), "§b${blocks.size} blocks", seeThroughBlocks = true)
         }
     }
 
-    fun isEnabled() = RiftApi.inRift() && (RiftApi.inLivingCave() || RiftApi.inLivingStillness()) && config.enabled
+    private fun isEnabled() = RiftApi.inRift() && (RiftApi.inLivingCave() || RiftApi.inLivingStillness()) && config.enabled
+
+    private class Snake(
+        var blocks: List<LorenzVec>,
+        var lastRemoveTime: SimpleTimeMark = SimpleTimeMark.farPast(),
+        var lastAddTime: SimpleTimeMark = SimpleTimeMark.farPast(),
+        var state: State = State.SPAWNING,
+        var lastCalmTime: SimpleTimeMark = SimpleTimeMark.farPast(),
+        var lastHitTime: SimpleTimeMark = SimpleTimeMark.farPast(),
+        var invalidHeadSince: SimpleTimeMark? = null,
+        var lastBrokenBlock: LorenzVec? = null,
+    ) {
+        val head get() = blocks.first()
+        val tail get() = blocks.last()
+
+        fun invalidSize(): Boolean = blocks.isEmpty() || blocks.zipWithNext().any { (a, b) ->
+            a.distance(b) > 3
+        }
+
+        fun invalidHeadRightNow(): Boolean = head.getBlockAt() != Blocks.lapis_block
+
+        fun invalidHead(): Boolean = invalidHeadSince?.let { it.passedSince() > 1.seconds } ?: false
+
+        fun isNotTouchingAir(): Boolean = blocks.any { it.isNotTouchingAir() }
+    }
+
+    private enum class State(val color: LorenzColor, label: String) {
+        SPAWNING(LorenzColor.AQUA, "Spawning"),
+        ACTIVE(LorenzColor.YELLOW, "Active"),
+        NOT_TOUCHING_AIR(LorenzColor.RED, "Not touching air"),
+        CALM(LorenzColor.GREEN, "Calm"),
+        ;
+
+        val display = "${color.getChatColor()}$label Snake"
+    }
+
+    private enum class Role {
+        BREAK,
+        CALM,
+    }
 }
