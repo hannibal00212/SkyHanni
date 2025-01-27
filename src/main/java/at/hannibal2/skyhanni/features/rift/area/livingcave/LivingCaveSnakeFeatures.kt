@@ -72,11 +72,14 @@ object LivingCaveSnakeFeatures {
         }
     }
 
-    enum class State(val color: LorenzColor) {
-        SPAWNING(LorenzColor.AQUA),
-        ACTIVE(LorenzColor.YELLOW),
-        NOT_TOUCHING_AIR(LorenzColor.RED),
-        CALM(LorenzColor.GREEN),
+    enum class State(val color: LorenzColor, label: String) {
+        SPAWNING(LorenzColor.AQUA, "Spawning"),
+        ACTIVE(LorenzColor.YELLOW, "Active"),
+        NOT_TOUCHING_AIR(LorenzColor.RED, "Not touching air"),
+        CALM(LorenzColor.GREEN, "Calm"),
+        ;
+
+        val display = "${color.getChatColor()}$label"
     }
 
     private val originalBlocks = mutableMapOf<LorenzVec, Block>()
@@ -225,13 +228,13 @@ object LivingCaveSnakeFeatures {
         if (!isEnabled()) return
 
         for (snake in snakes) {
-            val seeThroughBlocks = snake == selectedSnake
+            val isSelected = snake == selectedSnake
             val blocks = snake.blocks
             if (blocks.isEmpty()) continue
             val interaction = snake.getInteraction()
             if (LorenzUtils.debug) {
-                event.drawString(snake.head.add(0.5, 0.8, 0.5), "§fstate = ${snake.state}", seeThroughBlocks)
-                event.drawString(snake.head.add(0.5, 1.1, 0.5), "§finteraction = $interaction", seeThroughBlocks)
+                event.drawString(snake.head.add(0.5, 0.8, 0.5), "§fstate = ${snake.state}", isSelected)
+                event.drawString(snake.head.add(0.5, 1.1, 0.5), "§finteraction = $interaction", isSelected)
             }
 
             val size = blocks.size
@@ -243,24 +246,30 @@ object LivingCaveSnakeFeatures {
                     LocationUtils.slopeOverTime(snake.lastRemoveTime, 300.milliseconds, lastBrokenBlock, tail)
                 } else tail
 
-                event.drawColor(location, LorenzColor.GREEN.toColor(), alpha = 1f, seeThroughBlocks = seeThroughBlocks)
-                event.drawString(location.add(0.5, 0.5, 0.5), "§aTail", seeThroughBlocks)
+                event.drawColor(location, LorenzColor.GREEN.toColor(), alpha = 1f, seeThroughBlocks = isSelected)
+                val label = snake.state.display
+                if (isSelected) {
+                    event.drawString(location.add(0.5, 0.5, 0.5), label, seeThroughBlocks = true)
 
-                if (interaction == Interaction.BREAKING) {
-                    event.drawString(location.add(0.5, 0.2, 0.5), "§7($size blocks)", seeThroughBlocks)
+                    if (interaction == Interaction.BREAKING) {
+                        event.drawString(location.add(0.5, 0.2, 0.5), "§b$size blocks", seeThroughBlocks = true)
+                    }
                 }
             }
             if (interaction != Interaction.BREAKING || size == 1) {
                 val head = snake.head
                 val location = if (size > 1) {
-                    LocationUtils.slopeOverTime(snake.lastRemoveTime, 200.milliseconds, snake.blocks[1], head)
+                    LocationUtils.slopeOverTime(snake.lastAddTime, 200.milliseconds, snake.blocks[1], head)
                 } else head
-                event.drawColor(location, color, alpha = 1f, seeThroughBlocks = seeThroughBlocks)
+                event.drawColor(location, color, alpha = 1f, seeThroughBlocks = isSelected)
 
-                val headColor = if (snake.state == State.NOT_TOUCHING_AIR) "§c" else "§e"
-                event.drawString(location.add(0.5, 0.5, 0.5), "${headColor}Head", seeThroughBlocks)
-                if (interaction == Interaction.CALMING) {
-                    event.drawString(location.add(0.5, 0.2, 0.5), "§7($size blocks)", seeThroughBlocks)
+                val label = snake.state.display
+
+                if (isSelected) {
+                    event.drawString(location.add(0.5, 0.5, 0.5), label, seeThroughBlocks = true)
+                    if (interaction == Interaction.CALMING) {
+                        event.drawString(location.add(0.5, 0.2, 0.5), "§b$size blocks", seeThroughBlocks = true)
+                    }
                 }
             }
             for (block in blocks) {
