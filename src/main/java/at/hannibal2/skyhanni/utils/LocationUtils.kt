@@ -192,7 +192,7 @@ object LocationUtils {
 
             Pair(shiftedVertices[4], shiftedVertices[6]), // Edge along y-axis
             Pair(shiftedVertices[5], shiftedVertices[7]), // Edge along y-axis
-            Pair(shiftedVertices[6], shiftedVertices[7]),  // Edge along z-axis
+            Pair(shiftedVertices[6], shiftedVertices[7]), // Edge along z-axis
         )
 
         return edges
