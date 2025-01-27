@@ -13,7 +13,7 @@ import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
  * Code adapted from MoulConfig
  */
 class GuiOptionEditorCustomColor(option: ProcessedOption) : ComponentEditor(option) {
-    private var component: GuiComponent = wrapComponent(
+    private val component: GuiComponent = wrapComponent(
         object : GuiComponent() {
             override fun getWidth(): Int = 48
 

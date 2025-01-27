@@ -11,8 +11,8 @@ class CustomColor {
     private val brightness: Float
     private val alpha: Int
     private val chroma: Int
-    private val chromaSpeed: Float
 
+    private val chromaSpeed: Float // Cached value of the chromaSpeed, since it's only affected by the chroma value
     private val cachedrgb: Int // Cached rgb value, used for creating the string and for toInt() if the color isn't chroma
 
     private inline val red get(): Int = cachedrgb shr 16 and 0xFF
@@ -71,21 +71,16 @@ class CustomColor {
         this.chromaSpeed = chromaSpeed(chroma)
     }
 
-    override fun toString(): String {
-        return "CustomColor(hue=$hue, saturation=$saturation, brightness=$brightness," +
-            "alpha=$alpha, chroma=$chroma, chromaSpeed=$chromaSpeed, cachedrgb=$cachedrgb)"
-    }
+    override fun toString(): String = "CustomColor(red=$red, green=$green, blue=$blue, alpha=$alpha, chroma=$chroma)"
 
-    override fun hashCode(): Int = LorenzUtils.hashAll(hue, saturation, brightness, alpha, chroma)
+    override fun hashCode(): Int = LorenzUtils.hashAll(cachedrgb, chroma)
 
+    // We only need to compare cachedrgb and not the other values, since this class is always saved and loaded with integer rgb values,
+    // therefore, if two instances have the same hue, saturation, brightness and alpha, they will also have the same cached rgb value
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is CustomColor) return false
-        return hue == other.hue &&
-            saturation == other.saturation &&
-            brightness == other.brightness &&
-            alpha == other.alpha &&
-            chroma == other.chroma
+        return cachedrgb == other.cachedrgb && chroma == other.chroma
     }
 
     companion object {
