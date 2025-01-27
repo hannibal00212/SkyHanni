@@ -228,7 +228,7 @@ object PestTrapApi {
                 !trapBaitItemPattern.matches(it.displayName)
             }
             event.inventoryItems.onEach { (slot, stack) ->
-                val slotIndex = PEST_SLOTS.indexOf(slot).takeIf { it != -1 } ?: return@onEach
+                val slotIndex = PEST_SLOTS.toList().indexOf(slot).takeIf { it != -1 } ?: return@onEach
                 pestSlotPestPattern.matchMatcher(stack.displayName) {
                     val slotPestType = groupOrNull("type")?.let { PestType.getByNameOrNull(it) } ?: return@onEach
                     activeTrap.apply {
