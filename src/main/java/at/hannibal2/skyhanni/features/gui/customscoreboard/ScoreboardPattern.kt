@@ -666,10 +666,10 @@ object ScoreboardPattern {
      * REGEX-TEST: §eBring items to Moby
      * REGEX-TEST:  Glowing Mushroom §8x8
      */
-    @Suppress("LongLine")
+    @Suppress("MaxLineLength")
     val wtfAreThoseLinesPattern by miscSb.pattern(
         "wtfarethoselines",
-        "§eMine \\d+ .*|§eKill 100 Automatons|§eFind a Jungle Key|§eFind the \\d+ Missing Pieces?|§eTalk to the Goblin King|§eBring items to Moby| §.Glowing Mushroom §8x\\d",
+        "§eMine \\d+ .*|§eKill 100 Automatons|§eFind a Jungle Key|§eFind the \\d+ Missing Pieces?|§eTalk to the Goblin King|§eBring items to Moby| Glowing Mushroom §8x\\d",
     )
     val darkAuctionCurrentItemPattern by miscSb.pattern(
         "darkauction.currentitem",
