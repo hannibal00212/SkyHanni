@@ -301,4 +301,12 @@ object LorenzUtils {
 
         return listOf(cornerOne, cornerTwo, cornerThree, cornerFour)
     }
+
+    fun hashAll(vararg objects: Any?): Int {
+        var result = 1
+        for (element in objects) {
+            result = 31 * result + element.hashCode()
+        }
+        return result
+    }
 }

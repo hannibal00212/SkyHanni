@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
-import at.hannibal2.skyhanni.utils.OSUtils;
 import at.hannibal2.skyhanni.config.core.config.CustomColor;
+import at.hannibal2.skyhanni.utils.OSUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;

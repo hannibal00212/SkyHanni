@@ -9,8 +9,11 @@ import io.github.notenoughupdates.moulconfig.gui.component.ColorSelectComponent
 import io.github.notenoughupdates.moulconfig.gui.editors.ComponentEditor
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 
+/**
+ * Code adapted from MoulConfig
+ */
 class GuiOptionEditorCustomColor(option: ProcessedOption) : ComponentEditor(option) {
-    var component: GuiComponent = wrapComponent(
+    private var component: GuiComponent = wrapComponent(
         object : GuiComponent() {
             override fun getWidth(): Int = 48
 
@@ -21,10 +24,13 @@ class GuiOptionEditorCustomColor(option: ProcessedOption) : ComponentEditor(opti
                 val r = (argb shr 16) and 0xFF
                 val g = (argb shr 8) and 0xFF
                 val b = argb and 0xFF
-                context.renderContext.color(r / 255f, g / 255f, b / 255f, 1f)
-                context.renderContext.bindTexture(GuiTextures.BUTTON_WHITE)
-                context.renderContext.drawTexturedRect(0f, 0f, context.width.toFloat(), context.height.toFloat())
-                context.renderContext.color(1f, 1f, 1f, 1f)
+
+                context.renderContext.apply {
+                    color(r / 255f, g / 255f, b / 255f, 1f)
+                    bindTexture(GuiTextures.BUTTON_WHITE)
+                    drawTexturedRect(0f, 0f, context.width.toFloat(), context.height.toFloat())
+                    color(1f, 1f, 1f, 1f)
+                }
             }
 
             override fun mouseEvent(mouseEvent: MouseEvent, context: GuiImmediateContext): Boolean {
@@ -39,9 +45,9 @@ class GuiOptionEditorCustomColor(option: ProcessedOption) : ComponentEditor(opti
         },
     )
 
-    fun get(): CustomColor = option.get() as CustomColor
+    private fun get(): CustomColor = option.get() as CustomColor
 
-    fun set(newString: String) {
+    private fun set(newString: String) {
         option.set(CustomColor(newString))
     }
 
