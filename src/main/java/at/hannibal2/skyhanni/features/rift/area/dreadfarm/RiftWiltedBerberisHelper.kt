@@ -26,8 +26,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.event.FMLLoadEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -71,14 +70,14 @@ object RiftWiltedBerberisHelper {
         var lastTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
-    fun onLoad(event: WorldEvent.Load) {
+    @HandleEvent
+    fun onLoad(event: FMLLoadEvent) {
         for (i in 0..5) {
             plotCenters[i] = plots[i].a.middle(plots[i].b)
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
