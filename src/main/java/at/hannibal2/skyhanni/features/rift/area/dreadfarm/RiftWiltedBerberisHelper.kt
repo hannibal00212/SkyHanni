@@ -186,7 +186,7 @@ object RiftWiltedBerberisHelper {
         val plotCornerA = plots[closestPlot].a.toBlockPos()
         val plotCornerB = plots[closestPlot].b.toBlockPos()
         for (block in BlockPos.getAllInBox(plotCornerA, plotCornerB)) {
-            var blockLocation = block.toLorenzVec()
+            val blockLocation = block.toLorenzVec()
             if (blockLocation.getBlockAt() == Blocks.deadbush && !berberisLocationList.contains(blockLocation)) {
                 berberisLocationList = berberisLocationList.editCopy { add(blockLocation) }
                 lastSpawn = SimpleTimeMark.now()
@@ -196,7 +196,8 @@ object RiftWiltedBerberisHelper {
 
         // remove first berberis from list if broken and no berberis have grown in the last 1/4 seccond
         // (to stop you from breaking it before they all spawn in)
-        while (berberisLocationList.isNotEmpty() && berberisLocationList[0].getBlockAt() != Blocks.deadbush && lastSpawn.passedSince() > 250.milliseconds) {
+        while (berberisLocationList.isNotEmpty() && berberisLocationList[0].getBlockAt() != Blocks.deadbush
+            && lastSpawn.passedSince() > 250.milliseconds) {
             berberisLocationList = berberisLocationList.editCopy { removeFirst() }
             lastUpdated = SimpleTimeMark.now()
         }
@@ -229,6 +230,7 @@ object RiftWiltedBerberisHelper {
     }
 
     private fun renderFallbackHelper(event: RenderWorldEvent) {
+        val highlightColor = config.highlightColor.toSpecialColor()
         for (berberis in altBerberisLocationList) {
             with(berberis) {
                 if (currentParticles.distanceToPlayer() > 20) continue
@@ -236,7 +238,7 @@ object RiftWiltedBerberisHelper {
 
                 val location = currentParticles.fixLocation(berberis)
                 if (!moving) {
-                    event.drawBox(location, config.highlightColor.toSpecialColor(), 0.7f)
+                    event.drawBox(location, highlightColor, 0.7f)
                     event.drawDynamicText(location.up(), "§eWilted Berberis", 1.5, ignoreBlocks = false)
                 } else {
                     event.drawBox(location, Color.WHITE, 0.5f)
@@ -253,7 +255,7 @@ object RiftWiltedBerberisHelper {
         if (berberisLocationList.isEmpty()) return
         var alpha = 0.8f
         var previousBerberis: LorenzVec? = null
-        var highlightColor = config.highlightColor.toSpecialColor()
+        val highlightColor = config.highlightColor.toSpecialColor()
         event.drawDynamicText(berberisLocationList[0].up(), "§eWilted Berberis", 1.5, ignoreBlocks = false)
 
         berberisLocationList.take(config.previewCount + 1).forEachIndexed { i, loc ->
