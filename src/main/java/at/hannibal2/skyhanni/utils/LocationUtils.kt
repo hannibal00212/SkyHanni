@@ -146,4 +146,55 @@ object LocationUtils {
         } else to
         return location
     }
+
+    fun generateCubeEdges(delta: Double): Set<Pair<LorenzVec, LorenzVec>> {
+        // Define the center of the cube
+        val center = LorenzVec(0.5, 0.5, 0.5)
+
+        // List of all original vertices (corners) of the cube
+        val originalVertices = listOf(
+            LorenzVec(0.0, 0.0, 0.0), LorenzVec(0.0, 0.0, 1.0),
+            LorenzVec(0.0, 1.0, 0.0), LorenzVec(0.0, 1.0, 1.0),
+            LorenzVec(1.0, 0.0, 0.0), LorenzVec(1.0, 0.0, 1.0),
+            LorenzVec(1.0, 1.0, 0.0), LorenzVec(1.0, 1.0, 1.0)
+        )
+
+        // Function to shift a vertex outward from the center by delta
+        fun shiftOutward(vertex: LorenzVec): LorenzVec {
+            val direction = vertex - center
+            val magnitude = direction.length()
+            // Avoid division by zero for the center vertex (if applicable)
+            return if (magnitude != 0.0) {
+                val unitDirection = direction * (1.0 / magnitude)
+                vertex + unitDirection * delta
+            } else {
+                vertex // If the vertex is at the center, no shift
+            }
+        }
+
+        // Shift all vertices outward
+        val shiftedVertices = originalVertices.map { shiftOutward(it) }
+
+        // Predefined edges by their connecting shifted vertices
+        val edges = setOf(
+            Pair(shiftedVertices[0], shiftedVertices[1]), // Edge along z-axis
+            Pair(shiftedVertices[0], shiftedVertices[2]), // Edge along y-axis
+            Pair(shiftedVertices[0], shiftedVertices[4]), // Edge along x-axis
+
+            Pair(shiftedVertices[1], shiftedVertices[3]), // Edge along y-axis
+            Pair(shiftedVertices[1], shiftedVertices[5]), // Edge along x-axis
+
+            Pair(shiftedVertices[2], shiftedVertices[3]), // Edge along z-axis
+            Pair(shiftedVertices[2], shiftedVertices[6]), // Edge along x-axis
+
+            Pair(shiftedVertices[3], shiftedVertices[7]), // Edge along x-axis
+            Pair(shiftedVertices[4], shiftedVertices[5]), // Edge along z-axis
+
+            Pair(shiftedVertices[4], shiftedVertices[6]), // Edge along y-axis
+            Pair(shiftedVertices[5], shiftedVertices[7]), // Edge along y-axis
+            Pair(shiftedVertices[6], shiftedVertices[7])  // Edge along z-axis
+        )
+
+        return edges
+    }
 }

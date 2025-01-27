@@ -33,6 +33,7 @@ import kotlin.time.Duration.Companion.seconds
 object LivingCaveSnakeFeatures {
     private val config get() = RiftApi.config.area.livingCave.livingCaveLivingMetalConfig
     private var snakes = emptyList<Snake>()
+    private val edges = LocationUtils.generateCubeEdges(0.005)
 
     class Snake(
         var blocks: List<LorenzVec>,
@@ -217,40 +218,6 @@ object LivingCaveSnakeFeatures {
         LorenzVec(0, 0, -1),
     )
 
-    val edges = generateCubeEdges()
-
-    fun generateCubeEdges(): List<Pair<LorenzVec, LorenzVec>> {
-        // List of all vertices (corners) of the cube
-        val vertices = listOf(
-            LorenzVec(0, 0, 0), LorenzVec(0, 0, 1),
-            LorenzVec(0, 1, 0), LorenzVec(0, 1, 1),
-            LorenzVec(1, 0, 0), LorenzVec(1, 0, 1),
-            LorenzVec(1, 1, 0), LorenzVec(1, 1, 1),
-        )
-
-        val edges = listOf(
-            vertices[0] to vertices[1], // Edge along z-axis
-            vertices[0] to vertices[2], // Edge along y-axis
-            vertices[0] to vertices[4], // Edge along x-axis
-
-            vertices[1] to vertices[3], // Edge along y-axis
-            vertices[1] to vertices[5], // Edge along x-axis
-
-            vertices[2] to vertices[3], // Edge along z-axis
-            vertices[2] to vertices[6], // Edge along x-axis
-
-            vertices[3] to vertices[7], // Edge along x-axis
-            vertices[4] to vertices[5], // Edge along z-axis
-
-            vertices[4] to vertices[6], // Edge along y-axis
-            vertices[5] to vertices[7], // Edge along y-axis
-            vertices[6] to vertices[7], // Edge along z-axis
-        )
-
-
-        return edges
-    }
-
     private fun LorenzVec.isNotTouchingAir(): Boolean = directions.none { plus(it).getBlockAt() == Blocks.air }
 
     @HandleEvent
@@ -284,18 +251,23 @@ object LivingCaveSnakeFeatures {
                 }
             }
             if (interaction != Interaction.BREAKING || size == 1) {
-                snake.head.let {
-                    event.drawWaypointFilled(it, color, seeThroughBlocks)
-                    val headColor = if (snake.state == State.NOT_TOUCHING_AIR) "§c" else "§e"
-                    event.drawString(it.add(0.5, 0.5, 0.5), "${headColor}Head", seeThroughBlocks)
-                    if (interaction == Interaction.CALMING) {
-                        event.drawString(it.add(0.5, 0.2, 0.5), "§7($size blocks)", seeThroughBlocks)
-                    }
+                val head = snake.head
+                val location = if (size > 1) {
+                    LocationUtils.slopeOverTime(snake.lastRemoveTime, 200.milliseconds, snake.blocks[1], head)
+                } else head
+                event.drawWaypointFilled(location, color, seeThroughBlocks)
+                val headColor = if (snake.state == State.NOT_TOUCHING_AIR) "§c" else "§e"
+                event.drawString(location.add(0.5, 0.5, 0.5), "${headColor}Head", seeThroughBlocks)
+                if (interaction == Interaction.CALMING) {
+                    event.drawString(location.add(0.5, 0.2, 0.5), "§7($size blocks)", seeThroughBlocks)
                 }
             }
             for (block in blocks) {
+                if (block == snake.head && snake.lastAddTime.passedSince() < 200.milliseconds) {
+                    continue
+                }
                 for ((x, y) in edges) {
-                    event.draw3DLine(block + x, block + y, color, 3, !seeThroughBlocks)
+                    event.draw3DLine(block + x, block + y, color, 2, true)
                 }
             }
         }
