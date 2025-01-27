@@ -54,23 +54,19 @@ object PestTrapApi {
         @Expose var location: LorenzVec? = null,
         @Expose var trapType: PestTrapType? = PestTrapType.PEST_TRAP,
         @Expose var pestCount: Int = 0,
-        @Expose var pestType: MutableList<PestType?> = MutableList(MAX_PEST_COUNT_PER_TRAP) { null },
+        @Expose var pestType: MutableMap<Int, PestType?> = mutableMapOf(),
         @Expose var baitCount: Int = -1,
         @Expose var baitType: SprayType? = null,
     ) {
         val index get() = number - 1
         val isFull get() = pestCount >= MAX_PEST_COUNT_PER_TRAP
         val noBait get() = baitCount == 0
-        val plot
-            get() = plotName?.let {
-                GardenPlotApi.getPlotByName(it)
-            } ?: location?.let {
-                GardenPlotApi.closestPlot(it)
-            }
+        val plot get() = plotName?.let { GardenPlotApi.getPlotByName(it) }
+            ?: location?.let { GardenPlotApi.closestPlot(it) }
 
         fun affirmNoPests() {
             pestCount = 0
-            pestType = MutableList(MAX_PEST_COUNT_PER_TRAP) { null }
+            pestType.clear()
         }
 
         fun affirmHasUnknownBait() {
@@ -227,12 +223,12 @@ object PestTrapApi {
             val baitStack = event.inventoryItems[BAIT_SLOT]?.takeIf {
                 !trapBaitItemPattern.matches(it.displayName)
             }
-            event.inventoryItems.onEach { (slot, stack) ->
-                val slotIndex = PEST_SLOTS.toList().indexOf(slot).takeIf { it != -1 } ?: return@onEach
+            event.inventoryItems.filter {
+                it.key in PEST_SLOTS
+            }.onEach { (slot, stack) ->
                 pestSlotPestPattern.matchMatcher(stack.displayName) {
-                    val slotPestType = groupOrNull("type")?.let { PestType.getByNameOrNull(it) } ?: return@onEach
                     activeTrap.apply {
-                        pestType[slotIndex] = slotPestType
+                        pestType[slot] = PestType.getByNameOrNull(group("type")) ?: return@onEach
                     }
                 }
             }
