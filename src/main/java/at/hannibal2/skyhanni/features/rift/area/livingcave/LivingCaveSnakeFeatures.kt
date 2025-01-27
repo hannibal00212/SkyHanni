@@ -11,14 +11,13 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.CollectionUtils.drainForEach
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.Mutex
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
@@ -27,13 +26,14 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.block.Block
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
+import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object LivingCaveSnakeFeatures {
     private val config get() = RiftApi.config.area.livingCave.livingCaveLivingMetalConfig
-    private var snakes = Mutex(mutableListOf<Snake>())
+    private val snakes = ConcurrentLinkedQueue<Snake>()
     private val edges = LocationUtils.generateCubeEdges(0.005)
 
     private val originalBlocks = mutableMapOf<LorenzVec, Block>()
@@ -59,8 +59,8 @@ object LivingCaveSnakeFeatures {
 
     private var currentRole: Role? = null
 
-    private val addedList = Mutex(mutableListOf<LorenzVec>())
-    private val removedList = Mutex(mutableListOf<LorenzVec>())
+    private val addedList = ConcurrentLinkedQueue<LorenzVec>()
+    private val removedList = ConcurrentLinkedQueue<LorenzVec>()
 
     @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
@@ -71,20 +71,16 @@ object LivingCaveSnakeFeatures {
 
         if (new == Blocks.lapis_block) {
             originalBlocks[location] = old
-            addedList.withLock {
-                it.add(location)
-            }
+            addedList.add(location)
         }
         if (originalBlocks[location] == new) {
             originalBlocks.remove(location)
-            removedList.withLock {
-                it.add(location)
-            }
+            removedList.add(location)
         }
     }
 
-    private fun addSnakeBlock(snakes: MutableList<Snake>, location: LorenzVec) {
-        val snake = fixCollisions(findNearbySnakeHeads(snakes, location))
+    private fun addSnakeBlock(location: LorenzVec) {
+        val snake = fixCollisions(findNearbySnakeHeads(location))
         if (snake == null) {
             snakes.add(Snake(mutableListOf(location)))
         } else {
@@ -110,18 +106,16 @@ object LivingCaveSnakeFeatures {
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
 
-        snakes.withLock {
-            val snake = getClosest(it) ?: return@withLock
-            if (event.position !in snake.blocks) return@withLock
+        val snake = snakes.getClosest() ?: return
+        if (event.position !in snake.blocks) return
 
-            selectedSnake = snake
-            if (event.clickType == ClickType.RIGHT_CLICK) {
-                if (InventoryUtils.itemInHandId == "FROZEN_WATER_PUNGI".toInternalName())
-                    snake.lastCalmTime = SimpleTimeMark.now()
-            } else {
-                if (InventoryUtils.itemInHandId in pickaxes) {
-                    snake.lastHitTime = SimpleTimeMark.now()
-                }
+        selectedSnake = snake
+        if (event.clickType == ClickType.RIGHT_CLICK) {
+            if (InventoryUtils.itemInHandId == "FROZEN_WATER_PUNGI".toInternalName())
+                snake.lastCalmTime = SimpleTimeMark.now()
+        } else {
+            if (InventoryUtils.itemInHandId in pickaxes) {
+                snake.lastHitTime = SimpleTimeMark.now()
             }
         }
     }
@@ -130,36 +124,31 @@ object LivingCaveSnakeFeatures {
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
 
-        snakes.withLock { snakes ->
-            if (LorenzUtils.debug && Minecraft.getMinecraft().thePlayer.isSneaking && snakes.isNotEmpty()) {
-                snakes.clear()
-                ChatUtils.debug("Snakes reset.", replaceSameMessage = true)
-                return@withLock
-            }
-
-            addedList.withLock { list ->
-                list.forEach { addSnakeBlock(snakes, it) }
-                list.clear()
-            }
-
-            removedList.withLock { list ->
-                for (location in list) {
-                    snakes.filter { location in it.blocks }.forEach {
-                        it.removeSnakeBlock(snakes, location)
-                    }
-                }
-                list.clear()
-            }
-
-            snakes.removeIf {
-                val invalidSize = it.invalidSize()
-                val invalidHead = it.invalidHead()
-                if (invalidSize && LorenzUtils.debug) ChatUtils.chat("invalidSize")
-                if (invalidHead && LorenzUtils.debug) ChatUtils.chat("invalidHead")
-                invalidSize || invalidHead
-            }
-            snakes.forEach { it.tick() }
+        if (LorenzUtils.debug && Minecraft.getMinecraft().thePlayer.isSneaking && snakes.isNotEmpty()) {
+            snakes.clear()
+            ChatUtils.debug("Snakes reset.", replaceSameMessage = true)
+            return
         }
+
+        addedList.drainForEach {
+            addSnakeBlock(it)
+        }
+
+        removedList.drainForEach { location ->
+            snakes.filter { location in it.blocks }.forEach {
+                it.removeSnakeBlock(location)
+            }
+        }
+
+        snakes.removeIf {
+            val invalidSize = it.invalidSize()
+            val invalidHead = it.invalidHead()
+            if (invalidSize && LorenzUtils.debug) ChatUtils.chat("invalidSize")
+            if (invalidHead && LorenzUtils.debug) ChatUtils.chat("invalidHead")
+            invalidSize || invalidHead
+        }
+        snakes.forEach { it.tick() }
+
     }
 
     @HandleEvent
@@ -167,14 +156,11 @@ object LivingCaveSnakeFeatures {
         if (!isEnabled()) return
         if (currentRole == null) return
 
-        snakes.withLock { snakes ->
-            snakes.forEach { it.render(event) }
-        }
-
+        snakes.forEach { it.render(event) }
     }
 
     // sqrt(3) =~ 1.73
-    private fun findNearbySnakeHeads(snakes: MutableList<Snake>, location: LorenzVec): List<Snake> =
+    private fun findNearbySnakeHeads(location: LorenzVec): List<Snake> =
         snakes.filter { it.blocks.isNotEmpty() && it.head.distance(location) < 1.74 }
             .sortedBy { it.head.distance(location) }
 
@@ -189,15 +175,8 @@ object LivingCaveSnakeFeatures {
         }
     }
 
-    private fun getClosest(snakes: MutableList<Snake>): Snake? {
-        if (snakes.isEmpty()) return null
-        val snakeDistances = mutableMapOf<Snake, Double>()
-        for (snake in snakes) {
-            val d = snake.blocks.minOfOrNull { it.distanceSqToPlayer() } ?: Double.MAX_VALUE
-            snakeDistances[snake] = d
-        }
-        return snakeDistances.sorted().keys.first()
-    }
+    private fun ConcurrentLinkedQueue<Snake>.getClosest(): Snake? =
+        minByOrNull { it.blocks.minOfOrNull { block -> block.distanceSqToPlayer() } ?: Double.MAX_VALUE }
 
     private fun LorenzVec.isNotTouchingAir(): Boolean = directions.none { plus(it).getBlockAt() == Blocks.air }
 
@@ -283,7 +262,7 @@ object LivingCaveSnakeFeatures {
             }
         }
 
-        fun removeSnakeBlock(snakes: MutableList<Snake>, location: LorenzVec) {
+        fun removeSnakeBlock(location: LorenzVec) {
             blocks.remove(location)
             if (blocks.isEmpty()) {
                 snakes.remove(this)
