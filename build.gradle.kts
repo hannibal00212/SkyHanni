@@ -171,8 +171,8 @@ dependencies {
         modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
         modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.42.0+1.16")
     } else if (target == ProjectTarget.MODERN) {
-        modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
-        modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.102.0+1.21")
+        modCompileOnly("net.fabricmc:fabric-loader:0.16.10")
+        modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.115.0+1.21.4")
     }
 
     implementation(kotlin("stdlib-jdk8"))

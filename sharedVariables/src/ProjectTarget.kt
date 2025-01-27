@@ -43,9 +43,9 @@ enum class ProjectTarget(
         "MODERN",
     ),
     MODERN(
-        "1.21",
-        MinecraftVersion.MC121,
-        yarn("1.21+build.9"),
+        "1.21.4",
+        MinecraftVersion.MC12104,
+        yarn("1.21.4+build.8"),
         MappingStyle.YARN,
         null,
         null,

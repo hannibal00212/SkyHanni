@@ -181,13 +181,13 @@ open class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
-    fun initRenderer(position: Position, condition: () -> Boolean) {
+    fun initRenderer(position: () -> Position, condition: () -> Boolean) {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
             condition = condition,
             onRender = {
-                renderDisplay(position)
+                renderDisplay(position())
             },
         )
     }
