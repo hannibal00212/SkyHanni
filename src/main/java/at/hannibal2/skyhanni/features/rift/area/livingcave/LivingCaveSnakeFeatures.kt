@@ -141,27 +141,7 @@ object LivingCaveSnakeFeatures {
             if (invalidHead && LorenzUtils.debug) ChatUtils.chat("invalidHead")
             !invalidSize && !invalidHead
         }
-        for (snake in snakes) {
-            snake.tick()
-        }
-    }
-
-    private fun Snake.tick() {
-        if (invalidHeadRightNow()) {
-            if (invalidHeadSince == null) {
-                invalidHeadSince = SimpleTimeMark.now()
-            }
-        } else {
-            invalidHeadSince = null
-        }
-        if (state == State.SPAWNING) return
-
-        state = if (isNotTouchingAir()) {
-            State.NOT_TOUCHING_AIR
-        } else {
-            val notMoving = lastAddTime.passedSince() > 200.milliseconds
-            if (notMoving) State.CALM else State.ACTIVE
-        }
+        snakes.forEach { it.tick() }
     }
 
     @HandleEvent
@@ -200,47 +180,6 @@ object LivingCaveSnakeFeatures {
 
     private fun LorenzVec.isNotTouchingAir(): Boolean = directions.none { plus(it).getBlockAt() == Blocks.air }
 
-    private fun Snake.render(event: SkyHanniRenderWorldEvent) {
-        if (blocks.isEmpty()) return
-        if (LorenzUtils.debug) {
-            event.drawString(head.add(0.5, 0.8, 0.5), "§fstate = $state", this == selectedSnake)
-        }
-
-        val size = blocks.size
-        if (size > 1 && state == State.CALM && currentRole == Role.BREAK) {
-            val location = lastBrokenBlock?.let {
-                LocationUtils.slopeOverTime(lastRemoveTime, 300.milliseconds, it, tail)
-            } ?: tail
-            renderBlock(event, location)
-        }
-        if (currentRole == Role.CALM || size == 1 || state != State.CALM) {
-            val location = if (size > 1) {
-                LocationUtils.slopeOverTime(lastAddTime, 200.milliseconds, blocks[1], head)
-            } else head
-            renderBlock(event, location)
-        }
-        for (block in blocks) {
-            if (block == head && lastAddTime.passedSince() < 200.milliseconds) {
-                continue
-            }
-            for ((x, y) in edges) {
-                event.draw3DLine(block + x, block + y, state.color.toColor(), 2, true)
-            }
-        }
-    }
-
-    private fun Snake.renderBlock(
-        event: SkyHanniRenderWorldEvent,
-        location: LorenzVec,
-    ) {
-        val isSelected = this == selectedSnake
-        event.drawColor(location, state.color.toColor(), alpha = 1f, seeThroughBlocks = isSelected)
-        if (isSelected) {
-            event.drawString(location.add(0.5, 0.5, 0.5), state.display, seeThroughBlocks = true)
-            event.drawString(location.add(0.5, 0.2, 0.5), "§b${blocks.size} blocks", seeThroughBlocks = true)
-        }
-    }
-
     private fun isEnabled() = RiftApi.inRift() && (RiftApi.inLivingCave() || RiftApi.inLivingStillness()) && config.enabled
 
     private class Snake(
@@ -265,6 +204,66 @@ object LivingCaveSnakeFeatures {
         fun invalidHead(): Boolean = invalidHeadSince?.let { it.passedSince() > 1.seconds } ?: false
 
         fun isNotTouchingAir(): Boolean = blocks.any { it.isNotTouchingAir() }
+
+        @Suppress("HandleEventInspection")
+        fun render(event: SkyHanniRenderWorldEvent) {
+            if (blocks.isEmpty()) return
+            if (LorenzUtils.debug) {
+                event.drawString(head.add(0.5, 0.8, 0.5), "§fstate = $state", this == selectedSnake)
+            }
+
+            val size = blocks.size
+            if (size > 1 && state == State.CALM && currentRole == Role.BREAK) {
+                val location = lastBrokenBlock?.let {
+                    LocationUtils.slopeOverTime(lastRemoveTime, 300.milliseconds, it, tail)
+                } ?: tail
+                renderBlock(event, location)
+            }
+            if (currentRole == Role.CALM || size == 1 || state != State.CALM) {
+                val location = if (size > 1) {
+                    LocationUtils.slopeOverTime(lastAddTime, 200.milliseconds, blocks[1], head)
+                } else head
+                renderBlock(event, location)
+            }
+            for (block in blocks) {
+                if (block == head && lastAddTime.passedSince() < 200.milliseconds) {
+                    continue
+                }
+                for ((x, y) in edges) {
+                    event.draw3DLine(block + x, block + y, state.color.toColor(), 2, true)
+                }
+            }
+        }
+
+        fun renderBlock(
+            event: SkyHanniRenderWorldEvent,
+            location: LorenzVec,
+        ) {
+            val isSelected = this == selectedSnake
+            event.drawColor(location, state.color.toColor(), alpha = 1f, seeThroughBlocks = isSelected)
+            if (isSelected) {
+                event.drawString(location.add(0.5, 0.5, 0.5), state.display, seeThroughBlocks = true)
+                event.drawString(location.add(0.5, 0.2, 0.5), "§b${blocks.size} blocks", seeThroughBlocks = true)
+            }
+        }
+
+        fun tick() {
+            if (invalidHeadRightNow()) {
+                if (invalidHeadSince == null) {
+                    invalidHeadSince = SimpleTimeMark.now()
+                }
+            } else {
+                invalidHeadSince = null
+            }
+            if (state == State.SPAWNING) return
+
+            state = if (isNotTouchingAir()) {
+                State.NOT_TOUCHING_AIR
+            } else {
+                val notMoving = lastAddTime.passedSince() > 200.milliseconds
+                if (notMoving) State.CALM else State.ACTIVE
+            }
+        }
     }
 
     private enum class State(val color: LorenzColor, label: String) {
