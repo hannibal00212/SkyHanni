@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.rift.area.livingcave
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -57,19 +58,6 @@ object LivingCaveSnakeFeatures {
         fun invalidHead(): Boolean = invalidHeadSince?.let { it.passedSince() > 1.seconds } ?: false
 
         fun isNotTouchingAir(): Boolean = blocks.any { it.isNotTouchingAir() }
-
-        fun getInteraction(): Interaction {
-            if (this == selectedSnake) {
-                if (lastHitTime.passedSince() < 2.seconds) {
-                    return Interaction.BREAKING
-                }
-                if (lastCalmTime.passedSince() < 2.seconds) {
-                    return Interaction.CALMING
-                }
-            }
-
-            return Interaction.NONE
-        }
     }
 
     enum class State(val color: LorenzColor, label: String) {
@@ -79,7 +67,7 @@ object LivingCaveSnakeFeatures {
         CALM(LorenzColor.GREEN, "Calm"),
         ;
 
-        val display = "${color.getChatColor()}$label"
+        val display = "${color.getChatColor()}$label Snake"
     }
 
     private val originalBlocks = mutableMapOf<LorenzVec, Block>()
@@ -165,6 +153,22 @@ object LivingCaveSnakeFeatures {
         "CHRONO_PICKAXE",
     ).map { it.toInternalName() }
 
+    enum class Role {
+        BREAK,
+        CALM,
+    }
+
+    private var currentRole: Role? = null
+
+    @HandleEvent
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+        currentRole = when (event.newItem) {
+            "FROZEN_WATER_PUNGI".toInternalName() -> Role.CALM
+            in pickaxes -> Role.BREAK
+            else -> null
+        }
+    }
+
     @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
@@ -226,50 +230,42 @@ object LivingCaveSnakeFeatures {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
+        if (currentRole == null) return
 
         for (snake in snakes) {
             val isSelected = snake == selectedSnake
             val blocks = snake.blocks
             if (blocks.isEmpty()) continue
-            val interaction = snake.getInteraction()
+            val state = snake.state
             if (LorenzUtils.debug) {
-                event.drawString(snake.head.add(0.5, 0.8, 0.5), "§fstate = ${snake.state}", isSelected)
-                event.drawString(snake.head.add(0.5, 1.1, 0.5), "§finteraction = $interaction", isSelected)
+                event.drawString(snake.head.add(0.5, 0.8, 0.5), "§fstate = $state", isSelected)
             }
 
             val size = blocks.size
-            val color = snake.state.color.toColor()
-            if (size > 1 && snake.state == State.CALM && interaction != Interaction.CALMING) {
+            val color = state.color.toColor()
+            if (size > 1 && state == State.CALM && currentRole == Role.BREAK) {
                 val tail = snake.tail
                 val lastBrokenBlock = snake.lastBrokenBlock
-                val location = if (interaction == Interaction.BREAKING && lastBrokenBlock != null) {
+                val location = if (lastBrokenBlock != null) {
                     LocationUtils.slopeOverTime(snake.lastRemoveTime, 300.milliseconds, lastBrokenBlock, tail)
                 } else tail
 
                 event.drawColor(location, LorenzColor.GREEN.toColor(), alpha = 1f, seeThroughBlocks = isSelected)
-                val label = snake.state.display
                 if (isSelected) {
-                    event.drawString(location.add(0.5, 0.5, 0.5), label, seeThroughBlocks = true)
-
-                    if (interaction == Interaction.BREAKING) {
-                        event.drawString(location.add(0.5, 0.2, 0.5), "§b$size blocks", seeThroughBlocks = true)
-                    }
+                    event.drawString(location.add(0.5, 0.5, 0.5), state.display, seeThroughBlocks = true)
+                    event.drawString(location.add(0.5, 0.2, 0.5), "§b$size blocks", seeThroughBlocks = true)
                 }
             }
-            if (interaction != Interaction.BREAKING || size == 1) {
+            if (currentRole == Role.CALM || size == 1 || state != State.CALM) {
                 val head = snake.head
                 val location = if (size > 1) {
                     LocationUtils.slopeOverTime(snake.lastAddTime, 200.milliseconds, snake.blocks[1], head)
                 } else head
                 event.drawColor(location, color, alpha = 1f, seeThroughBlocks = isSelected)
 
-                val label = snake.state.display
-
                 if (isSelected) {
-                    event.drawString(location.add(0.5, 0.5, 0.5), label, seeThroughBlocks = true)
-                    if (interaction == Interaction.CALMING) {
-                        event.drawString(location.add(0.5, 0.2, 0.5), "§b$size blocks", seeThroughBlocks = true)
-                    }
+                    event.drawString(location.add(0.5, 0.5, 0.5), state.display, seeThroughBlocks = true)
+                    event.drawString(location.add(0.5, 0.2, 0.5), "§b$size blocks", seeThroughBlocks = true)
                 }
             }
             for (block in blocks) {
@@ -281,12 +277,6 @@ object LivingCaveSnakeFeatures {
                 }
             }
         }
-    }
-
-    enum class Interaction {
-        NONE,
-        CALMING,
-        BREAKING,
     }
 
     fun isEnabled() = RiftApi.inRift() && (RiftApi.inLivingCave() || RiftApi.inLivingStillness()) && config.enabled
