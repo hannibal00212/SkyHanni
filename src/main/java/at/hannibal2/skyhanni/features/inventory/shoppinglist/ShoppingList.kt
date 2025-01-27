@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -30,6 +31,7 @@ object ShoppingList {
     fun add(itemName: NeuInternalName, amount: Int = 1, categoryName: String? = null) {
         // TODO: shouldn't happen @Thunderblade73
         if (!isEnabled()) return
+        println("Adding ${itemName.itemName} x$amount to $categoryName")
 
         val category: ShoppingListCategory
         if (categoryName != null) {
@@ -43,6 +45,8 @@ object ShoppingList {
             category = items
         }
         category.add(itemName, amount)
+
+        createDisplay()
     }
 
     fun removeCategory(categoryName: String) {
@@ -55,6 +59,7 @@ object ShoppingList {
     // removeCommand ???
     fun remove(name: String, amount: Int? = null, categoryName: String? = null) {
         if (!isEnabled()) return
+        println("Removing $name x$amount from $categoryName")
 
         var itemName: NeuInternalName? = name.toInternalName()
         if (itemName == null || !itemName.isKnownItem()) {
@@ -64,43 +69,42 @@ object ShoppingList {
             } else {
                 removeCategory(name)
             }
-            return
-        }
 
-        if (categoryName != null) {
+        } else if (categoryName != null) {
             if (!categoryName.isCategory()) {
                 ChatUtils.userError("Category $categoryName not found")
+                return
             } else {
                 val category = categories.firstOrNull { it.name == categoryName } ?: return
 
                 category.remove(itemName, amount)
             }
-            return
-        }
 
-        if (items.contains(itemName)) {
+        } else if (items.contains(itemName)) {
             items.remove(itemName, amount)
-            return
-        }
 
-        var category: ShoppingListCategory? = null
-        for (cat in categories) {
-            if (cat.contains(itemName)) {
-                if (category != null) {
-                    ChatUtils.userError(
-                        "Item $itemName found in multiple categories, " +
-                            "please specify the category to remove from",
-                    )
-                    return
+        } else {
+            var category: ShoppingListCategory? = null
+            for (cat in categories) {
+                if (cat.contains(itemName)) {
+                    if (category != null) {
+                        ChatUtils.userError(
+                            "Item ${itemName.itemName} found in multiple categories, " +
+                                "please specify the category to remove from",
+                        )
+                        return
+                    }
+                    category = cat
                 }
-                category = cat
+            }
+            if (category == null) {
+                ChatUtils.userError("Item ${itemName.itemName} not found")
+            } else {
+                category.remove(itemName, amount)
             }
         }
-        if (category == null) {
-            ChatUtils.userError("Item $itemName not found")
-        } else {
-            category.remove(itemName, amount)
-        }
+
+        createDisplay()
     }
 
     fun clear() {
@@ -117,12 +121,16 @@ object ShoppingList {
 
     // all display related functions come here
     fun createDisplay() {
+        println("Creating display")
         display = buildList {
-            addString("Shopping List")
+            addString("§l" + "Shopping List")
             categories.forEach {
 
-                addString(it.toString())
+                addString("§n" + it.name)
+
+                addAll(it.getRenderables(1))
             }
+            addAll(items.getRenderables(0))
         }
     }
 

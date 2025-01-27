@@ -1,7 +1,12 @@
 package at.hannibal2.skyhanni.features.inventory.shoppinglist
 
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import net.minecraft.item.EnumRarity
 
 class ShoppingListItem(
     val name: NeuInternalName,
@@ -14,7 +19,7 @@ class ShoppingListItem(
     private val subItems = mutableListOf<ShoppingListItem>()
 
     override fun toString(): String {
-        return "$name x$amount" + if (subItems.isNotEmpty()) {
+        return "${name.itemName} x$amount" + if (subItems.isNotEmpty()) {
             " (${subItems.joinToString(", ")})"
         } else {
             ""
@@ -22,9 +27,9 @@ class ShoppingListItem(
     }
 
     fun getRecipe() {
+        println("getting the Recipe")
+
         val allRecipes = NeuItems.getRecipes(name)
-
-
     }
 
     fun changeAmountBy(amount: Int) {
@@ -33,5 +38,40 @@ class ShoppingListItem(
 
     fun changeAmountTo(amount: Int) {
         this.amount = amount
+    }
+
+    fun getIndent(amount: Int): String {
+        var result = ""
+        for (i in 0 until amount) {
+            result += "- "
+        }
+        return result
+    }
+
+    fun getRenderables(indent: Int): List<Renderable> {
+        val renderables = mutableListOf<Renderable>()
+        if (!hidden) {
+            println(name.itemName)
+            val rarity: EnumRarity? = name.getItemStackOrNull()?.rarity
+            val displayName: String
+            if (name.itemName.startsWith("fa") || rarity == EnumRarity.UNCOMMON) {
+                displayName = "§e" + name.itemNameWithoutColor
+            } else {
+                displayName = name.itemName
+            }
+            println("Adding $displayName x$amount to renderables, rarity: ${rarity.toString()}")
+            renderables.add(
+                Renderable.link(
+                    getIndent(indent) + "${displayName}§e x$amount" + " §7Click to view recipe", true,
+                    {
+                        getRecipe()
+                    },
+                ),
+            )
+            subItems.forEach {
+                renderables.addAll(it.getRenderables(indent + 1))
+            }
+        }
+        return renderables
     }
 }
