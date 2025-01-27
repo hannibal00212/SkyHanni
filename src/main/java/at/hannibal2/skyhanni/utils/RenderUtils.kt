@@ -148,6 +148,7 @@ object RenderUtils {
         color: Color,
         beacon: Boolean = false,
         alpha: Float = -1f,
+        seeThroughBlocks: Boolean = false,
     ) {
         val (viewerX, viewerY, viewerZ) = getViewerPos(partialTicks)
         val x = location.x - viewerX
@@ -159,8 +160,10 @@ object RenderUtils {
         } else {
             alpha
         }
-        GlStateManager.disableDepth()
-        GlStateManager.disableCull()
+        if (!seeThroughBlocks) {
+            GlStateManager.disableDepth()
+            GlStateManager.disableCull()
+        }
         drawFilledBoundingBox(
             AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expandBlock(),
             color,
@@ -170,8 +173,10 @@ object RenderUtils {
         if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f, partialTicks)
         GlStateManager.disableLighting()
         GlStateManager.enableTexture2D()
-        GlStateManager.enableDepth()
-        GlStateManager.enableCull()
+        if (!seeThroughBlocks) {
+            GlStateManager.enableDepth()
+            GlStateManager.enableCull()
+        }
     }
 
     val absoluteTranslation

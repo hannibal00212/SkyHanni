@@ -156,7 +156,7 @@ object LocationUtils {
             LorenzVec(0.0, 0.0, 0.0), LorenzVec(0.0, 0.0, 1.0),
             LorenzVec(0.0, 1.0, 0.0), LorenzVec(0.0, 1.0, 1.0),
             LorenzVec(1.0, 0.0, 0.0), LorenzVec(1.0, 0.0, 1.0),
-            LorenzVec(1.0, 1.0, 0.0), LorenzVec(1.0, 1.0, 1.0)
+            LorenzVec(1.0, 1.0, 0.0), LorenzVec(1.0, 1.0, 1.0),
         )
 
         // Function to shift a vertex outward from the center by delta
@@ -192,7 +192,7 @@ object LocationUtils {
 
             Pair(shiftedVertices[4], shiftedVertices[6]), // Edge along y-axis
             Pair(shiftedVertices[5], shiftedVertices[7]), // Edge along y-axis
-            Pair(shiftedVertices[6], shiftedVertices[7])  // Edge along z-axis
+            Pair(shiftedVertices[6], shiftedVertices[7]),  // Edge along z-axis
         )
 
         return edges

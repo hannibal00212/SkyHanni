@@ -20,8 +20,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
+import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.block.Block
 import net.minecraft.client.Minecraft
@@ -243,7 +243,7 @@ object LivingCaveSnakeFeatures {
                     LocationUtils.slopeOverTime(snake.lastRemoveTime, 300.milliseconds, lastBrokenBlock, tail)
                 } else tail
 
-                event.drawWaypointFilled(location, LorenzColor.GREEN.toColor(), seeThroughBlocks)
+                event.drawColor(location, LorenzColor.GREEN.toColor(), alpha = 1f, seeThroughBlocks = seeThroughBlocks)
                 event.drawString(location.add(0.5, 0.5, 0.5), "§aTail", seeThroughBlocks)
 
                 if (interaction == Interaction.BREAKING) {
@@ -255,7 +255,8 @@ object LivingCaveSnakeFeatures {
                 val location = if (size > 1) {
                     LocationUtils.slopeOverTime(snake.lastRemoveTime, 200.milliseconds, snake.blocks[1], head)
                 } else head
-                event.drawWaypointFilled(location, color, seeThroughBlocks)
+                event.drawColor(location, color, alpha = 1f, seeThroughBlocks = seeThroughBlocks)
+
                 val headColor = if (snake.state == State.NOT_TOUCHING_AIR) "§c" else "§e"
                 event.drawString(location.add(0.5, 0.5, 0.5), "${headColor}Head", seeThroughBlocks)
                 if (interaction == Interaction.CALMING) {
