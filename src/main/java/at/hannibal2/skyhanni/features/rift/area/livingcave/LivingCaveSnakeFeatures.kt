@@ -233,49 +233,51 @@ object LivingCaveSnakeFeatures {
         if (currentRole == null) return
 
         for (snake in snakes) {
-            val isSelected = snake == selectedSnake
-            val blocks = snake.blocks
-            if (blocks.isEmpty()) continue
-            val state = snake.state
-            if (LorenzUtils.debug) {
-                event.drawString(snake.head.add(0.5, 0.8, 0.5), "§fstate = $state", isSelected)
-            }
+            snake.render(event)
+        }
+    }
 
-            val size = blocks.size
-            val color = state.color.toColor()
-            if (size > 1 && state == State.CALM && currentRole == Role.BREAK) {
-                val tail = snake.tail
-                val lastBrokenBlock = snake.lastBrokenBlock
-                val location = if (lastBrokenBlock != null) {
-                    LocationUtils.slopeOverTime(snake.lastRemoveTime, 300.milliseconds, lastBrokenBlock, tail)
-                } else tail
+    private fun Snake.render(
+        event: SkyHanniRenderWorldEvent,
+    ) {
+        if (blocks.isEmpty()) return
+        if (LorenzUtils.debug) {
+            event.drawString(head.add(0.5, 0.8, 0.5), "§fstate = $state", this == selectedSnake)
+        }
 
-                event.drawColor(location, LorenzColor.GREEN.toColor(), alpha = 1f, seeThroughBlocks = isSelected)
-                if (isSelected) {
-                    event.drawString(location.add(0.5, 0.5, 0.5), state.display, seeThroughBlocks = true)
-                    event.drawString(location.add(0.5, 0.2, 0.5), "§b$size blocks", seeThroughBlocks = true)
-                }
+        val size = blocks.size
+        if (size > 1 && state == State.CALM && currentRole == Role.BREAK) {
+            val location = lastBrokenBlock?.let {
+                LocationUtils.slopeOverTime(lastRemoveTime, 300.milliseconds, it, tail)
+            } ?: tail
+            renderBlock(event, location)
+        }
+        if (currentRole == Role.CALM || size == 1 || state != State.CALM) {
+            val location = if (size > 1) {
+                LocationUtils.slopeOverTime(lastAddTime, 200.milliseconds, blocks[1], head)
+            } else head
+            renderBlock(event, location)
+        }
+        for (block in blocks) {
+            if (block == head && lastAddTime.passedSince() < 200.milliseconds) {
+                continue
             }
-            if (currentRole == Role.CALM || size == 1 || state != State.CALM) {
-                val head = snake.head
-                val location = if (size > 1) {
-                    LocationUtils.slopeOverTime(snake.lastAddTime, 200.milliseconds, snake.blocks[1], head)
-                } else head
-                event.drawColor(location, color, alpha = 1f, seeThroughBlocks = isSelected)
+            for ((x, y) in edges) {
+                event.draw3DLine(block + x, block + y, state.color.toColor(), 2, true)
+            }
+        }
+    }
 
-                if (isSelected) {
-                    event.drawString(location.add(0.5, 0.5, 0.5), state.display, seeThroughBlocks = true)
-                    event.drawString(location.add(0.5, 0.2, 0.5), "§b$size blocks", seeThroughBlocks = true)
-                }
-            }
-            for (block in blocks) {
-                if (block == snake.head && snake.lastAddTime.passedSince() < 200.milliseconds) {
-                    continue
-                }
-                for ((x, y) in edges) {
-                    event.draw3DLine(block + x, block + y, color, 2, true)
-                }
-            }
+    private fun Snake.renderBlock(
+        event: SkyHanniRenderWorldEvent,
+        location: LorenzVec,
+    ) {
+        val isSelected = this == selectedSnake
+        val size = blocks.size
+        event.drawColor(location, state.color.toColor(), alpha = 1f, seeThroughBlocks = isSelected)
+        if (isSelected) {
+            event.drawString(location.add(0.5, 0.5, 0.5), state.display, seeThroughBlocks = true)
+            event.drawString(location.add(0.5, 0.2, 0.5), "§b$size blocks", seeThroughBlocks = true)
         }
     }
 
