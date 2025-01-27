@@ -42,11 +42,7 @@ class ShoppingListItem(
     }
 
     fun getIndent(amount: Int): String {
-        var result = ""
-        (0 until amount).forEach {
-            result += "- "
-        }
-        return result
+        return "- ".repeat(amount)
     }
 
     fun getRenderables(indent: Int): List<Renderable> {
