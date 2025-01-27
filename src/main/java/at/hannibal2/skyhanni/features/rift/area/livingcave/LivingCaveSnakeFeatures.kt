@@ -142,21 +142,25 @@ object LivingCaveSnakeFeatures {
             !invalidSize && !invalidHead
         }
         for (snake in snakes) {
-            if (snake.invalidHeadRightNow()) {
-                if (snake.invalidHeadSince == null) {
-                    snake.invalidHeadSince = SimpleTimeMark.now()
-                }
-            } else {
-                snake.invalidHeadSince = null
-            }
-            if (snake.state == State.SPAWNING) continue
+            snake.tick()
+        }
+    }
 
-            snake.state = if (snake.isNotTouchingAir()) {
-                State.NOT_TOUCHING_AIR
-            } else {
-                val notMoving = snake.lastAddTime.passedSince() > 200.milliseconds
-                if (notMoving) State.CALM else State.ACTIVE
+    private fun Snake.tick() {
+        if (invalidHeadRightNow()) {
+            if (invalidHeadSince == null) {
+                invalidHeadSince = SimpleTimeMark.now()
             }
+        } else {
+            invalidHeadSince = null
+        }
+        if (state == State.SPAWNING) return
+
+        state = if (isNotTouchingAir()) {
+            State.NOT_TOUCHING_AIR
+        } else {
+            val notMoving = lastAddTime.passedSince() > 200.milliseconds
+            if (notMoving) State.CALM else State.ACTIVE
         }
     }
 
@@ -173,15 +177,15 @@ object LivingCaveSnakeFeatures {
         snakes.filter { it.blocks.isNotEmpty() && it.head.distance(location) < 1.74 }
             .sortedBy { it.head.distance(location) }
 
-    private fun fixCollisions(found: List<Snake>): Snake? = if (found.size > 1) {
+    private fun fixCollisions(found: List<Snake>): Snake? {
+        if (found.size <= 1) return found.firstOrNull()
+
         val filtered = found.filter { it.state != State.CALM }
-        if (filtered.size < found.size && filtered.isNotEmpty()) {
+        return if (filtered.size < found.size) {
             filtered.firstOrNull()
         } else {
             found.firstOrNull()
         }
-    } else {
-        found.firstOrNull()
     }
 
     private fun getClosest(): Snake? {
