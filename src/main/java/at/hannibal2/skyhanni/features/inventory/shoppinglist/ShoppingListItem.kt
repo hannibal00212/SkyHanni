@@ -43,7 +43,7 @@ class ShoppingListItem(
 
     fun getIndent(amount: Int): String {
         var result = ""
-        for (i in 0 until amount) {
+        (0 until amount).forEach {
             result += "- "
         }
         return result
