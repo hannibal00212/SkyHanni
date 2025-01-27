@@ -71,36 +71,30 @@ object LivingCaveSnakeFeatures {
             ChatUtils.debug("Snakes reset.", replaceSameMessage = true)
         }
 
-
         if (new == Blocks.lapis_block) {
-            val snake = fixCollisions(findNearbySnakeHeads(location))
-            if (snake != null) {
-                // hypixel is sometimes funny
-                if (location in snake.blocks) return
-
-                snake.blocks = snake.blocks.editCopy { add(0, location) }
-                snake.lastAddTime = SimpleTimeMark.now()
-                snake.invalidHeadSince = null
-            } else {
-                snakes = snakes.editCopy { add(Snake(listOf(location))) }
-            }
             originalBlocks[location] = old
+            addSnakeBlock(location)
         }
         for (snake in snakes) {
             if (location !in snake.blocks) continue
             if (originalBlocks[location] != new) continue
             originalBlocks.remove(location)
-            snake.blocks = snake.blocks.editCopy { remove(location) }
-            if (snake.blocks.isEmpty()) {
-                snakes = snakes.editCopy { remove(snake) }
-            }
-            if (snake.state == State.SPAWNING) {
-                snake.state = State.ACTIVE
-            }
-            snake.lastRemoveTime = SimpleTimeMark.now()
-            snake.lastBrokenBlock = location
-
+            snake.removeSnakeBlock(location)
             originalBlocks[location] = old
+        }
+    }
+
+    private fun addSnakeBlock(location: LorenzVec) {
+        val snake = fixCollisions(findNearbySnakeHeads(location))
+        if (snake == null) {
+            snakes = snakes.editCopy { add(Snake(listOf(location))) }
+        } else {
+            // hypixel is sometimes funny
+            if (location in snake.blocks) return
+
+            snake.blocks = snake.blocks.editCopy { add(0, location) }
+            snake.lastAddTime = SimpleTimeMark.now()
+            snake.invalidHeadSince = null
         }
     }
 
@@ -217,13 +211,13 @@ object LivingCaveSnakeFeatures {
                 val location = lastBrokenBlock?.let {
                     LocationUtils.slopeOverTime(lastRemoveTime, 300.milliseconds, it, tail)
                 } ?: tail
-                renderBlock(event, location)
+                event.renderBlock(location)
             }
             if (currentRole == Role.CALM || size == 1 || state != State.CALM) {
                 val location = if (size > 1) {
                     LocationUtils.slopeOverTime(lastAddTime, 200.milliseconds, blocks[1], head)
                 } else head
-                renderBlock(event, location)
+                event.renderBlock(location)
             }
             for (block in blocks) {
                 if (block == head && lastAddTime.passedSince() < 200.milliseconds) {
@@ -235,15 +229,12 @@ object LivingCaveSnakeFeatures {
             }
         }
 
-        fun renderBlock(
-            event: SkyHanniRenderWorldEvent,
-            location: LorenzVec,
-        ) {
-            val isSelected = this == selectedSnake
-            event.drawColor(location, state.color.toColor(), alpha = 1f, seeThroughBlocks = isSelected)
+        fun SkyHanniRenderWorldEvent.renderBlock(location: LorenzVec) {
+            val isSelected = this@Snake == selectedSnake
+            drawColor(location, state.color.toColor(), alpha = 1f, seeThroughBlocks = isSelected)
             if (isSelected) {
-                event.drawString(location.add(0.5, 0.5, 0.5), state.display, seeThroughBlocks = true)
-                event.drawString(location.add(0.5, 0.2, 0.5), "§b${blocks.size} blocks", seeThroughBlocks = true)
+                drawString(location.add(0.5, 0.5, 0.5), state.display, seeThroughBlocks = true)
+                drawString(location.add(0.5, 0.2, 0.5), "§b${blocks.size} blocks", seeThroughBlocks = true)
             }
         }
 
@@ -264,6 +255,18 @@ object LivingCaveSnakeFeatures {
                 if (notMoving) State.CALM else State.ACTIVE
             }
         }
+
+        fun removeSnakeBlock(location: LorenzVec) {
+            blocks = blocks.editCopy { remove(location) }
+            if (blocks.isEmpty()) {
+                snakes = snakes.editCopy { remove(this@Snake) }
+            }
+            if (state == State.SPAWNING) {
+                state = State.ACTIVE
+            }
+            lastRemoveTime = SimpleTimeMark.now()
+            lastBrokenBlock = location
+        }
     }
 
     private enum class State(val color: LorenzColor, label: String) {
@@ -273,7 +276,7 @@ object LivingCaveSnakeFeatures {
         CALM(LorenzColor.GREEN, "Calm"),
         ;
 
-        val display = "${color.getChatColor()}$label Snake"
+        val display = "${color.getChatColor()}$label snake"
     }
 
     private enum class Role {
