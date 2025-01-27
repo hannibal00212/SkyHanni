@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.shoppinglist
 
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrCommon
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -9,7 +8,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraft.item.EnumRarity
 
 class ShoppingListItem(
     val name: NeuInternalName,
@@ -61,10 +59,10 @@ class ShoppingListItem(
             } else {
                 name.itemName
             }
-            println("Adding $displayName x$amount to renderables, rarity: ${rarity.toString()}")
+            println("Adding $displayName x$amount to renderables, rarity: $rarity")
             renderables.add(
                 Renderable.link(
-                    getIndent(indent) + "${displayName}§e x$amount" + " §7Click to view recipe", true,
+                    getIndent(indent) + "$displayName§e x$amount" + " §7Click to view recipe", true,
                 ) {
                     getRecipe()
                 },

@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 class ShoppingListCategory(val name: String) {
     val items = mutableListOf<ShoppingListItem>()
     var hidden = false
-    var pinned = false  // TODO: implement this
+    var pinned = false // TODO: implement this
 
     override fun toString(): String {
         return name
