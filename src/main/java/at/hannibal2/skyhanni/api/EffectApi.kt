@@ -181,13 +181,13 @@ object EffectApi {
             duration = 25.minutes
         }
 
-        if (event.message == "§a§lYUM! §r§6Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!") {
+        if (event.message == "§a§lYUM! §r§2Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!") {
             effect = NonGodPotEffect.PEST_REPELLENT
             changeType = EffectDurationChangeType.SET
             duration = 1.hours
         }
 
-        if (event.message == "§a§lYUM! §r§6Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!") {
+        if (event.message == "§a§lYUM! §r§2Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!") {
             effect = NonGodPotEffect.PEST_REPELLENT_MAX
             changeType = EffectDurationChangeType.SET
             duration = 1.hours
