@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.core.config
 
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.inPartialSeconds
 import java.awt.Color
 
 class CustomColor {
@@ -21,7 +20,7 @@ class CustomColor {
 
     fun toInt(): Int {
         if (chroma == 0) return cachedrgb
-        val adjustedHue = (hue + (startTime.passedSince().inPartialSeconds.toFloat() / chromaSpeed % 1)).let {
+        val adjustedHue = (hue + ((startTime.passedSince().inWholeMilliseconds / chromaSpeed) % 1)).let {
             if (it < 0) it + 1f else it
         }
 
@@ -87,6 +86,6 @@ class CustomColor {
         private val startTime = SimpleTimeMark.now()
         private const val MIN_CHROMA_SECS = 1
         private const val MAX_CHROMA_SECS = 60
-        private fun chromaSpeed(speed: Int) = (255 - speed) / 254f * (MAX_CHROMA_SECS - MIN_CHROMA_SECS) + MIN_CHROMA_SECS
+        private fun chromaSpeed(speed: Int) = ((255 - speed) / 254f * (MAX_CHROMA_SECS - MIN_CHROMA_SECS) + MIN_CHROMA_SECS) * 1000f
     }
 }
