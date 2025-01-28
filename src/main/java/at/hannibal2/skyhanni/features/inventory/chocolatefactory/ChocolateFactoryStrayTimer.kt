@@ -66,7 +66,7 @@ object ChocolateFactoryStrayTimer {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled() && ChocolateFactoryApi.inChocolateFactory) return
+        if (!isEnabled() || !ChocolateFactoryApi.inChocolateFactory) return
         lastTimerSubtraction = lastTimerSubtraction?.takeIfInitialized()?.let {
             timer -= it.passedSince()
             if (timer < Duration.ZERO) timer = Duration.ZERO
@@ -80,7 +80,7 @@ object ChocolateFactoryStrayTimer {
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!isEnabled() && ChocolateFactoryApi.inChocolateFactory) return
+        if (!isEnabled() || !ChocolateFactoryApi.inChocolateFactory) return
         eventConfig.strayTimerPosition.renderRenderable(getTimerRenderable(), posLabel = "Stray Timer")
     }
 
