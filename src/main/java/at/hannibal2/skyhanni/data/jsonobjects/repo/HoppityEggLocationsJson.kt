@@ -24,6 +24,7 @@ data class HoppityEggLocationsJson(
     @Expose val rabbitHitmanIndex: Int,
     @Expose val maxRabbits: Int,
     @Expose val maxPrestige: Int,
+    @Expose @SerializedName("cf_shortcut_index") val cfShortcutIndex: Int,
     @Expose val chocolateMilestones: TreeSet<Long>,
     @Expose @SerializedName("hitman_costs") val hitmanCosts: TreeSet<Long>,
     @Expose val chocolateShopMilestones: List<MilestoneJson>,
