@@ -146,8 +146,7 @@ object ExperimentationTableApi {
      */
     val experimentRenewPattern by patternGroup.pattern(
         "renew",
-        "^(?:§d)?☕ (?:§r)?§eYou (?:renewed|bought a bonus charge for) the " +
-            "[Ee]xperiment(?:ation)? [Tt]able! (?:§r)?§b\\((?<current>\\d)/3\\)\$",
+        "^§d☕ §r§eYou bought a bonus charge for the Experimentation Table! §r§b\\((?<current>\\d)/3\\)\$",
     )
 
     /**
