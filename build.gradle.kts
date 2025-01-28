@@ -200,6 +200,7 @@ dependencies {
         isTransitive = false
     }
 
+    shadowModImpl(libs.gson)
     shadowModImpl(libs.moulconfig)
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
@@ -349,6 +350,7 @@ tasks.shadowJar {
     }
     exclude("META-INF/versions/**")
     mergeServiceFiles()
+    relocate("com.google.gson", "at.hannibal2.skyhanni.deps.gson")
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
     relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
