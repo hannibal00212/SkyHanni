@@ -30,7 +30,6 @@ object ChocolateFactoryStrayTimer {
 
     @HandleEvent
     fun onEggFound(event: EggFoundEvent) {
-        if (!isEnabled()) return
         timer = when (event.type) {
             // If a stray is found, the timer is no longer relevant
             HoppityEggType.STRAY -> { Duration.ZERO }
