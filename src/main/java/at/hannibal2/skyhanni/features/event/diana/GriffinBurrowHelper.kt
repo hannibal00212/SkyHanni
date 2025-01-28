@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
@@ -14,9 +16,9 @@ import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
+import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
@@ -72,7 +74,7 @@ object GriffinBurrowHelper {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Griffin Burrow Helper")
 
-        if (!DianaAPI.isDoingDiana()) {
+        if (!DianaApi.isDoingDiana()) {
             event.addIrrelevant("not doing diana")
             return
         }
@@ -264,7 +266,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         showTestLocations(event)
@@ -346,7 +348,7 @@ object GriffinBurrowHelper {
         }
     }
 
-    private fun showTestLocations(event: RenderWorldEvent) {
+    private fun showTestLocations(event: SkyHanniRenderWorldEvent) {
         if (!testGriffinSpots) return
         for (location in testList) {
             event.drawColor(location, LorenzColor.WHITE)
@@ -367,7 +369,7 @@ object GriffinBurrowHelper {
 
         if (particleBurrows.containsKey(location)) {
             DelayedRun.runDelayed(1.seconds) {
-                if (BurrowAPI.lastBurrowRelatedChatMessage.passedSince() > 2.seconds) {
+                if (BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 2.seconds) {
                     if (particleBurrows.containsKey(location)) {
                         // workaround
                         particleBurrows = particleBurrows.editCopy { keys.remove(location) }
@@ -392,9 +394,9 @@ object GriffinBurrowHelper {
         }
     }
 
-    private fun isEnabled() = DianaAPI.isDoingDiana()
+    private fun isEnabled() = DianaApi.isDoingDiana()
 
-    fun setTestBurrow(strings: Array<String>) {
+    private fun setTestBurrow(strings: Array<String>) {
         if (!IslandType.HUB.isInIsland()) {
             ChatUtils.userError("You can only create test burrows on the hub island!")
             return
@@ -438,5 +440,14 @@ object GriffinBurrowHelper {
         val location = LocationUtils.playerLocation().roundLocation()
         particleBurrows = particleBurrows.editCopy { this[location] = type }
         update()
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtestburrow") {
+            description = "Sets a test burrow waypoint at your location"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { setTestBurrow(it) }
+        }
     }
 }

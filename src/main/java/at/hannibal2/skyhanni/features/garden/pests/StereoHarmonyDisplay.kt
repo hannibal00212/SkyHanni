@@ -6,11 +6,11 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -83,7 +83,7 @@ object StereoHarmonyDisplay {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         selectVinylPattern.matchMatcher(event.message) {
             activeVinyl = VinylType.getByName(group("type"))
             update()
@@ -97,7 +97,7 @@ object StereoHarmonyDisplay {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (!GardenAPI.isCurrentlyFarming() && !config.alwaysShow) return
+        if (!GardenApi.isCurrentlyFarming() && !config.alwaysShow) return
 
         if (activeVinyl == VinylType.NONE && config.hideWhenNone) return
         else if (display.isEmpty()) update()
@@ -117,5 +117,5 @@ object StereoHarmonyDisplay {
         ConditionalUtils.onToggle(config.showHead, config.showCrop) { update() }
     }
 
-    fun isEnabled() = GardenAPI.inGarden() && config.displayEnabled
+    fun isEnabled() = GardenApi.inGarden() && config.displayEnabled
 }

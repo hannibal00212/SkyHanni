@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -11,7 +13,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -33,7 +35,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GardenVisitorDropStatistics {
 
-    private val config get() = GardenAPI.config.visitors.dropsStatistics
+    private val config get() = GardenApi.config.visitors.dropsStatistics
     private var display = emptyList<List<Any>>()
 
     private var acceptedVisitors = 0
@@ -119,7 +121,7 @@ object GardenVisitorDropStatistics {
 
     @HandleEvent
     fun onVisitorAccept(event: VisitorAcceptEvent) {
-        if (!GardenAPI.onBarnPlot) return
+        if (!GardenApi.onBarnPlot) return
         if (!ProfileStorageData.loaded) return
 
         for (internalName in event.visitor.allRewards) {
@@ -131,12 +133,12 @@ object GardenVisitorDropStatistics {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!GardenAPI.onBarnPlot) return
+        if (!GardenApi.onBarnPlot) return
         if (!ProfileStorageData.loaded) return
         if (lastAccept.passedSince() > 1.seconds) return
 
         val message = event.message.removeColor().trim()
-        val storage = GardenAPI.storage?.visitorDrops ?: return
+        val storage = GardenApi.storage?.visitorDrops ?: return
 
         copperPattern.matchMatcher(message) {
             val amount = group("amount").formatInt()
@@ -178,7 +180,7 @@ object GardenVisitorDropStatistics {
     private fun setRarities(rarity: String) {
         acceptedVisitors += 1
         val currentRarity = LorenzUtils.enumValueOf<VisitorRarity>(rarity)
-        val visitorRarities = GardenAPI.storage?.visitorDrops?.visitorRarities ?: return
+        val visitorRarities = GardenApi.storage?.visitorDrops?.visitorRarities ?: return
         fixRaritiesSize(visitorRarities)
         // TODO, change functionality to use enum rather than ordinals
         val temp = visitorRarities[currentRarity.ordinal] + 1
@@ -263,8 +265,8 @@ object GardenVisitorDropStatistics {
     }
 
     fun saveAndUpdate() {
-        if (!GardenAPI.inGarden()) return
-        val storage = GardenAPI.storage?.visitorDrops ?: return
+        if (!GardenApi.inGarden()) return
+        val storage = GardenApi.storage?.visitorDrops ?: return
         storage.acceptedVisitors = acceptedVisitors
         storage.deniedVisitors = deniedVisitors
         totalVisitors = acceptedVisitors + deniedVisitors
@@ -274,7 +276,7 @@ object GardenVisitorDropStatistics {
     }
 
     fun resetCommand() {
-        val storage = GardenAPI.storage?.visitorDrops ?: return
+        val storage = GardenApi.storage?.visitorDrops ?: return
         ChatUtils.clickableChat(
             "Click here to reset Visitor Drops Statistics.",
             onClick = {
@@ -299,7 +301,7 @@ object GardenVisitorDropStatistics {
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        val storage = GardenAPI.storage?.visitorDrops ?: return
+        val storage = GardenApi.storage?.visitorDrops ?: return
         val visitorRarities = storage.visitorRarities
         if (visitorRarities.size == 0) {
             visitorRarities.add(0)
@@ -319,9 +321,9 @@ object GardenVisitorDropStatistics {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
-        if (!GardenAPI.inGarden()) return
-        if (GardenAPI.hideExtraGuis()) return
-        if (config.onlyOnBarn && !GardenAPI.onBarnPlot) return
+        if (!GardenApi.inGarden()) return
+        if (GardenApi.hideExtraGuis()) return
+        if (config.onlyOnBarn && !GardenApi.onBarnPlot) return
         config.pos.renderStringsAndItems(display, posLabel = "Visitor Stats")
     }
 
@@ -338,6 +340,15 @@ object GardenVisitorDropStatistics {
 
         event.transform(11, "${newPrefix}textFormat") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, DropsStatisticsTextEntry::class.java)
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetvisitordrops") {
+            description = "Resets the Visitors Drop Statistics"
+            category = CommandCategory.USERS_RESET
+            callback { resetCommand() }
         }
     }
 }

@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.garden.PlotChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -162,7 +163,7 @@ object GardenPlotApi {
         val type: SprayType,
     )
 
-    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) {
+    private fun Plot.getData() = GardenApi.storage?.plotData?.getOrPut(id) {
         PlotData(
             id,
             "$id",
@@ -307,7 +308,7 @@ object GardenPlotApi {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
 
         plotSprayedPattern.matchMatcher(event.message) {
             val sprayName = group("spray")
@@ -340,7 +341,7 @@ object GardenPlotApi {
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         if (event.inventoryName != "Configure Plots") return
 
         for (plot in plots) {
@@ -440,7 +441,7 @@ object GardenPlotApi {
 
     fun getPlotByID(plotId: Int) = plots.firstOrNull { it.id == plotId }
 
-    fun RenderWorldEvent.renderPlot(
+    fun SkyHanniRenderWorldEvent.renderPlot(
         plot: Plot,
         lineColor: Color,
         cornerColor: Color,
@@ -511,7 +512,7 @@ object GardenPlotApi {
         }
     }
 
-    private fun RenderWorldEvent.tryDraw3DLine(
+    private fun SkyHanniRenderWorldEvent.tryDraw3DLine(
         p1: LorenzVec,
         p2: LorenzVec,
         color: Color,

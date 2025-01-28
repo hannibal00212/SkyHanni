@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -29,7 +29,7 @@ object SlayerBossSpawnSoon {
     @HandleEvent
     fun onSlayerProgressChange(event: SlayerProgressChangeEvent) {
         if (!isEnabled()) return
-        if (!SlayerAPI.isInCorrectArea) return
+        if (!SlayerApi.isInCorrectArea) return
 
         val completion = progressPattern.matchMatcher(event.newProgress.removeColor()) {
             group("progress").formatDouble() / group("total").formatDouble()
@@ -47,5 +47,5 @@ object SlayerBossSpawnSoon {
         lastCompletion = completion
     }
 
-    fun isEnabled() = config.enabled && SlayerAPI.hasActiveSlayerQuest()
+    fun isEnabled() = config.enabled && SlayerApi.hasActiveSlayerQuest()
 }

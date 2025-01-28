@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.PlotMenuHighlightingConfig.PlotStatusType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.currentSpray
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isBeingPasted
@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 @SkyHanniModule
 object GardenPlotMenuHighlighting {
 
-    private val config get() = GardenAPI.config.plotMenuHighlighting
+    private val config get() = GardenApi.config.plotMenuHighlighting
 
     private val highlightedPlots = mutableMapOf<GardenPlotApi.Plot, PlotStatusType>()
 
@@ -83,5 +83,5 @@ object GardenPlotMenuHighlighting {
     }
 
     private fun isEnabled() =
-        GardenAPI.inGarden() && InventoryUtils.openInventoryName() == "Configure Plots" && config.enabled
+        GardenApi.inGarden() && InventoryUtils.openInventoryName() == "Configure Plots" && config.enabled
 }

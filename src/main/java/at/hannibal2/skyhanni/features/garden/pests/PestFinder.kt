@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isPestCountInaccurate
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isPlayerInside
@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -128,7 +128,7 @@ object PestFinder {
             inOwnInventory = true,
             condition = { shouldShowDisplay() },
             onRender = {
-                if (GardenAPI.inGarden() && config.showDisplay) {
+                if (GardenApi.inGarden() && config.showDisplay) {
                     config.position.renderRenderables(display, posLabel = "Pest Finder")
                 }
             },
@@ -148,7 +148,7 @@ object PestFinder {
 
     // priority to low so that this happens after other renderPlot calls.
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.showPlotInWorld) return
         if (heldItemDisabled() && timePassedDisabled()) return
@@ -176,7 +176,7 @@ object PestFinder {
     private fun drawName(
         plot: GardenPlotApi.Plot,
         playerLocation: LorenzVec,
-        event: RenderWorldEvent,
+        event: SkyHanniRenderWorldEvent,
     ) {
         val pests = plot.pests
         val pestsName = StringUtils.pluralize(pests, "pest")
@@ -193,7 +193,7 @@ object PestFinder {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         if (!config.noPestTitle) return
 
         if (PestApi.noPestsChatPattern.matches(event.message)) LorenzUtils.sendTitle("§eNo pests!", 2.seconds)
@@ -201,9 +201,9 @@ object PestFinder {
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
-        if (NEUItems.neuHasFocus()) return
+        if (NeuItems.neuHasFocus()) return
 
         if (event.keyCode != config.teleportHotkey) return
         if (lastKeyPress.passedSince() < 2.seconds) return
@@ -214,7 +214,7 @@ object PestFinder {
 
     fun teleportNearestInfestedPlot() {
         // need to check again for the command
-        if (!GardenAPI.inGarden()) {
+        if (!GardenApi.inGarden()) {
             ChatUtils.userError("This command only works while on the Garden!")
         }
 
@@ -233,5 +233,5 @@ object PestFinder {
         plot.sendTeleportTo()
     }
 
-    fun isEnabled() = GardenAPI.inGarden() && (config.showDisplay || config.showPlotInWorld)
+    fun isEnabled() = GardenApi.inGarden() && (config.showDisplay || config.showPlotInWorld)
 }

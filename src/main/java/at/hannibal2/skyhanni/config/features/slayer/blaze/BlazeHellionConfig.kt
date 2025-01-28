@@ -36,13 +36,11 @@ class BlazeHellionConfig {
     @ConfigEditorDropdown
     var firstDagger: FirstDaggerEntry = FirstDaggerEntry.SPIRIT_OR_CRYSTAL
 
-    enum class FirstDaggerEntry(private val displayName: String, private val legacyId: Int) : HasLegacyId {
+    enum class FirstDaggerEntry(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
         SPIRIT_OR_CRYSTAL("Spirit/Crystal", 0),
         ASHEN_OR_AURIC("Ashen/Auric", 1),
         ;
 
-        // Constructor if new enum elements are added post-migration
-        constructor(str: String) : this(str, -1)
         override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }

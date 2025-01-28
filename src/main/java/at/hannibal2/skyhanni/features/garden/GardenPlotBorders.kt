@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.renderPlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
@@ -14,7 +14,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object GardenPlotBorders {
 
-    private val config get() = GardenAPI.config.plotBorders
+    private val config get() = GardenApi.config.plotBorders
     private var timeLastSaved = SimpleTimeMark.farPast()
     private var showBorders = false
 
@@ -34,7 +34,7 @@ object GardenPlotBorders {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!showBorders) return
         val plot = GardenPlotApi.getCurrentPlot() ?: getClosestPlot() ?: return
@@ -44,5 +44,5 @@ object GardenPlotBorders {
     private fun getClosestPlot(): GardenPlotApi.Plot? =
         GardenPlotApi.plots.minByOrNull { it.middle.distanceSqToPlayer() }
 
-    fun isEnabled() = GardenAPI.inGarden() && config
+    fun isEnabled() = GardenApi.inGarden() && config
 }

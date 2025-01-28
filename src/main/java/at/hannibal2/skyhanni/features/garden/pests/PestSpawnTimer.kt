@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -36,5 +36,5 @@ object PestSpawnTimer {
         config.position.renderString(display, posLabel = "Pest Spawn Timer")
     }
 
-    fun isEnabled() = GardenAPI.inGarden() && config.enabled
+    fun isEnabled() = GardenApi.inGarden() && config.enabled
 }

@@ -1,13 +1,15 @@
 package at.hannibal2.skyhanni.features.chat.translation
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
+import at.hannibal2.skyhanni.SkyHanniMod.coroutineScope
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.APIUtils
+import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
@@ -110,7 +112,7 @@ object Translator {
      * ]
      */
 
-    private fun getJSONResponse(urlString: String) = APIUtils.getJSONResponseAsElement(urlString, false, "Google Translate API")
+    private fun getJSONResponse(urlString: String) = ApiUtils.getJSONResponseAsElement(urlString, false, "Google Translate API")
 
     fun getTranslation(
         message: String,
@@ -138,7 +140,7 @@ object Translator {
         return arrayOf(messageToSend, language)
     }
 
-    fun toNativeLanguage(args: Array<String>) {
+    private fun toNativeLanguage(args: Array<String>) {
         val message = args.joinToString(" ").removeColor()
 
         coroutineScope.launch {
@@ -158,7 +160,7 @@ object Translator {
         }
     }
 
-    fun fromNativeLanguage(args: Array<String>) {
+    private fun fromNativeLanguage(args: Array<String>) {
         if (args.size < 2) {
             ChatUtils.userError("Usage: /shcopytranslation <language code (found at the end of a translation)> <message>")
             return
@@ -176,7 +178,27 @@ object Translator {
         }
     }
 
-    fun translateAdvancedCommand(args: Array<String>) {
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtranslateadvanced") {
+            description = "Translates a message in an inputted language to another inputted language."
+            category = CommandCategory.DEVELOPER_TEST
+            callback { translateAdvancedCommand(it) }
+        }
+        event.register("shcopytranslation") {
+            description = "Copy the translation of a message in another language to your clipboard.\n" +
+                "Uses a 2 letter language code that can be found at the end of a translation message."
+            category = CommandCategory.USERS_ACTIVE
+            callback { fromNativeLanguage(it) }
+        }
+        event.register("shtranslate") {
+            description = "Translate a message in another language your language."
+            category = CommandCategory.USERS_ACTIVE
+            callback { toNativeLanguage(it) }
+        }
+    }
+
+    private fun translateAdvancedCommand(args: Array<String>) {
         if (args.size < 3) {
             ChatUtils.userError("Usage: /shtranslateadvanced <source lang code> <target lang code> <message>")
             return

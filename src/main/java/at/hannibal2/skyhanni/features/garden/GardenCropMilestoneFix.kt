@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -62,9 +62,9 @@ object GardenCropMilestoneFix {
         }
         PestApi.pestDeathChatPattern.matchMatcher(event.message) {
             val amount = group("amount").toInt()
-            val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
+            val item = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
 
-            val primitiveStack = NEUItems.getPrimitiveMultiplier(item)
+            val primitiveStack = NeuItems.getPrimitiveMultiplier(item)
             val rawName = primitiveStack.internalName.itemNameWithoutColor
             val cropType = CropType.getByNameOrNull(rawName) ?: return
 
@@ -74,9 +74,9 @@ object GardenCropMilestoneFix {
             GardenCropMilestoneDisplay.update()
         }
         pestRareDropPattern.matchMatcher(event.message) {
-            val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
+            val item = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
 
-            val primitiveStack = NEUItems.getPrimitiveMultiplier(item)
+            val primitiveStack = NeuItems.getPrimitiveMultiplier(item)
             val rawName = primitiveStack.internalName.itemNameWithoutColor
             val cropType = CropType.getByNameOrNull(rawName) ?: return
 
@@ -88,7 +88,7 @@ object GardenCropMilestoneFix {
     }
 
     @HandleEvent
-    fun onTabListUpdate(event: WidgetUpdateEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.CROP_MILESTONE)) return
         tabListPattern.firstMatcher(event.lines) {
             val tier = group("tier").toInt()

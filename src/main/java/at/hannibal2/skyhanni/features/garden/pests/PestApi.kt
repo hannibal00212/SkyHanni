@@ -6,15 +6,15 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isBarn
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isPestCountInaccurate
@@ -31,7 +31,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -40,15 +40,14 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PestApi {
 
-    val config get() = GardenAPI.config.pests
-    val storage get() = GardenAPI.storage
+    val config get() = GardenApi.config.pests
+    val storage get() = GardenApi.storage
 
     var scoreboardPests: Int
         get() = storage?.scoreboardPests ?: 0
@@ -130,18 +129,16 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST: §eMouse Trap #1§r
-     * REGEX-TEST: §eMouse Trap #2§r
-     * REGEX-TEST: §eMouse Trap #3§r
-     * REGEX-TEST: §aPest Trap #3§r
+     * REGEX-TEST: §a§lPEST TRAP #3§r
+     * REGEX-TEST: §9§lMOUSE TRAP #2§r
      */
     private val pestTrapPattern by patternGroup.pattern(
         "entity.pesttrap",
-        "(?:§.)+(?:Pest|Mouse) Trap(?: #\\d+)?(?:§.)+",
+        "(?:§.)+§l(?:PEST|MOUSE) TRAP(?: #\\d+)?(?:§.)+",
     )
 
-    var gardenJoinTime = SimpleTimeMark.farPast()
-    var firstScoreboardCheck = false
+    private var gardenJoinTime = SimpleTimeMark.farPast()
+    private var firstScoreboardCheck = false
 
     private fun fixPests(loop: Int = 2) {
         DelayedRun.runDelayed(2.seconds) {
@@ -204,7 +201,7 @@ object PestApi {
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         if (event.inventoryName != "Configure Plots") return
 
         for (plot in GardenPlotApi.plots) {
@@ -221,7 +218,7 @@ object PestApi {
 
     @HandleEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         for (line in event.tabList) {
             infectedPlotsTablistPattern.matchMatcher(line) {
                 val plotList = group("plots").removeColor().split(", ").map { it.toInt() }
@@ -244,14 +241,14 @@ object PestApi {
 
     @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         if (!firstScoreboardCheck) return
         checkScoreboardLines(event.added)
     }
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         if (pestDeathChatPattern.matches(event.message)) {
             lastPestKillTime = SimpleTimeMark.now()
             removeNearestPest()
@@ -262,9 +259,9 @@ object PestApi {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!GardenAPI.inGarden()) return
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
+        if (!GardenApi.inGarden()) return
         if (!firstScoreboardCheck && gardenJoinTime.passedSince() > 5.seconds) {
             checkScoreboardLines(ScoreboardData.sidebarLinesFormatted)
             firstScoreboardCheck = true
@@ -282,7 +279,7 @@ object PestApi {
 
     @HandleEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         if (event.oldItem !in vacuumVariants) return
         lastTimeVacuumHold = SimpleTimeMark.now()
     }
@@ -309,11 +306,7 @@ object PestApi {
     }
 
     private fun removeNearestPest() {
-        val plot = getNearestInfestedPlot() ?: run {
-            if (isNearPestTrap()) return
-            else ErrorManager.skyHanniError("Can not remove nearest pest: No infested plots detected.")
-        }
-
+        val plot = getNearestInfestedPlot() ?: return updatePests()
         if (!plot.isPestCountInaccurate) plot.pests--
         scoreboardPests--
         updatePests()
@@ -387,7 +380,7 @@ object PestApi {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Garden Pests")
 
-        if (!GardenAPI.inGarden()) {
+        if (!GardenApi.inGarden()) {
             event.addIrrelevant("not in garden")
             return
         }

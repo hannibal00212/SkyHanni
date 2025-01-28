@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -27,7 +27,7 @@ object InfernoMinionFeatures {
         "minion.infernominiontitle",
         "Inferno Minion .*",
     )
-    private var fuelItemIds = listOf<NEUInternalName>()
+    private var fuelItemIds = listOf<NeuInternalName>()
     private var inInventory = false
 
     @HandleEvent
@@ -52,7 +52,7 @@ object InfernoMinionFeatures {
         if (!inInventory) return
 
         val containsFuel =
-            NEUInternalName.fromItemNameOrNull(event.container.getSlot(19).stack.name) in fuelItemIds
+            NeuInternalName.fromItemNameOrNull(event.container.getSlot(19).stack.name) in fuelItemIds
         if (!containsFuel) return
 
         if (event.slot?.slotNumber == 19 || event.slot?.slotNumber == 53) {
@@ -66,7 +66,7 @@ object InfernoMinionFeatures {
         if (!config.infernoFuelBlocker) return
         if (!inInventory) return
 
-        val containsFuel = NEUInternalName.fromItemNameOrNull(event.itemStack.name) in fuelItemIds
+        val containsFuel = NeuInternalName.fromItemNameOrNull(event.itemStack.name) in fuelItemIds
         if (!containsFuel) return
 
         if (event.slot.slotNumber == 19) {
