@@ -228,7 +228,10 @@ object PestTrapApi {
             }.onEach { (slot, stack) ->
                 pestSlotPestPattern.matchMatcher(stack.displayName) {
                     activeTrap.apply {
-                        pestType[slot] = PestType.getByNameOrNull(group("type")) ?: return@onEach
+                        val slotIndex = slot - PEST_SLOTS.first
+                        val pestName = groupOrNull("type") ?: return@onEach
+                        val pest = PestType.getByNameOrNull(pestName) ?: return@onEach
+                        pestType[slotIndex] = pest
                     }
                 }
             }
