@@ -60,11 +60,8 @@ object ItemPriceUtils {
             return 7.0 // NPC price
         }
 
-        return if (priceSource == ItemPriceSource.NPC_SELL) {
-            getNpcPriceOrNull()
-        } else {
-            getNpcPriceOrNull() ?: getRawCraftCostOrNull(priceSource, pastRecipes)
-        }
+        return getNpcPriceOrNull()
+            ?: getRawCraftCostOrNull(priceSource, pastRecipes).takeUnless { priceSource == ItemPriceSource.NPC_SELL }
     }
 
     fun NeuInternalName.isAuctionHouseItem(): Boolean = getLowestBinOrNull() != null
