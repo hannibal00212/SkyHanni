@@ -30,8 +30,8 @@ object SkippingTypeAdapterFactory : TypeAdapterFactory {
                 parent.read(reader)
             } catch (e: Exception) {
                 val foundValue = reader.peek().toString()
-                SkyHanniMod.logger.warn("Failed to read value from JSON at path ${reader.path} (), " +
-                    "found value of '$foundValue' skipping", e)
+                val message = "Skipping reading JSON from failed path '${reader.path}', found value of '$foundValue'."
+                SkyHanniMod.logger.warn(message, e)
                 if (!reader.hasNext()) return null
                 // reader skip value seems to have an infinite loop if you dont have another element
                 reader.skipValue()
