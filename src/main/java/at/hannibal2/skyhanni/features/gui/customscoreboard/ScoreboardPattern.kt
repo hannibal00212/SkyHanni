@@ -665,7 +665,7 @@ object ScoreboardPattern {
      * REGEX-TEST: §eTalk to the Goblin King
      * REGEX-TEST: §eBring items to Moby
      * REGEX-TEST:  Glowing Mushroom §8x8
-    */
+     */
     @Suppress("MaxLineLength")
     val wtfAreThoseLinesPattern by miscSB.pattern(
         "wtfarethoselines",
