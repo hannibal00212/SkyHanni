@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.garden.PlotChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
-import at.hannibal2.skyhanni.features.garden.pests.PestAPI
+import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -38,7 +38,7 @@ import kotlin.time.Duration.Companion.seconds
 object GardenPlotApi {
 
     private val patternGroup = RepoPattern.group("garden.plot")
-    private val config get() = PestAPI.config.spray
+    private val config get() = PestApi.config.spray
 
     /**
      * REGEX-TEST: §aPlot §7- §b4

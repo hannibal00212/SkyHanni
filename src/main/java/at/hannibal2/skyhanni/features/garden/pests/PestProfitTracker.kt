@@ -92,7 +92,7 @@ object PestProfitTracker {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        PestAPI.pestDeathChatPattern.matchMatcher(event.message) {
+        PestApi.pestDeathChatPattern.matchMatcher(event.message) {
             val amount = group("amount").toInt()
             val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
 
@@ -149,7 +149,7 @@ object PestProfitTracker {
     private fun shouldShowDisplay(): Boolean {
         if (!isEnabled()) return false
         if (GardenAPI.isCurrentlyFarming()) return false
-        if (lastPestKillTime.passedSince() > config.timeDisplayed.seconds && !PestAPI.hasVacuumInHand()) return false
+        if (lastPestKillTime.passedSince() > config.timeDisplayed.seconds && !PestApi.hasVacuumInHand()) return false
 
         return true
     }

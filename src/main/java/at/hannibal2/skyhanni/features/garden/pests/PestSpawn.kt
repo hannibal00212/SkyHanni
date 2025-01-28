@@ -21,7 +21,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object PestSpawn {
 
-    private val config get() = PestAPI.config.pestSpawn
+    private val config get() = PestApi.config.pestSpawn
 
     private val patternGroup = RepoPattern.group("garden.pests.spawn")
 

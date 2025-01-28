@@ -37,7 +37,7 @@ object PestParticleLine {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
-        if (PestAPI.hasVacuumInHand()) {
+        if (PestApi.hasVacuumInHand()) {
             if (event.clickType == ClickType.LEFT_CLICK) {
                 lastPestTrackerUse = SimpleTimeMark.now()
             }

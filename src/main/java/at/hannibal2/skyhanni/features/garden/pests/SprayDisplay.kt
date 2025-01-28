@@ -24,7 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object SprayDisplay {
 
-    private val config get() = PestAPI.config.spray
+    private val config get() = PestApi.config.spray
     private var display: String? = null
 
     @SubscribeEvent

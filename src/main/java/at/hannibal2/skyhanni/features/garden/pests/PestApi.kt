@@ -45,7 +45,7 @@ import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object PestAPI {
+object PestApi {
 
     val config get() = GardenAPI.config.pests
     val storage get() = GardenAPI.storage

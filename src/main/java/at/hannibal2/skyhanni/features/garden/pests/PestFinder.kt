@@ -38,7 +38,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object PestFinder {
 
-    private val config get() = PestAPI.config.pestFinder
+    private val config get() = PestApi.config.pestFinder
 
     private var display = emptyList<Renderable>()
 
@@ -54,9 +54,9 @@ object PestFinder {
     }
 
     private fun drawDisplay() = buildList {
-        add(Renderable.string("§6Total pests: §e${PestAPI.scoreboardPests}§6/§e8"))
+        add(Renderable.string("§6Total pests: §e${PestApi.scoreboardPests}§6/§e8"))
 
-        for (plot in PestAPI.getInfestedPlots()) {
+        for (plot in PestApi.getInfestedPlots()) {
             val pests = plot.pests
             val plotName = plot.name
             val isInaccurate = plot.isPestCountInaccurate
@@ -79,9 +79,9 @@ object PestFinder {
             add(renderable)
         }
 
-        if (PestAPI.getInfestedPlots().isEmpty() && PestAPI.scoreboardPests != 0) {
+        if (PestApi.getInfestedPlots().isEmpty() && PestApi.scoreboardPests != 0) {
             remindInChat()
-            add(Renderable.string("§e${PestAPI.scoreboardPests} §6Bugged pests!"))
+            add(Renderable.string("§e${PestApi.scoreboardPests} §6Bugged pests!"))
             add(
                 Renderable.clickAndHover(
                     "§cTry opening your plots menu",
@@ -138,13 +138,13 @@ object PestFinder {
     private fun shouldShowDisplay(): Boolean {
         if (!isEnabled()) return false
         if (!config.showDisplay) return false
-        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand()) return false
+        if (config.onlyWithVacuum && !PestApi.hasVacuumInHand()) return false
 
         return true
     }
 
-    private fun heldItemDisabled() = config.onlyWithVacuum && !PestAPI.hasVacuumInHand()
-    private fun timePassedDisabled() = PestAPI.lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds
+    private fun heldItemDisabled() = config.onlyWithVacuum && !PestApi.hasVacuumInHand()
+    private fun timePassedDisabled() = PestApi.lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds
 
     // priority to low so that this happens after other renderPlot calls.
     @HandleEvent(priority = HandleEvent.LOW)
@@ -157,7 +157,7 @@ object PestFinder {
         val visibility = config.visibilityType
         val showBorder = visibility == VisibilityType.BOTH || visibility == VisibilityType.BORDER
         val showName = visibility == VisibilityType.BOTH || visibility == VisibilityType.NAME
-        for (plot in PestAPI.getInfestedPlots()) {
+        for (plot in PestApi.getInfestedPlots()) {
             if (plot.isPlayerInside()) {
                 if (showBorder) {
                     event.renderPlot(plot, LorenzColor.RED.toColor(), LorenzColor.DARK_RED.toColor())
@@ -196,7 +196,7 @@ object PestFinder {
         if (!GardenAPI.inGarden()) return
         if (!config.noPestTitle) return
 
-        if (PestAPI.noPestsChatPattern.matches(event.message)) LorenzUtils.sendTitle("§eNo pests!", 2.seconds)
+        if (PestApi.noPestsChatPattern.matches(event.message)) LorenzUtils.sendTitle("§eNo pests!", 2.seconds)
     }
 
     @HandleEvent
@@ -218,7 +218,7 @@ object PestFinder {
             ChatUtils.userError("This command only works while on the Garden!")
         }
 
-        val plot = PestAPI.getNearestInfestedPlot() ?: run {
+        val plot = PestApi.getNearestInfestedPlot() ?: run {
             if (config.backToGarden) return HypixelCommands.warp("garden")
 
             ChatUtils.userError("No infested plots detected to warp to!")

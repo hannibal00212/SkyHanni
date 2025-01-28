@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 @SkyHanniModule
 object PestSpawnTimer {
 
-    private val config get() = PestAPI.config.pestTimer
+    private val config get() = PestApi.config.pestTimer
 
     var lastSpawnTime = SimpleTimeMark.farPast()
 
@@ -24,7 +24,7 @@ object PestSpawnTimer {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand()) return
+        if (config.onlyWithVacuum && !PestApi.hasVacuumInHand()) return
 
         val display = if (lastSpawnTime.isFarPast()) {
             "§cNo pest spawned since joining."

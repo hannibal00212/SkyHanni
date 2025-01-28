@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
-import at.hannibal2.skyhanni.features.garden.pests.PestAPI
+import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -280,7 +280,7 @@ object FarmingFortuneDisplay {
 
     private fun getPestFFReduction(): Int {
         val bpc = SkyblockStat.BONUS_PEST_CHANCE.lastKnownValue ?: 0.0
-        val pests = (PestAPI.scoreboardPests - floor(bpc / 100).toInt()).coerceAtLeast(0)
+        val pests = (PestApi.scoreboardPests - floor(bpc / 100).toInt()).coerceAtLeast(0)
 
         return when (pests) {
             in 0..3 -> 0

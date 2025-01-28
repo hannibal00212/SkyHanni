@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.renderPlot
-import at.hannibal2.skyhanni.features.garden.pests.PestAPI.getPests
+import at.hannibal2.skyhanni.features.garden.pests.PestApi.getPests
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SprayFeatures {
 
-    private val config get() = PestAPI.config.spray
+    private val config get() = PestApi.config.spray
 
     private var display: String? = null
     private var lastChangeTime = SimpleTimeMark.farPast()

@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 @SkyHanniModule
 object StereoHarmonyDisplay {
 
-    private val config get() = PestAPI.config.stereoHarmony
+    private val config get() = PestApi.config.stereoHarmony
 
     private var activeVinyl: VinylType?
         get() = ProfileStorageData.profileSpecific?.garden?.activeVinyl
