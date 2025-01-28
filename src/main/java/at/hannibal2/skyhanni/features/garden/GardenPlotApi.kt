@@ -35,7 +35,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object GardenPlotAPI {
+object GardenPlotApi {
 
     private val patternGroup = RepoPattern.group("garden.plot")
     private val config get() = PestAPI.config.spray

@@ -15,13 +15,13 @@ import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isBarn
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isPestCountInaccurate
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.locked
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.uncleared
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isBarn
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isPestCountInaccurate
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.locked
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.name
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.pests
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.uncleared
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -186,7 +186,7 @@ object PestAPI {
         PestSpawnTimer.lastSpawnTime = SimpleTimeMark.now()
         val plotNames = event.plotNames
         for (plotName in plotNames) {
-            val plot = GardenPlotAPI.getPlotByName(plotName)
+            val plot = GardenPlotApi.getPlotByName(plotName)
             if (plot == null) {
                 ChatUtils.userError("Open Plot Management Menu to load plot names and pest locations!")
                 return
@@ -207,7 +207,7 @@ object PestAPI {
         if (!GardenAPI.inGarden()) return
         if (event.inventoryName != "Configure Plots") return
 
-        for (plot in GardenPlotAPI.plots) {
+        for (plot in GardenPlotApi.plots) {
             if (plot.isBarn() || plot.locked || plot.uncleared) continue
             plot.pests = 0
             plot.isPestCountInaccurate = false
@@ -227,7 +227,7 @@ object PestAPI {
                 val plotList = group("plots").removeColor().split(", ").map { it.toInt() }
                 if (plotList.sorted() == getInfestedPlots().map { it.id }.sorted()) return
 
-                for (plot in GardenPlotAPI.plots) {
+                for (plot in GardenPlotApi.plots) {
                     if (plotList.contains(plot.id)) {
                         if (!plot.isPestCountInaccurate && plot.pests == 0) {
                             plot.isPestCountInaccurate = true
@@ -287,13 +287,13 @@ object PestAPI {
         lastTimeVacuumHold = SimpleTimeMark.now()
     }
 
-    private fun getPlotsWithAccuratePests() = GardenPlotAPI.plots.filter { it.pests > 0 && !it.isPestCountInaccurate }
+    private fun getPlotsWithAccuratePests() = GardenPlotApi.plots.filter { it.pests > 0 && !it.isPestCountInaccurate }
 
-    private fun getPlotsWithInaccuratePests() = GardenPlotAPI.plots.filter { it.isPestCountInaccurate }
+    private fun getPlotsWithInaccuratePests() = GardenPlotApi.plots.filter { it.isPestCountInaccurate }
 
-    fun getInfestedPlots() = GardenPlotAPI.plots.filter { it.pests > 0 || it.isPestCountInaccurate }
+    fun getInfestedPlots() = GardenPlotApi.plots.filter { it.pests > 0 || it.isPestCountInaccurate }
 
-    fun getPlotsWithoutPests() = GardenPlotAPI.plots.filter { it.pests == 0 || !it.isPestCountInaccurate }
+    fun getPlotsWithoutPests() = GardenPlotApi.plots.filter { it.pests == 0 || !it.isPestCountInaccurate }
 
     fun getNearestInfestedPlot() = getInfestedPlots().minByOrNull { it.middle.distanceSqToPlayer() }
 
@@ -321,7 +321,7 @@ object PestAPI {
 
     private fun resetAllPests() {
         scoreboardPests = 0
-        GardenPlotAPI.plots.forEach {
+        GardenPlotApi.plots.forEach {
             it.pests = 0
             it.isPestCountInaccurate = false
         }
@@ -362,7 +362,7 @@ object PestAPI {
             pestsInPlotScoreboardPattern.matchMatcher(line) {
                 val plotName = group("plot")
                 val pestsInPlot = group("pests").toInt()
-                val plot = GardenPlotAPI.getPlotByName(plotName) ?: return
+                val plot = GardenPlotApi.getPlotByName(plotName) ?: return
                 if (pestsInPlot != plot.pests || plot.isPestCountInaccurate) {
                     plot.pests = pestsInPlot
                     plot.isPestCountInaccurate = false
@@ -373,7 +373,7 @@ object PestAPI {
             // gets if there are no pests remaining in the current plot
             noPestsInPlotScoreboardPattern.matchMatcher(line) {
                 val plotName = group("plot")
-                val plot = GardenPlotAPI.getPlotByName(plotName) ?: return
+                val plot = GardenPlotApi.getPlotByName(plotName) ?: return
                 if (plot.pests != 0 || plot.isPestCountInaccurate) {
                     plot.pests = 0
                     plot.isPestCountInaccurate = false
