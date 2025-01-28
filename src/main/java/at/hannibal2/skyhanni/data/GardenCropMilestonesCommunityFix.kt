@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -111,7 +113,7 @@ object GardenCropMilestonesCommunityFix {
      * differences are getting replaced, and the result gets put into the clipboard.
      * The clipboard context can be used to update the repo content.
      */
-    fun readDataFromClipboard() {
+    private fun readDataFromClipboard() {
         SkyHanniMod.coroutineScope.launch {
             OSUtils.readFromClipboard()?.let {
                 handleInput(it)
@@ -158,6 +160,15 @@ object GardenCropMilestonesCommunityFix {
     private fun fix(crop: CropType, map: MutableMap<CropType, List<Int>>, tier: Int, amount: Int) {
         map[crop] = map[crop]!!.editCopy {
             this[tier] = amount
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shreadcropmilestonefromclipboard") {
+            description = "Read crop milestone from clipboard. This helps fixing wrong crop milestone data"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { readDataFromClipboard() }
         }
     }
 }

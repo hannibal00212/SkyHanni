@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
@@ -183,7 +185,7 @@ object SkyHanniDebugsAndTests {
         }
     }
 
-    fun resetConfigCommand() {
+    private fun resetConfigCommand() {
         ChatUtils.clickableChat(
             "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to proceed.",
             onClick = { resetConfig() },
@@ -648,5 +650,16 @@ object SkyHanniDebugsAndTests {
         event.move(3, "dev.showItemRarity", "dev.debug.showItemRarity")
         event.move(3, "dev.copyInternalName", "dev.debug.copyInternalName")
         event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetconfig") {
+            description = "Reloads the config manager and rendering processors of MoulConfig. " +
+                "This §cWILL RESET §7your config, but also update the config files " +
+                "(names, description, orderings and stuff)."
+            category = CommandCategory.DEVELOPER_TEST
+            callback { resetConfigCommand() }
+        }
     }
 }

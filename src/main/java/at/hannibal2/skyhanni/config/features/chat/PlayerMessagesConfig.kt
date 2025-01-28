@@ -19,7 +19,7 @@ class PlayerMessagesConfig {
     @Expose
     @ConfigOption(name = "Part Order", desc = "Drag text to change the chat message format order for chat messages.")
     @ConfigEditorDraggableList
-    var partsOrder: List<MessagePart> = listOf(
+    var partsOrder: MutableList<MessagePart> = mutableListOf(
         MessagePart.SKYBLOCK_LEVEL,
         MessagePart.PRIVATE_ISLAND_RANK,
         MessagePart.PRIVATE_ISLAND_GUEST,
