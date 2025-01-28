@@ -46,7 +46,7 @@ object PestSpawnTimer {
 
     var lastSpawnTime = SimpleTimeMark.farPast()
 
-    private var pestCooldownEndTime: SimpleTimeMark? = null
+    private var pestCooldownEndTime = SimpleTimeMark.farPast()
 
     private var lastCropBrokenTime = SimpleTimeMark.farPast()
 
@@ -72,7 +72,7 @@ object PestSpawnTimer {
 
             val tablistCooldownEnd = SimpleTimeMark.now() + (minutes?.minutes ?: 0.seconds) + (seconds?.seconds ?: 0.seconds)
 
-            if (pestCooldownEndTime == null) {
+            if (pestCooldownEndTime.isFarPast()) {
                 pestCooldownEndTime = tablistCooldownEnd
             }
 
