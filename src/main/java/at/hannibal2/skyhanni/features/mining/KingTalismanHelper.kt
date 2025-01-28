@@ -5,12 +5,12 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -203,8 +202,8 @@ object KingTalismanHelper {
 
     private fun getKingTimes(): MutableMap<String, Long> {
         val currentOffset = getCurrentOffset() ?: 0
-        val oneSbDay = 1000 * 60 * 20
-        val oneCircleTime = oneSbDay * kingCircles.size
+        val oneSBDay = 1000 * 60 * 20
+        val oneCircleTime = oneSBDay * kingCircles.size
         val kingTime = mutableMapOf<String, Long>()
         for ((index, king) in kingCircles.withIndex()) {
 //             val startTime = SkyBlockTime(day = index + 2 - kingCircles.size)
@@ -229,10 +228,10 @@ object KingTalismanHelper {
         config.position.renderStrings(display, posLabel = "King Talisman Helper")
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        if (!MiningAPI.inDwarvenMines) return
+        if (!MiningApi.inDwarvenMines) return
 
         if (talismanPattern.matches(event.message)) {
             storage?.kingsTalkedTo = kingCircles.toMutableList()

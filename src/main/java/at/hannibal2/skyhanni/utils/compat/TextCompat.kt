@@ -5,7 +5,7 @@ import net.minecraft.util.IChatComponent
 //$$ import net.minecraft.ChatFormatting
 //$$ import net.minecraft.network.chat.TextColor
 //#endif
-//#if MC > 1.20
+//#if MC > 1.21
 //$$ import net.minecraft.text.MutableText
 //$$ import net.minecraft.text.PlainTextContent
 //#endif
@@ -13,7 +13,7 @@ import net.minecraft.util.IChatComponent
 fun IChatComponent.getDirectlyContainedText() =
 //#if MC < 1.16
     this.unformattedTextForChat
-//#elseif MC < 1.20
+//#elseif MC < 1.21
 //$$    this.contents
 //#else
 //$$        (this.content as? PlainTextContent)?.string().orEmpty()
@@ -46,8 +46,7 @@ fun IChatComponent?.getFormattedTextCompat(): String =
 //$$    return sequenceOf(this) + siblings.asSequence().flatMap { it.iterator() } // TODO: in theory we want to properly inherit styles here
 //$$}
 //#endif
-
-//#if MC > 1.20
+//#if MC > 1.21
 //$$fun MutableText.withColor(formatting: Formatting): Text {
 //$$    return this.styled { it.withColor(formatting) }
 //$$}

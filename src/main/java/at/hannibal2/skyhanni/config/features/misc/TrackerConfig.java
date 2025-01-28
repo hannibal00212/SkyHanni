@@ -93,11 +93,6 @@ public class TrackerConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Hide outside Inventory", desc = "Hide Profit Trackers while not inside an inventory.")
-    @ConfigEditorBoolean
-    public boolean hideItemTrackersOutsideInventory = false;
-
-    @Expose
     @ConfigOption(name = "Tracker Search", desc = "Add a search bar to tracker GUIs.")
     @ConfigEditorBoolean
     public Property<Boolean> trackerSearchEnabled = Property.of(true);

@@ -2,9 +2,10 @@ package at.hannibal2.skyhanni.features.mining.fossilexcavator
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
@@ -15,7 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -73,7 +74,7 @@ object ExcavatorProfitTracker {
         var fossilDustGained = 0L
     }
 
-    private val scrapItem get() = FossilExcavatorAPI.scrapItem
+    private val scrapItem get() = FossilExcavatorApi.scrapItem
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lFossil Excavation Profit Tracker")
@@ -168,7 +169,7 @@ object ExcavatorProfitTracker {
         }
     }
 
-    private fun tryAddItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
+    private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
         tracker.addItem(internalName, amount, command)
     }
 
@@ -201,7 +202,7 @@ object ExcavatorProfitTracker {
             return
         }
 
-        val internalName = NEUInternalName.fromItemNameOrNull(name)
+        val internalName = NeuInternalName.fromItemNameOrNull(name)
         if (internalName == null) {
             ChatUtils.debug("no price for excavator profit: '$name'")
             return
@@ -210,18 +211,17 @@ object ExcavatorProfitTracker {
         tryAddItem(internalName, amount, command = false)
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        val inChest = Minecraft.getMinecraft().currentScreen is GuiChest
-        if (inChest) {
-            // Only show in excavation menu
-            if (!FossilExcavatorAPI.inExcavatorMenu) {
-                return
-            }
-        }
+    init {
+        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
+    }
 
-        tracker.renderDisplay(config.position)
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        val inChest = Minecraft.getMinecraft().currentScreen is GuiChest
+        // Only show in excavation menu
+        if (inChest && !FossilExcavatorApi.inExcavatorMenu) return false
+
+        return true
     }
 
     @HandleEvent
@@ -234,8 +234,12 @@ object ExcavatorProfitTracker {
     fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled &&
         LorenzUtils.skyBlockArea == "Fossil Research Center"
 
-    fun resetCommand() {
-        tracker.resetCommand()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetexcavatortracker") {
+            description = "Resets the Fossil Excavator Profit Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
-
 }

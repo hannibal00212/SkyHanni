@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -14,7 +14,7 @@ import kotlin.time.Duration.Companion.seconds
 
 object GardenCropTimeCommand {
 
-    private val config get() = GardenAPI.config.moneyPerHours
+    private val config get() = GardenApi.config.moneyPerHours
 
     fun onCommand(args: Array<String>) {
         if (!config.display) {
@@ -42,7 +42,7 @@ object GardenCropTimeCommand {
             val internalName = entry.key
             val itemName = internalName.itemName
             if (itemName.removeColor().lowercase().contains(searchName)) {
-                val (baseId, baseAmount) = NEUItems.getPrimitiveMultiplier(internalName)
+                val (baseId, baseAmount) = NeuItems.getPrimitiveMultiplier(internalName)
                 val baseName = baseId.itemName
                 val crop = CropType.getByName(baseName.removeColor())
 

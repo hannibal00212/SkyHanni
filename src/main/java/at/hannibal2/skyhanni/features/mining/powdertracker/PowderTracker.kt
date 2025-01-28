@@ -1,19 +1,20 @@
 package at.hannibal2.skyhanni.features.mining.powdertracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.HotmAPI
+import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry
 import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.mining.PowderGainEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
@@ -34,7 +35,6 @@ import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -161,17 +161,19 @@ object PowderTracker {
         var rewards: MutableMap<PowderChestReward, Long> = mutableMapOf()
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-
-        if (config.onlyWhenPowderGrinding && !isGrinding) return
-
-        tracker.renderDisplay(config.position)
+    init {
+        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        if (config.onlyWhenPowderGrinding && !isGrinding) return false
+
+        return true
+    }
+
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         val msg = event.message
 
@@ -216,7 +218,7 @@ object PowderTracker {
         if (lastChestPicked.passedSince() > 5.seconds) return
         tracker.modify {
             val reward = when (event.powder) {
-                HotmAPI.PowderType.GEMSTONE -> PowderChestReward.GEMSTONE_POWDER
+                HotmApi.PowderType.GEMSTONE -> PowderChestReward.GEMSTONE_POWDER
                 else -> return@modify
             }
             it.rewards.addOrPut(reward, event.amount)
@@ -230,8 +232,8 @@ object PowderTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         if (!isEnabled()) return
         gemstoneInfo.perHour = 0.0
         gemstoneInfo.stoppedChecks = 0
@@ -461,7 +463,12 @@ object PowderTracker {
 
     private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.enabled
 
-    fun resetCommand() {
-        tracker.resetCommand()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetpowdertracker") {
+            description = "Resets the Powder Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
 }

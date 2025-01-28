@@ -2,9 +2,8 @@ package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import java.awt.Color
 
@@ -30,9 +29,8 @@ object LineToMobHandler {
         lines.remove(event.mob)
     }
 
-    @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (lines.isEmpty()) return
         RenderUtils.LineDrawer.draw3D(event.partialTicks) {
             for ((mob, settings) in lines) {

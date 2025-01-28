@@ -2,11 +2,12 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ElectionAPI.getElectionYear
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.ElectionApi.getElectionYear
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -24,7 +26,6 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import net.minecraft.util.ChatComponentText
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
 @SkyHanniModule
@@ -90,11 +91,11 @@ object MythologicalCreatureTracker {
         MINOS_INQUISITOR("§cMinos Inquisitor", minosInquisitorPattern),
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         for (creatureType in MythologicalCreatureType.entries) {
             if (!creatureType.pattern.matches(event.message)) continue
-            BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
+            BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             tracker.modify {
                 it.count.addOrPut(creatureType, 1)
 
@@ -133,21 +134,29 @@ object MythologicalCreatureTracker {
         }
     }
 
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = { config.enabled },
+            onRender = {
+                val spadeInHand = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
+                if (!DianaApi.isDoingDiana() && !spadeInHand) return@RenderDisplayHelper
+                if (spadeInHand) {
+                    tracker.firstUpdate()
+                }
+
+                tracker.renderDisplay(config.position)
+            },
+        )
+    }
+
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.enabled) return
-        val spadeInHand = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
-        if (!DianaAPI.isDoingDiana() && !spadeInHand) return
-        if (spadeInHand) {
-            tracker.firstUpdate()
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetmythologicalcreaturetracker") {
+            description = "Resets the Mythological Creature Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
         }
-
-        tracker.renderDisplay(config.position)
     }
-
-    fun resetCommand() {
-        tracker.resetCommand()
-    }
-
 }

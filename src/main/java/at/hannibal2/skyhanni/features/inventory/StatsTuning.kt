@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.MaxwellAPI
+import at.hannibal2.skyhanni.data.MaxwellApi
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
@@ -38,7 +37,7 @@ object StatsTuning {
         val stack = event.stack
 
         if (config.templateStats && inventoryName == "Stats Tuning") if (templateStats(stack, event)) return
-        if (config.selectedStats && MaxwellAPI.isThaumaturgyInventory(inventoryName) && renderTunings(
+        if (config.selectedStats && MaxwellApi.isThaumaturgyInventory(inventoryName) && renderTunings(
                 stack,
                 event,
             )
@@ -76,7 +75,7 @@ object StatsTuning {
 
     private fun renderTunings(stack: ItemStack, event: RenderInventoryItemTipEvent): Boolean {
         if (stack.name != "§aStats Tuning") return false
-        val tunings = MaxwellAPI.tunings ?: return false
+        val tunings = MaxwellApi.tunings ?: return false
 
         event.stackTip = tunings
             .map { tuning ->
@@ -98,10 +97,8 @@ object StatsTuning {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.LOW)
+    @HandleEvent(priority = HandleEvent.LOW, onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
         val chestName = InventoryUtils.openInventoryName()
         if (!config.selectedTemplate || chestName != "Stats Tuning") return
         for (slot in InventoryUtils.getItemsInOpenChest()) {
