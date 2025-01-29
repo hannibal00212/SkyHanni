@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
@@ -33,9 +34,8 @@ object RiftAgaricusCap {
         location = updateLocation()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onAreaChange(event: GraphAreaChangeEvent) {
-        if (!RiftApi.inRift()) return
         inArea = event.area == "Dreadfarm" || event.area == "West Village"
     }
 

@@ -86,7 +86,7 @@ enum class TabWidgetDisplay(
                     "Positions" to config.displayPositions,
                 )
             } else {
-                config.displayPositions.addAll(generateSequence { Position() }.take(sizeDiff))
+                config.displayPositions.addAll(List(sizeDiff) { Position() })
             }
         }
     }

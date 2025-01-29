@@ -16,11 +16,10 @@ class IsInIslandEarlyReturn(config: Config) : SkyHanniRule(config) {
     override val issue = Issue(
         "IsInIslandEarlyReturn",
         Severity.Style,
-        "!isInIsland checks should be removed and replaced with onlyOnIsland = IslandType in @HandleEvent annotation",
+        "!isInIsland checks should be removed and replaced with onlyOnIsland = IslandType in the @HandleEvent annotation",
         Debt.FIVE_MINS
     )
 
-    private fun KtExpression.containsIsInIslandCheck(): Boolean = isInIslandRegex.matches(text)
     private fun KtExpression.isEarlyReturn(): Boolean = this is KtIfExpression && then is KtReturnExpression
 
     override fun visitNamedFunction(function: KtNamedFunction) {
@@ -28,9 +27,11 @@ class IsInIslandEarlyReturn(config: Config) : SkyHanniRule(config) {
             val bodyExpressions = function.bodyExpression?.collectDescendantsOfType<KtIfExpression>() ?: return
 
             for (ifExpression in bodyExpressions) {
-                if (ifExpression.containsIsInIslandCheck() && ifExpression.isEarlyReturn()) {
-                    ifExpression.reportIssue("This early return should be replaced with onlyOnIsland = IslandType in @HandleEvent annotation")
-                }
+                if (!ifExpression.isEarlyReturn()) continue
+                val issueSpecific = regexMap.entries.firstOrNull { it.key.matches(ifExpression.text) }?.value ?: continue
+                ifExpression.reportIssue(
+                    "This early return should be replaced with onlyOnIsland = $issueSpecific in the @HandleEvent annotation"
+                )
             }
         }
 
@@ -38,6 +39,25 @@ class IsInIslandEarlyReturn(config: Config) : SkyHanniRule(config) {
     }
 
     companion object {
+        /**
+         * This is the regex I'm using to check these:
+         *
+         * @HandleEvent
+         * (?<fun>.*)
+         * .*if \(!RiftApi.inRift\(\)\) return
+         */
         private val isInIslandRegex = Regex(".*!IslandType\\..*\\.isInIsland\\(\\).*")
+        private val isInGardenRegex = Regex(".*!GardenApi.inGarden\\(\\).*")
+        private val isInRiftRegex = Regex(".*!RiftApi.inRift\\(\\).*")
+        private val isInDungeonRegex = Regex(".*!DungeonApi.inDungeon\\(\\).*")
+        private val isInKuudraRegex = Regex(".*!KuudraApi.inKuudra\\(\\).*")
+
+        private val regexMap = mapOf(
+            isInIslandRegex to "IslandType",
+            isInGardenRegex to "IslandType.GARDEN",
+            isInRiftRegex to "IslandType.THE_RIFT",
+            isInDungeonRegex to "IslandType.CATACOMBS",
+            isInKuudraRegex to "IslandType.KUUDRA_ARENA"
+        )
     }
 }
