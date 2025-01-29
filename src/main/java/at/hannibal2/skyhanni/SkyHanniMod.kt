@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
@@ -62,8 +61,6 @@ object SkyHanniMod {
 
         SkyHanniEvents.init(modules)
         if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesManager.downloadRepo()
-
-        CommandRegistrationEvent.post()
 
         PreInitFinishedEvent.post()
     }

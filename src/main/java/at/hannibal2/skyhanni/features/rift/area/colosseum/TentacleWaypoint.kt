@@ -67,11 +67,11 @@ object TentacleWaypoint {
         }
     }
 
-    private fun getText(hits: Int) = if (BactePhase.currentPhase == BactePhase.BactePhase.PHASE_5) {
+    private fun getText(hits: Int) = if (BacteApi.currentPhase == BacteApi.Phase.PHASE_5) {
         "§a${pluralize(hits, "Hit", withNumber = true)}"
     } else {
-        val maxHp = when (BactePhase.currentPhase) {
-            BactePhase.BactePhase.PHASE_4 -> 3
+        val maxHp = when (BacteApi.currentPhase) {
+            BacteApi.Phase.PHASE_4 -> 3
             else -> 4
         }
         val hpColor = if (hits > 0) "§c" else "§a"

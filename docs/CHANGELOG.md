@@ -84,6 +84,10 @@
 + Replaced old hoppity ready reminder messages when clickable is disabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3215)
 + Separated totals from mob list on Mythological Creature Tracker. - indigo_polecat (https://github.com/hannibal002/SkyHanni/pull/3228)
 
+#### Chat Improvements
+
++ Added option to only hide sack messages while in the garden. - MisterCheezeCake (https://github.com/hannibal002/SkyHanni/pull/2858)
+
 #### Misc Improvements
 
 + Added EliteBot profile button to Discord Rich Presence. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3169)
@@ -105,6 +109,8 @@
 
 + Fixed Chocolate Factory's "Party Mode" not checking if chroma is enabled. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3164)
 + Fixed Rabbit Hitman claim estimates. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3142)
++ Fixed stray rabbit tracker being gray. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3327)
++ Fixed stray timer inaccurately resetting on inventory change. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3322)
 
 #### Event Bug Fixes
 
@@ -131,6 +137,9 @@
 + Fixed prismatic books causing errors with Bazaar Order Helper. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3273)
 + Fixed reading NEU data in Estimated Item Value. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3297)
 + Fixed Sack Display for gemstone sacks. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3294)
++ Fixed Experimentation Table profit tracker being gray while in superpair inventory. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3329)
++ Fixed hiding new item in the SB menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3325)
+    + Moved the Chocolate Factory shortcut in the SB menu so it no longer hides the newly added "Raffle of the Century" item.
 
 #### Custom Scoreboard Bug Fixes
 
@@ -199,6 +208,9 @@
 + Fixed rare freezes at Minecraft startup. - nopo (https://github.com/hannibal002/SkyHanni/pull/3302)
 + Fixed SkyBlock XP Bar overriding other mods. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3253)
 + Fixed Widget Display occasionally showing player names. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3257)
++ Fixed crash when editing the order of powder mining and chat formatting features. - !nea (https://github.com/hannibal002/SkyHanni/pull/3285)
++ Fixed some things that may unintentionally decrease FPS. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3300)
++ Fixed tracker positions resetting on restart. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3319)
 
 ### Technical Details
 
@@ -250,6 +262,17 @@
 + Implemented REPO patterns in `BazaarAPI`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3271)
     + Improved maintainability.
 + Renamed `LorenzChatEvent` to `SkyHanniChatEvent`. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3270)
++ Added a KotlinLanguageAdapter and made SkyHanniMod an object. - Empa (https://github.com/hannibal002/SkyHanni/pull/3162)
++ Added extra detekt lint warning against using immutable container types in config. - !nea (https://github.com/hannibal002/SkyHanni/pull/3285)
+    + MoulConfig modifies `List`s directly, requiring `MutableList`, a constraint not enforceable in Java's type system. We manually enforce this since moulconfig does not.
++ Added the debug command `/shgraphloadthisisland` that starts the graph editor and loads the current island data into it. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3284)
++ Changed modern version of preprocessing to 1.21.4. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3310)
++ Fixed /shchathistory not working. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3283)
++ Fixed /shdebug error with Computer Time Offset. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3306)
++ Fixed `/shconfig reset` not working. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3282)
++ Followed Kotlin conventions: `NPC` → `Npc`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3304)
++ Moved some commands to their own classes. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3309)
++ Removed LorenzEvent in favor of SkyHanni event. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3308)
 
 ## Version 1.0.0
 

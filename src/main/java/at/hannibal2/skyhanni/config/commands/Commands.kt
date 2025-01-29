@@ -67,8 +67,6 @@ object Commands {
     // Do not add new commands in this class
     // TODO move all command loading away from this class
 
-    val commandList = mutableListOf<CommandBuilder>()
-
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         usersMain(event)
