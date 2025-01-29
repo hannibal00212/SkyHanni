@@ -1,22 +1,17 @@
 package at.hannibal2.skyhanni.features.rift.area.colosseum
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
-object BactePhase {
+object BacteApi {
 
     private val group = RepoPattern.group("rift.colosseum.bacte")
 
@@ -37,7 +32,7 @@ object BactePhase {
         "§a(?<previousName>.*) §r§eis growing into §r§a(?<name>.*)§r§e!",
     )
 
-    enum class BactePhase(val displayName: String) {
+    enum class Phase(val displayName: String) {
         NOT_ACTIVE("Not Active"),
         PHASE_1("Phase 1"),
         PHASE_2("Phase 2"),
@@ -51,13 +46,13 @@ object BactePhase {
         }
     }
 
-    var currentPhase = BactePhase.NOT_ACTIVE
+    var currentPhase = Phase.NOT_ACTIVE
     private var bacte: Mob? = null
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onChatMessage(event: SkyHanniChatEvent) {
         nameChatPattern.matchMatcher(event.message) {
-            currentPhase = BactePhase.fromNumber(group("name").length)
+            currentPhase = Phase.fromNumber(group("name").length)
         }
     }
 
@@ -70,7 +65,7 @@ object BactePhase {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (event.mob == bacte) {
-            currentPhase = BactePhase.NOT_ACTIVE
+            currentPhase = Phase.NOT_ACTIVE
             bacte = null
         }
     }
@@ -82,25 +77,10 @@ object BactePhase {
         val name = bacte.armorStand?.name ?: return
 
         namePattern.matchMatcher(name) {
-            currentPhase = BactePhase.fromNumber(group("name").length)
+            currentPhase = Phase.fromNumber(group("name").length)
             return
         }
 
-        currentPhase = BactePhase.NOT_ACTIVE
+        currentPhase = Phase.NOT_ACTIVE
     }
-
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onWorldRender(event: SkyHanniRenderWorldEvent) {
-        if (!isEnabled()) return
-        if (currentPhase == BactePhase.NOT_ACTIVE) return
-        val bacte = bacte ?: return
-        event.drawDynamicText(
-            bacte.baseEntity.getLorenzVec().add(-0.5, -1.0, -0.5),
-            "${currentPhase.displayName}/${BactePhase.PHASE_5.ordinal} Bacte",
-            1.0,
-        )
-    }
-
-    private fun isEnabled() = RiftApi.inColosseum() && SkyHanniMod.feature.rift.area.colosseum.showBactePhase
-
 }
