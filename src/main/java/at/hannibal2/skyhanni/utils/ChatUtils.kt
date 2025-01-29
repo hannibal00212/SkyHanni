@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -27,6 +28,7 @@ import kotlin.time.times
 
 @SkyHanniModule
 object ChatUtils {
+    private val config get() = SkyHanniMod.feature.chat
 
     // TODO log based on chat category (error, warning, debug, user error, normal)
     private val log = LorenzLogger("chat/mod_sent")
@@ -85,7 +87,7 @@ object ChatUtils {
         onlySendOnce: Boolean = false,
     ) {
 
-        if (prefix) {
+        if (prefix && !config.removeChatPrefix) {
             internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage, onlySendOnce)
         } else {
             internalChat(message, replaceSameMessage, onlySendOnce)
