@@ -40,5 +40,10 @@ enum class CommandCategory(val color: String, val categoryName: String, val desc
         "§b",
         "Shortened Commands",
         "Commands that shorten or improve existing Hypixel commands!",
-    )
+    ),
+    ;
+
+    companion object {
+        val developmentCategories = listOf(DEVELOPER_DEBUG, DEVELOPER_TEST, INTERNAL)
+    }
 }

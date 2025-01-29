@@ -1,16 +1,21 @@
 package at.hannibal2.skyhanni.config.commands
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.config.commands.Commands.commandList
 import net.minecraftforge.client.ClientCommandHandler
 
-object CommandRegistrationEvent : SkyHanniEvent() {
+class CommandRegistrationEvent(private val builders: MutableList<CommandBuilder>) : SkyHanniEvent() {
+
+    val commands: List<CommandBuilder> get() = builders
+
     fun register(name: String, block: CommandBuilder.() -> Unit) {
-        val info = CommandBuilder(name).apply(block)
-        if (commandList.any { it.name == name }) {
+        val command = CommandBuilder(name).apply(block)
+        if (builders.any { it.name == name || it.aliases.contains(name) }) {
             error("The command '$name is already registered!'")
         }
-        ClientCommandHandler.instance.registerCommand(info.toSimpleCommand())
-        commandList.add(info)
+        if (command.description.isEmpty() && command.category !in CommandCategory.developmentCategories) {
+            error("The command '$name' has no description!")
+        }
+        ClientCommandHandler.instance.registerCommand(command.toSimpleCommand())
+        builders.add(command)
     }
 }

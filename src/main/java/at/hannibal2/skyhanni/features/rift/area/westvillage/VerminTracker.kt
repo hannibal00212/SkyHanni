@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.rift.area.westvillage
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -96,9 +98,8 @@ object VerminTracker {
         SILVERFISH(3, "§aSilverfish", silverfishPattern),
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!RiftApi.inRift()) return
         checkVacuum()
     }
 
@@ -107,7 +108,7 @@ object VerminTracker {
             .any { it.getInternalName() == TURBOMAX_VACUUM }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onChat(event: SkyHanniChatEvent) {
         for (verminType in VerminType.entries) {
             if (verminType.pattern.matches(event.message)) {
@@ -120,9 +121,9 @@ object VerminTracker {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!RiftApi.inRift() || event.inventoryName != "Vermin Bin") return
+        if (event.inventoryName != "Vermin Bin") return
 
         val bin = event.inventoryItems[13]?.getLore() ?: return
         val bag = InventoryUtils.getItemsInOwnInventory()
@@ -181,7 +182,7 @@ object VerminTracker {
     }
 
     init {
-        tracker.initRenderer(config.position) { shouldShowDisplay() }
+        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {
@@ -199,8 +200,13 @@ object VerminTracker {
         }
     }
 
-    fun resetCommand() {
-        tracker.resetCommand()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetvermintracker") {
+            description = "Resets the Vermin Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
 
     private fun isEnabled() = RiftApi.inRift() && config.enabled

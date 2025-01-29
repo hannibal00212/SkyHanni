@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -81,9 +82,8 @@ object StereoHarmonyDisplay {
         add(Renderable.verticalContainer(list, verticalAlign = RenderUtils.VerticalAlignment.CENTER))
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!GardenApi.inGarden()) return
         selectVinylPattern.matchMatcher(event.message) {
             activeVinyl = VinylType.getByName(group("type"))
             update()
