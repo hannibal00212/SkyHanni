@@ -112,7 +112,7 @@ object CompactJacobClaim {
         blockedReason = reason
     }
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
         if (!config.compactJacobClaim) return
         val message = event.message
