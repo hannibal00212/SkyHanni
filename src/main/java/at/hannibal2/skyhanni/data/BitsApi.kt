@@ -40,7 +40,7 @@ object BitsApi {
 
     private var currentFameRank: FameRank?
         get() = getFameRankByNameOrNull(playerStorage.currentFameRank)
-        private set(value) {
+        set(value) {
             if (value != null) {
                 playerStorage.currentFameRank = value.name
             }
@@ -56,12 +56,6 @@ object BitsApi {
         get() = profileStorage?.boosterCookieExpiryTime
         private set(value) {
             profileStorage?.boosterCookieExpiryTime = value
-        }
-
-    var museumMilestone: Int
-        get() = profileStorage?.museumMilestone ?: 0
-        private set(value) {
-            profileStorage?.museumMilestone = value
         }
 
     private const val defaultCookieBits = 4800
@@ -273,7 +267,7 @@ object BitsApi {
     }
 
     fun bitsPerCookie(): Int {
-        val museumBonus = 1 + (museumMilestone * 0.01) // Adds 1% per level
+        val museumBonus = profileStorage?.museumMilestone?.let { 1 + it * 0.01 } ?: 1.0 // Adds 1% per level
         return (defaultCookieBits * museumBonus * (currentFameRank?.bitsMultiplier ?: 1.0)).toInt()
     }
 
@@ -401,14 +395,13 @@ object BitsApi {
         val stack = stacks.firstOrNull { museumRewardStackPattern.matches(it.displayName) } ?: return
 
         museumMilestonePattern.firstMatcher(stack.getLore()) {
-            museumMilestone = group("milestone").formatInt()
+            profileStorage?.museumMilestone = group("milestone").formatInt()
         }
     }
 
     fun hasCookieBuff() = cookieBuffTime?.isInFuture() == true
 
-    private fun sendBitsGainEvent(difference: Int) =
-        BitsUpdateEvent.BitsGain(bits, bitsAvailable, difference).post()
+    private fun sendBitsGainEvent(difference: Int) = BitsUpdateEvent.BitsGain(bits, bitsAvailable, difference).post()
 
     private fun sendBitsSpentEvent() = BitsUpdateEvent.BitsSpent(bits, bitsAvailable).post()
     private fun sendBitsAvailableGainedEvent() = BitsUpdateEvent.BitsAvailableGained(bits, bitsAvailable).post()
