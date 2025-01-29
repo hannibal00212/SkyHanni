@@ -36,7 +36,7 @@ object ChatUtils {
 
     private const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
     private const val USER_ERROR_PREFIX = "§c[SkyHanni] "
-    private const val CHAT_PREFIX = "[SkyHanni] "
+    private val CHAT_PREFIX = if (config.removeChatPrefix) "" else "[SkyHanni] "
 
     /**
      * Sends a debug message to the chat and the console.
@@ -87,7 +87,7 @@ object ChatUtils {
         onlySendOnce: Boolean = false,
     ) {
 
-        if (prefix && !config.removeChatPrefix) {
+        if (prefix) {
             internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage, onlySendOnce)
         } else {
             internalChat(message, replaceSameMessage, onlySendOnce)
@@ -159,7 +159,7 @@ object ChatUtils {
         oneTimeClick: Boolean = false,
         replaceSameMessage: Boolean = false,
     ) {
-        val msgPrefix = if (prefix && !config.removeChatPrefix) prefixColor + CHAT_PREFIX else ""
+        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
 
         val rawText = msgPrefix + message
         val text = Text.text(rawText) {
@@ -201,7 +201,7 @@ object ChatUtils {
         prefix: Boolean = true,
         prefixColor: String = "§e",
     ) {
-        val msgPrefix = if (prefix && !config.removeChatPrefix) prefixColor + CHAT_PREFIX else ""
+        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
 
         chat(
             Text.text(msgPrefix + message) {
@@ -232,7 +232,7 @@ object ChatUtils {
         prefix: Boolean = true,
         prefixColor: String = "§e",
     ) {
-        val msgPrefix = if (prefix && !config.removeChatPrefix) prefixColor + CHAT_PREFIX else ""
+        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         chat(
             Text.text(msgPrefix + message) {
                 this.url = url
@@ -255,7 +255,7 @@ object ChatUtils {
         prefix: Boolean = true,
         prefixColor: String = "§e",
     ) {
-        val msgPrefix = if (prefix && !config.removeChatPrefix) prefixColor + CHAT_PREFIX else ""
+        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         chat(Text.join(components).prefix(msgPrefix))
     }
 
