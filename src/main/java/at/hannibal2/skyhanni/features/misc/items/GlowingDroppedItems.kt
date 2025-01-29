@@ -35,13 +35,6 @@ object GlowingDroppedItems {
         "Déjà Vu Alley",
     )
 
-    private val showcaseItemIslands = setOf(
-        IslandType.HUB,
-        IslandType.PRIVATE_ISLAND,
-        IslandType.PRIVATE_ISLAND_GUEST,
-        IslandType.CRIMSON_ISLE,
-    )
-
     @HandleEvent
     fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {
         if (isEnabled() && event.type === RenderEntityOutlineEvent.Type.XRAY) {

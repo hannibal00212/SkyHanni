@@ -88,8 +88,7 @@ object ScoreboardEventMining : ScoreboardEvent() {
         ScoreboardPattern.mithrilUselessPattern,
         ScoreboardPattern.goblinUselessPattern,
         ScoreboardPattern.mineshaftNotStartedPattern,
-
-        )
+    )
 
     override fun showIsland() = IslandTypeTags.ADVANCED_MINING.inAny()
 }
