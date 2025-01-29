@@ -100,7 +100,7 @@ object ArmorDropTracker {
     }
 
     init {
-        tracker.initRenderer(config.pos) { shouldShowDisplay() }
+        tracker.initRenderer({ config.pos }) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {

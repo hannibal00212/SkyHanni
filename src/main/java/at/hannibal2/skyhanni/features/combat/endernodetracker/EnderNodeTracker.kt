@@ -176,7 +176,7 @@ object EnderNodeTracker {
     }
 
     init {
-        tracker.initRenderer(config.position) { isEnabled() }
+        tracker.initRenderer({ config.position }) { isEnabled() }
     }
 
     @HandleEvent
