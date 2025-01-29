@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
@@ -36,9 +37,8 @@ object NpcVisitorFix {
         "§aChanging Barn skin to §r.*",
     )
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (!GardenApi.inGarden()) return
         val name = staticVisitors.firstOrNull { event.inventoryName.contains(it) } ?: return
         val nearest = findNametags(name).firstOrNull { it.distanceToPlayer() < 3 } ?: return
         DelayedRun.runDelayed(200.milliseconds) {

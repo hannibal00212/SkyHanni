@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -108,8 +109,9 @@ object ChocolateFactoryApi {
     private var chocolateFactoryMilestones: MutableList<MilestoneJson> = mutableListOf()
     private var chocolateShopMilestones: MutableList<MilestoneJson> = mutableListOf()
     private var maxPrestige = 6
+    var cfShortcutIndex = 16
 
-    var inChocolateFactory = false
+    val inChocolateFactory get() = mainInventory.isInside()
     var chocolateFactoryPaused = false
 
     var currentPrestige = 1
@@ -124,10 +126,10 @@ object ChocolateFactoryApi {
 
     var specialRabbitTextures = listOf<String>()
     var warningSound = SoundUtils.createSound("note.pling", 1f)
+    val mainInventory = InventoryDetector { name -> name == "Chocolate Factory" }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-
         if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
             if (config.enabled) {
                 chocolateFactoryPaused = true
@@ -135,8 +137,7 @@ object ChocolateFactoryApi {
             }
             return
         }
-        if (event.inventoryName != "Chocolate Factory") return
-        inChocolateFactory = true
+        if (!mainInventory.isInside()) return
 
         if (config.enabled) {
             factoryUpgrades = emptyList()
@@ -166,6 +167,7 @@ object ChocolateFactoryApi {
         rabbitHitmanIndex = data.rabbitHitmanIndex
         maxRabbits = data.maxRabbits
         maxPrestige = data.maxPrestige
+        cfShortcutIndex = data.cfShortcutIndex
         chocolateMilestones = data.chocolateMilestones
         hitmanCosts = data.hitmanCosts
         chocolateFactoryMilestones = data.chocolateFactoryMilestones.toMutableList()

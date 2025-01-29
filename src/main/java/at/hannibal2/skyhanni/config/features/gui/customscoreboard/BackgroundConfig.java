@@ -72,7 +72,6 @@ public class BackgroundConfig {
     @ConfigEditorSlider(minValue = 0, maxValue = 100, minStep = 1)
     public int customBackgroundImageOpacity = 100;
 
-    @Expose
     @ConfigOption(
         name = "Pack Creator",
         desc = "Click here to open the background creator. You can use this website to add your own image into as your Scoreboard Background."
