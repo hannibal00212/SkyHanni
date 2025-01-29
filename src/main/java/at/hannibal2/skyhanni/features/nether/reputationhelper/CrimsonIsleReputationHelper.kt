@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQu
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.QuestLoader
 import at.hannibal2.skyhanni.features.nether.reputationhelper.kuudra.DailyKuudraBossHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMiniBossHelper
+import at.hannibal2.skyhanni.features.nether.RescueMissionWaypoints
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
@@ -38,6 +39,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     val questHelper = DailyQuestHelper(this)
     val miniBossHelper = DailyMiniBossHelper(this)
     val kuudraBossHelper = DailyKuudraBossHelper(this)
+    val rescueMissionWaypoints = RescueMissionWaypoints(this)
 
     var factionType: FactionType? = null
 
@@ -59,6 +61,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         skyHanniMod.loadModule(questHelper)
         skyHanniMod.loadModule(miniBossHelper)
         skyHanniMod.loadModule(kuudraBossHelper)
+        skyHanniMod.loadModule(rescueMissionWaypoints)
     }
 
     @HandleEvent
