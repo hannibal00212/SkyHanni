@@ -260,7 +260,7 @@ object PestProfitTracker {
     }
 
     init {
-        tracker.initRenderer(config.position) { shouldShowDisplay() }
+        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {

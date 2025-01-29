@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -29,26 +30,42 @@ object ChocolateFactoryStrayTimer {
 
     @HandleEvent
     fun onEggFound(event: EggFoundEvent) {
-        val type = event.type
-        // Only reset the timer for meal entries and hitman eggs
-        if (type !in resettingEntries && type != HoppityEggType.HITMAN) return
-        timer = 30.seconds
+        timer = when (event.type) {
+            // If a stray is found, the timer is no longer relevant
+            HoppityEggType.STRAY -> { Duration.ZERO }
+            // Only reset the timer for meal entries and hitman eggs
+            in resettingEntries, HoppityEggType.HITMAN -> { 30.seconds }
+            else -> return
+        }
         lastTimerSubtraction = null
     }
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
+        if (!isEnabled()) return
         timer = Duration.ZERO
+        lastTimerSubtraction = null
+    }
+
+    @HandleEvent
+    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
+        if (timer == Duration.ZERO) return
+        timer = when (event.inventoryName) {
+            "Chocolate Factory" -> timer
+            else -> 30.seconds
+        }
     }
 
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        if (timer > Duration.ZERO) timer = 30.seconds
+        if (!isEnabled()) return
+        // Reset the timer when the inventory is closed prematurely
+        timer = 30.seconds
     }
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!ChocolateFactoryApi.inChocolateFactory || timer <= Duration.ZERO) return
+        if (!isEnabled() || !ChocolateFactoryApi.inChocolateFactory) return
         lastTimerSubtraction = lastTimerSubtraction?.takeIfInitialized()?.let {
             timer -= it.passedSince()
             if (timer < Duration.ZERO) timer = Duration.ZERO
@@ -62,8 +79,7 @@ object ChocolateFactoryStrayTimer {
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!ChocolateFactoryApi.inChocolateFactory) return
-        if (!eventConfig.enabled || timer <= Duration.ZERO) return
+        if (!isEnabled() || !ChocolateFactoryApi.inChocolateFactory) return
         eventConfig.strayTimerPosition.renderRenderable(getTimerRenderable(), posLabel = "Stray Timer")
     }
 
@@ -73,4 +89,6 @@ object ChocolateFactoryStrayTimer {
             "§b${String.format(Locale.US, "%.2f", timer.inPartialSeconds)}s"
         ).map { Renderable.string(it) }
     )
+
+    private fun isEnabled() = eventConfig.enabled && timer > Duration.ZERO
 }
