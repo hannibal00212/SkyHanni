@@ -8,7 +8,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.EnumSet
 
 class IslandTypeTag internal constructor(name: String, private val types: EnumSet<IslandType>) {
-
+// test
     internal constructor(name: String, vararg types: Any) : this(
         name,
         EnumSet.copyOf(
