@@ -790,7 +790,7 @@ object GraphEditor {
     }
 
     fun distanceToPlayer(location: LorenzVec): Double {
-        val playerPosition = ghostPosition?:  LocationUtils.playerLocation()
+        val playerPosition = ghostPosition ?: LocationUtils.playerLocation()
         return location.distanceSq(playerPosition)
     }
 }
