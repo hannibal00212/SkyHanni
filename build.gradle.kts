@@ -44,12 +44,6 @@ java {
     // IntelliJ run configuration.
     toolchain.vendor.set(JvmVendorSpec.ADOPTIUM)
 }
-// NEU's `error_prone_annotation` override gson to 2.2 which makes us lose some features.
-configurations.all {
-    resolutionStrategy.eachDependency {
-        if (requested.group == "com.google.code.gson" && requested.name == "gson") useVersion("2.11.0")
-    }
-}
 val runDirectory = rootProject.file("run")
 runDirectory.mkdirs()
 // Minecraft configuration:
