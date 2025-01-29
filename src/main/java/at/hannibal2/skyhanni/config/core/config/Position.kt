@@ -28,7 +28,10 @@ import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.ScaledResolution
 import java.lang.reflect.Field
+
 
 class Position @JvmOverloads constructor(
     x: Int,
@@ -126,35 +129,72 @@ class Position @JvmOverloads constructor(
     }
 
     fun moveX(deltaX: Int, objWidth: Int): Int {
-        val (newX, newDeltaX) = adjustWithinBounds(x, deltaX, GuiScreenUtils.scaledWindowWidth, objWidth)
-        this.x = newX
+        var newDeltaX = deltaX
+        val screenWidth = ScaledResolution(Minecraft.getMinecraft()).scaledWidth
+        val wasPositiveX = x >= 0
+        this.x += newDeltaX
+
+        if (wasPositiveX) {
+            if (x < 0) {
+                newDeltaX -= x
+                this.x = 0
+            } else if (x > screenWidth) {
+                newDeltaX += screenWidth - x
+                this.x = screenWidth
+            }
+        } else {
+            if (x + 1 > 0) {
+                newDeltaX += -1 - x
+                this.x = -1
+            } else if (x + screenWidth < 0) {
+                newDeltaX += -screenWidth - x
+                this.x = -screenWidth
+            }
+        }
+
+        if (x >= 0 && x + objWidth / 2 > screenWidth / 2) {
+            this.x -= screenWidth - objWidth
+        } else if (x < 0 && x + objWidth / 2 <= -screenWidth / 2) {
+            x += screenWidth - objWidth
+        }
         return newDeltaX
     }
 
     fun moveY(deltaY: Int, objHeight: Int): Int {
-        val (newY, newDeltaY) = adjustWithinBounds(y, deltaY, GuiScreenUtils.scaledWindowWidth, objHeight)
-        this.y = newY
+        var newDeltaY = deltaY
+        val screenHeight = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
+        val wasPositiveY = y >= 0
+        this.y += newDeltaY
+
+        if (wasPositiveY) {
+            if (y < 0) {
+                newDeltaY -= y
+                this.y = 0
+            } else if (y > screenHeight) {
+                newDeltaY += screenHeight - y
+                this.y = screenHeight
+            }
+        } else {
+            if (y + 1 > -0) {
+                newDeltaY += -1 - y
+                this.y = -1
+            } else if (y + screenHeight < 0) {
+                newDeltaY += -screenHeight - y
+                this.y = -screenHeight
+            }
+        }
+
+        if (y >= 0 && y - objHeight / 2 > screenHeight / 2) {
+            this.y -= screenHeight - objHeight
+        } else if (y < 0 && y - objHeight / 2 <= -screenHeight / 2) {
+            this.y += screenHeight - objHeight
+        }
         return newDeltaY
     }
 
     fun ignoreScale(value: Boolean = true): Position {
         this.ignoreCustomScale = value
         return this
-    }
-
-    private fun adjustWithinBounds(axis: Int, delta: Int, length: Int, objLength: Int): Pair<Int, Int> {
-        var adjustedAxis = axis + delta
-        var adjustedDelta = delta
-
-        if (adjustedAxis < 0) {
-            adjustedDelta -= adjustedAxis
-            adjustedAxis = 0
-        } else if (adjustedAxis + objLength > length) {
-            adjustedDelta += length - adjustedAxis - objLength
-            adjustedAxis = length - objLength
-        }
-
-        return adjustedAxis to adjustedDelta
     }
 
     fun canJumpToConfigOptions(): Boolean {
