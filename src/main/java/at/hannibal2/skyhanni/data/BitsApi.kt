@@ -345,11 +345,13 @@ object BitsApi {
             fameRankCommunityShopPattern.matchMatcher(line) {
                 val rank = group("rank")
                 fameRankOrNull(rank)
+                return
             }
 
             fameRankSBMenuPattern.matchMatcher(line) {
                 val rank = group("rank")
                 fameRankOrNull(rank)
+                return
             }
         }
     }
