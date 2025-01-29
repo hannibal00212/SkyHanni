@@ -50,25 +50,27 @@ object DungeonSecretChime {
 
     @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
-        if (!config.muteSecretSound.muteChestSound && !config.muteSecretSound.muteLeverSound) return
-        if (config.muteSecretSound.muteChestSound && checkChestSound(event)) event.cancel()
-        if (config.muteSecretSound.muteLeverSound && checkLeverSound(event)) event.cancel()
+        with(config.muteSecretSound) {
+            if (!muteChestSound && !muteLeverSound) return
+            if (muteChestSound && event.isChestSound()) event.cancel()
+            if (muteLeverSound && event.isLeverSound()) event.cancel()
+        }
     }
 
-    private fun checkChestSound(event: PlaySoundEvent): Boolean {
-        return when (event.soundName) {
-            "random.chestopen" -> event.volume == 0.5f
+    private fun PlaySoundEvent.isChestSound(): Boolean {
+        return when (soundName) {
+            "random.chestopen" -> volume == 0.5f
             "note.harp" ->
-                event.volume == 1.0f &&
-                    event.pitch in setOf(0.7936508f, 0.8888889f, 1.0f, 1.0952381f, 1.1904762f)
+                volume == 1.0f && pitch in setOf(0.7936508f, 0.8888889f, 1.0f, 1.0952381f, 1.1904762f)
+
             else -> false
         }
     }
 
-    private fun checkLeverSound(event: PlaySoundEvent): Boolean {
-        return when (event.soundName) {
-            "random.anvil_break" -> event.volume == 1.0f && event.pitch == 1.6984127f
-            "random.wood_click" -> event.volume in setOf(1.0f, 2.0f) && event.pitch == 0.4920635f
+    private fun PlaySoundEvent.isLeverSound(): Boolean {
+        return when (soundName) {
+            "random.anvil_break" -> volume == 1.0f && pitch == 1.6984127f
+            "random.wood_click" -> volume in setOf(1.0f, 2.0f) && pitch == 0.4920635f
             else -> false
         }
     }
