@@ -174,6 +174,5 @@ class ChatConfig {
             "§cWarning: It's not recommended to enable this unless you know what you're doing!"
     )
     @ConfigEditorBoolean
-    @FeatureToggle
     var removeChatPrefix: Boolean = false
 }
