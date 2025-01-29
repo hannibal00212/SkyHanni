@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -142,7 +144,7 @@ object PartyApi {
     var partyLeader: String? = null
     var prevPartyLeader: String? = null
 
-    fun listMembers() {
+    private fun listMembers() {
         val size = partyMembers.size
         if (size == 0) {
             ChatUtils.chat("No tracked party members!")
@@ -277,5 +279,14 @@ object PartyApi {
         partyMembers.clear()
         partyLeader = null
         prevPartyLeader = null
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shpartydebug") {
+            description = "List persons into the chat SkyHanni thinks are in your party."
+            category = CommandCategory.DEVELOPER_TEST
+            callback { listMembers() }
+        }
     }
 }
