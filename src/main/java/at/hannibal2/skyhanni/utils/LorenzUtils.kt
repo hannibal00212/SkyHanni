@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.Perk
@@ -281,7 +282,8 @@ object LorenzUtils {
         FMLCommonHandler.instance().handleExit(-1)
     }
 
-    fun isBetaVersion() = UpdateManager.isCurrentlyBeta()
+    @Deprecated("Use IslandTypeTags instead", ReplaceWith("IslandTypeTags.MINING.inAny()"))
+    fun inMiningIsland() = IslandTypeTags.MINING.inAny()
 
     private var lastGuiTime = SimpleTimeMark.farPast()
 

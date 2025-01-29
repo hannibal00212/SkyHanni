@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import com.google.gson.reflect.TypeToken
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.EnumSet
 
 class IslandTypeTag internal constructor(name: String, private val types: EnumSet<IslandType>) {
-// test
+
     internal constructor(name: String, vararg types: Any) : this(
         name,
         EnumSet.copyOf(
@@ -44,7 +44,7 @@ class IslandTypeTag internal constructor(name: String, private val types: EnumSe
         private val type = object : TypeToken<Map<String, List<String>>>() {}.type
         private val tags = mutableMapOf<String, IslandTypeTag>()
 
-        @SubscribeEvent
+        @HandleEvent
         fun onRepoReload(event: RepositoryReloadEvent) {
             IslandTypeTags // Make sure the object is initialized
             event.getConstant<Map<String, List<String>>>("IslandTypeTags", type).forEach { (name, values) ->
@@ -108,7 +108,7 @@ object IslandTypeTags {
     )
     val SB_COINS_NOT_SHOWN = IslandTypeTag(
         "custom_scoreboard_coins_not_shown",
-        SB_MOTES_SHOWN
+        SB_MOTES_SHOWN,
     )
     val SB_COPPER_SHOWN = IslandTypeTag(
         "custom_scoreboard_copper_shown",
