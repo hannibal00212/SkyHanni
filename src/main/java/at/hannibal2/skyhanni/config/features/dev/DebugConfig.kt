@@ -59,10 +59,7 @@ class DebugConfig {
     var showItemName: Boolean = false
 
     @Expose
-    @ConfigOption(
-        name = "Copy Internal Name",
-        desc = "Copies the internal name of an item on key press in the clipboard."
-    )
+    @ConfigOption(name = "Copy Internal Name", desc = "Copies the internal name of an item on key press in the clipboard.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var copyInternalName: Int = Keyboard.KEY_NONE
 
@@ -97,10 +94,7 @@ class DebugConfig {
     var copyItemData: Int = Keyboard.KEY_NONE
 
     @Expose
-    @ConfigOption(
-        name = "Copy Compressed Item Data",
-        desc = "Copies compressed item NBT data on key press in a GUI to clipboard."
-    )
+    @ConfigOption(name = "Copy Compressed Item Data", desc = "Copies compressed item NBT data on key press in a GUI to clipboard.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     var copyItemDataCompressed: Int = Keyboard.KEY_NONE
 
@@ -113,10 +107,7 @@ class DebugConfig {
     var copyRngMeter: Boolean = false
 
     @Expose
-    @ConfigOption(
-        name = "Copy Bestiary Data",
-        desc = "Copies the bestiary data from the inventory as json to clipboard."
-    )
+    @ConfigOption(name = "Copy Bestiary Data", desc = "Copies the bestiary data from the inventory as json to clipboard.")
     @ConfigEditorBoolean
     var copyBestiaryData: Boolean = false
 
@@ -134,10 +125,7 @@ class DebugConfig {
     var hotSwapDetection: Boolean = false
 
     @Expose
-    @ConfigOption(
-        name = "Always Outdated",
-        desc = "For the sake of the auto updater, act like you are always outdated."
-    )
+    @ConfigOption(name = "Always Outdated", desc = "For the sake of the auto updater, act like you are always outdated.")
     @ConfigEditorBoolean
     var alwaysOutdated: Boolean = false
 
