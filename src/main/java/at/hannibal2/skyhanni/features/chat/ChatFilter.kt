@@ -216,6 +216,12 @@ object ChatFilter {
         "§6§lRARE DROP! §r§5Crystal Fragment",
     )
 
+    @Suppress("MaxLineLength")
+    // Legacy Items
+    private val legacyItems = listOf(
+        "§cYou currently have one or more Legacy Items in your inventory or sacks that are no longer used throughout the game! Exchange them in the Legacy Trades menu, accessed through /legacytrades!"
+    )
+
     // Useless Notification
     private val uselessNotificationPatterns = listOf(
         "§aYou tipped \\d+ players? in \\d+(?: different)? games?!".toPattern(),
@@ -494,6 +500,7 @@ object ChatFilter {
         "bz_ah_minis" to miniBazaarAndAHMessages,
         "slayer" to slayerMessages,
         "useless_drop" to uselessDropMessages,
+        "legacy_items" to legacyItems,
         "useless_notification" to uselessNotificationMessages,
         "party" to partyMessages,
         "money" to auctionHouseMessages,
@@ -625,6 +632,7 @@ object ChatFilter {
             message.isPresent("winter_island") -> "winter_island"
             message.isPresent("useless_warning") -> "useless_warning"
             message.isPresent("annoying_spam") -> "annoying_spam"
+            message.isPresent("legacy_items") -> "legacy_items"
             else -> null
         }
         return othersMsg != null
