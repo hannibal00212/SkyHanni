@@ -137,7 +137,7 @@ object ChocolateFactoryApi {
             }
             return
         }
-        if (!mainInventory.isInside()) return
+        if (!inChocolateFactory) return
 
         if (config.enabled) {
             factoryUpgrades = emptyList()
