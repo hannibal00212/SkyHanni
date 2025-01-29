@@ -20,7 +20,7 @@ import net.minecraft.client.gui.inventory.GuiInventory
  * @property onRender This is getting called when the render should happen.
  */
 class RenderDisplayHelper(
-    private val inventory: InventoryDetector = noInventory,
+    private val inventory: InventoryDetector = NO_INVENTORY,
     private val outsideInventory: Boolean = false,
     private val inOwnInventory: Boolean = false,
     private val condition: () -> Boolean,
@@ -38,7 +38,7 @@ class RenderDisplayHelper(
 
     @SkyHanniModule
     companion object {
-        private val noInventory = InventoryDetector { false }
+        val NO_INVENTORY = InventoryDetector { false }
         private val allDisplays = mutableListOf<RenderDisplayHelper>()
         private var currentlyVisibleDisplays = emptyList<RenderDisplayHelper>()
 

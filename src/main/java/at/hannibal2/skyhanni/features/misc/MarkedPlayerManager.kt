@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -25,7 +26,7 @@ object MarkedPlayerManager {
     private val playerNamesToMark = mutableListOf<String>()
     private val markedPlayers = mutableMapOf<String, EntityOtherPlayerMP>()
 
-    fun command(args: Array<String>) {
+    private fun command(args: Array<String>) {
         if (args.size != 1) {
             ChatUtils.userError("Usage: /shmarkplayer <name>")
             return
@@ -130,5 +131,13 @@ object MarkedPlayerManager {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "markedPlayers", "gui.markedPlayers")
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shmarkplayer") {
+            description = "Add a highlight effect to a player for better visibility"
+            callback { command(it) }
+        }
     }
 }
