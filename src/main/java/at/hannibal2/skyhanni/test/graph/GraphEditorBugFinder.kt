@@ -73,7 +73,7 @@ object GraphEditorBugFinder {
 
         val clusters = GraphUtils.findDisjointClusters(graph)
         if (clusters.size > 1) {
-            val closestCluster = clusters.minBy { it.minOf { distanceToPlayer(it.position) } }
+            val closestCluster = clusters.minBy { cluster -> cluster.minOf { distanceToPlayer(it.position) } }
             val foreignClusters = clusters.filter { it !== closestCluster }
             val closestForeignNodes = foreignClusters.map { network -> network.minBy { distanceToPlayer(it.position) } }
             closestForeignNodes.forEach {
