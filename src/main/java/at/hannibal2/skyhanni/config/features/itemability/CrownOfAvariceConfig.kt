@@ -17,10 +17,30 @@ class CrownOfAvariceConfig {
     @Expose
     @ConfigOption(
         name = "Counter format",
-        desc = "Have the crown of avarice counter as short format instead of every digit."
+        desc = "Have the crown of avarice counter as short format instead of every digit.",
     )
     @ConfigEditorBoolean
     var shortFormat: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Coins Per Hour format", desc = "Shows the coins per hour gained as short format i.e. 7.3M.")
+    @ConfigEditorBoolean
+    var shortFormatCPH: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Crown Coins Per Hour", desc = "Show coins per hour in the Avarice Counter.")
+    @ConfigEditorBoolean
+    var perHour: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Time until Max Crown", desc = "Shows the time until you reach max coins (1B coins).")
+    @ConfigEditorBoolean
+    var time: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Last coins gained", desc = "Shows the amount of scavenger coins gained by last killed mob.")
+    @ConfigEditorBoolean
+    var coinDiff: Boolean = false
 
     @Expose
     @ConfigLink(owner = CrownOfAvariceConfig::class, field = "enable")
