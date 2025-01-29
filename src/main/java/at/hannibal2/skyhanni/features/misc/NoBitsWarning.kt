@@ -20,7 +20,7 @@ object NoBitsWarning {
 
     @HandleEvent
     fun onBitsGain(event: BitsUpdateEvent.BitsGain) {
-        if (isWarningEnabled() && event.bitsAvailable == 0) {
+        if (config.bitsGainChatMessage && event.bitsAvailable == 0) {
 
             ChatUtils.clickableChat(
                 "§bNo Bits Available! §eClick to buy booster cookies on the bazaar.",
@@ -33,7 +33,7 @@ object NoBitsWarning {
             if (config.notificationSound) SoundUtils.repeatSound(100, 10, createSound("note.pling", 0.6f))
         }
 
-        if (isChatMessageEnabled()) {
+        if (config.enableWarning) {
             if (event.bits < config.threshold) return
             ChatUtils.chat("You have gained §b${event.difference.addSeparators()} §eBits.")
         }
@@ -45,7 +45,4 @@ object NoBitsWarning {
         event.move(40, "misc.noBitsWarning.enabled", "misc.bits.enableWarning")
         event.move(40, "misc.noBitsWarning.notificationSound", "misc.bits.notificationSound")
     }
-
-    private fun isChatMessageEnabled() = LorenzUtils.inSkyBlock && config.bitsGainChatMessage
-    private fun isWarningEnabled() = LorenzUtils.inSkyBlock && config.enableWarning
 }

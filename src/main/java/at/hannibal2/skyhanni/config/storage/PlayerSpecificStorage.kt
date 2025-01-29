@@ -21,6 +21,9 @@ class PlayerSpecificStorage {
     var gardenCommunityUpgrade: Int = -1
 
     @Expose
+    var fameRank: String = "New Player"
+
+    @Expose
     var nextCityProjectParticipationTime: SimpleTimeMark = farPast()
 
     @Expose
