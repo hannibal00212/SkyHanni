@@ -32,14 +32,14 @@ object GlowingDroppedItems {
         "Photon Pathway",
         "Barrier Street",
         "Village Plaza",
-        "Déjà Vu Alley"
+        "Déjà Vu Alley",
     )
 
     private val showcaseItemIslands = setOf(
         IslandType.HUB,
         IslandType.PRIVATE_ISLAND,
         IslandType.PRIVATE_ISLAND_GUEST,
-        IslandType.CRIMSON_ISLE
+        IslandType.CRIMSON_ISLE,
     )
 
     @HandleEvent
@@ -76,7 +76,7 @@ object GlowingDroppedItems {
 
         for (entityArmorStand in entity.worldObj.getEntitiesWithinAABB(
             EntityArmorStand::class.java,
-            entity.entityBoundingBox
+            entity.entityBoundingBox,
         )) {
             if (entityArmorStand.isInvisible) {
                 return true
