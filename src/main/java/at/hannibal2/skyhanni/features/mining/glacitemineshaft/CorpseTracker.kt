@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -129,7 +131,7 @@ object CorpseTracker {
     }
 
     init {
-        tracker.initRenderer(config.position) { isEnabled() }
+        tracker.initRenderer({ config.position }) { isEnabled() }
     }
 
     @HandleEvent
@@ -139,8 +141,13 @@ object CorpseTracker {
         }
     }
 
-    fun resetCommand() {
-        tracker.resetCommand()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetcorpsetracker") {
+            description = "Resets the Glacite Mineshaft Corpse Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
 
     fun isEnabled() =
