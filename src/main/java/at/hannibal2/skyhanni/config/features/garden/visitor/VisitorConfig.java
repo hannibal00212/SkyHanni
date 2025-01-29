@@ -54,18 +54,6 @@ public class VisitorConfig {
     @ConfigEditorDropdown
     public HighlightMode highlightStatus = HighlightMode.BOTH;
 
-    @Expose
-    @ConfigOption(name = "Hide Chat", desc = "Hide chat messages from the visitors in the garden. (Except Beth, Maeve, and Spaceman)")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean hideChat = true;
-
-    @Expose
-    @ConfigOption(name = "Hypixel Message", desc = "Hide the chat message from Hypixel that a new visitor has arrived at your garden.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean hypixelArrivedMessage = true;
-
     public enum HighlightMode implements HasLegacyId {
         COLOR("Color Only", 0),
         NAME("Name Only", 1),
@@ -94,6 +82,18 @@ public class VisitorConfig {
             return displayName;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "Hypixel Message", desc = "Hide the chat message from Hypixel that a new visitor has arrived at your garden.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hypixelArrivedMessage = true;
+
+    @Expose
+    @ConfigOption(name = "Hide Chat", desc = "Hide chat messages from the visitors in the garden. (Except Beth, Maeve, and Spaceman)")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideChat = true;
 
     @Expose
     @ConfigOption(name = "Visitor Drops Statistics Counter", desc = "")

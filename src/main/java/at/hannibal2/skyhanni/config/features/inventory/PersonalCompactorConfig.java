@@ -20,14 +20,6 @@ public class PersonalCompactorConfig {
     @ConfigOption(name = "Visibility Mode", desc = "Choose when to show the overlay.")
     @ConfigEditorDropdown
     public VisibilityMode visibilityMode = VisibilityMode.EXCEPT_KEYBIND;
-    @Expose
-    @ConfigOption(name = "Keybind", desc = "The keybind to hold to show the overlay.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
-    public int keybind = Keyboard.KEY_LSHIFT;
-    @Expose
-    @ConfigOption(name = "Show On/Off", desc = "Show whether the Personal Compactor/Deletor is currently turned on or off.")
-    @ConfigEditorBoolean
-    public boolean showToggle = true;
 
     public enum VisibilityMode {
         ALWAYS("Always"),
@@ -46,4 +38,14 @@ public class PersonalCompactorConfig {
             return name;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "Keybind", desc = "The keybind to hold to show the overlay.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
+    public int keybind = Keyboard.KEY_LSHIFT;
+
+    @Expose
+    @ConfigOption(name = "Show On/Off", desc = "Show whether the Personal Compactor/Deletor is currently turned on or off.")
+    @ConfigEditorBoolean
+    public boolean showToggle = true;
 }

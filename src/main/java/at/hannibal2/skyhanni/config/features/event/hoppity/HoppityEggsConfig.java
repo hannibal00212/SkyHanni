@@ -107,6 +107,24 @@ public class HoppityEggsConfig {
     @ConfigOption(name = "Unclaimed Eggs Order", desc = "Order in which to display unclaimed eggs.")
     @ConfigEditorDropdown
     public UnclaimedEggsOrder unclaimedEggsOrder = UnclaimedEggsOrder.SOONEST_FIRST;
+
+    public enum UnclaimedEggsOrder {
+        SOONEST_FIRST("Soonest First"),
+        MEAL_ORDER("Meal Order"),
+        ;
+
+        private final String name;
+
+        UnclaimedEggsOrder(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
     @Expose
     @ConfigOption(
         name = "Show Collected Locations", desc = "Show the number of found egg locations on this island.\n" +
@@ -115,15 +133,12 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showCollectedLocationCount = false;
+
     @Expose
     @ConfigOption(name = "Warn When Unclaimed", desc = "Warn when all six eggs are ready to be found.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean warnUnclaimedEggs = false;
-    @Expose
-    @ConfigOption(name = "Compacted Rarity", desc = "Show rarity of found rabbit in Compacted chat messages.")
-    @ConfigEditorDropdown
-    public CompactRarityTypes rarityInCompact = CompactRarityTypes.NEW;
 
     @Expose
     @ConfigOption(name = "Click to Warp", desc = "Make the eggs ready chat message & unclaimed timer display clickable to warp you to an island.")
@@ -191,46 +206,11 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean compactChat = false;
-    @Expose
-    @ConfigOption(name = "Show Duplicate Count", desc = "Show the number of previous finds of a duplicate Hoppity rabbit in chat messages.")
-    @ConfigEditorBoolean
-    public boolean showDuplicateNumber = false;
-    @Expose
-    @ConfigOption(name = "Recolor Time-Towered Chocolate", desc = "Recolor raw chocolate gain from duplicate rabbits while Time Tower is active.")
-    @ConfigEditorBoolean
-    public boolean recolorTTChocolate = false;
-    @Expose
-    @ConfigOption(name = "Prevent Missing Rabbit the Fish", desc = "Prevent closing a Meal Egg's inventory if Rabbit the Fish is present.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean preventMissingRabbitTheFish = true;
-
-    public enum UnclaimedEggsOrder {
-        SOONEST_FIRST("Soonest First"),
-        MEAL_ORDER("Meal Order"),
-        ;
-
-        private final String name;
-
-        UnclaimedEggsOrder(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
 
     @Expose
-    @ConfigOption(
-        name = "Rabbit Pet Warning",
-        desc = "Warn when using the Egglocator without a §d§lMythic Rabbit Pet §7equipped. " +
-            "§eOnly enable this setting when you own a mythic Rabbit pet."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean petWarning = false;
+    @ConfigOption(name = "Compacted Rarity", desc = "Show rarity of found rabbit in Compacted chat messages.")
+    @ConfigEditorDropdown
+    public CompactRarityTypes rarityInCompact = CompactRarityTypes.NEW;
 
     public enum CompactRarityTypes {
         NONE("Neither"),
@@ -250,4 +230,30 @@ public class HoppityEggsConfig {
             return name;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "Show Duplicate Count", desc = "Show the number of previous finds of a duplicate Hoppity rabbit in chat messages.")
+    @ConfigEditorBoolean
+    public boolean showDuplicateNumber = false;
+
+    @Expose
+    @ConfigOption(name = "Recolor Time-Towered Chocolate", desc = "Recolor raw chocolate gain from duplicate rabbits while Time Tower is active.")
+    @ConfigEditorBoolean
+    public boolean recolorTTChocolate = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Rabbit Pet Warning",
+        desc = "Warn when using the Egglocator without a §d§lMythic Rabbit Pet §7equipped. " +
+            "§eOnly enable this setting when you own a mythic Rabbit pet."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean petWarning = false;
+
+    @Expose
+    @ConfigOption(name = "Prevent Missing Rabbit the Fish", desc = "Prevent closing a Meal Egg's inventory if Rabbit the Fish is present.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean preventMissingRabbitTheFish = true;
 }

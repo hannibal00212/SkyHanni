@@ -90,48 +90,6 @@ public class DisplayConfig {
     @ConfigOption(name = "Powder Display", desc = "Select how the powder display should be formatted.")
     @ConfigEditorDropdown
     public PowderDisplay powderDisplay = PowderDisplay.AVAILABLE;
-    @Expose
-    @ConfigOption(name = "SkyBlock Time 24h Format", desc = "Display the current SkyBlock time in 24hr format rather than 12h Format.")
-    @ConfigEditorBoolean
-    public boolean skyblockTime24hFormat = false;
-
-    @Expose
-    @ConfigOption(name = "Number Format", desc = "")
-    @ConfigEditorDropdown
-    public NumberFormat numberFormat = NumberFormat.LONG;
-    @Expose
-    @ConfigOption(name = "SkyBlock Time Exact Minutes", desc = "Display the exact minutes in the SkyBlock time, rather than only 10 minute increments.")
-    @ConfigEditorBoolean
-    public boolean skyblockTimeExactMinutes = false;
-    @Expose
-    @ConfigOption(name = "Date in Lobby Code", desc = "Show the current date infront of the server name, like Hypixel does.")
-    @ConfigEditorBoolean
-    public boolean dateInLobbyCode = true;
-    @Expose
-    @ConfigOption(name = "Lobby Code Date Format", desc = "Select your preferred date format.")
-    @ConfigEditorDropdown
-    public DateFormat dateFormat = DateFormat.US_SLASH_MMDDYYYY;
-    @Expose
-    @ConfigOption(name = "Text Alignment", desc = "Will align the text to the left, center or right, while not overriding certain lines, like title or footer.")
-    @ConfigEditorDropdown
-    public RenderUtils.HorizontalAlignment textAlignment = RenderUtils.HorizontalAlignment.LEFT;
-    @Expose
-    @ConfigOption(name = "Show Profile Name", desc = "Show profile name instead of the type in the profile element.")
-    @ConfigEditorBoolean
-    public boolean showProfileName = false;
-
-    @Expose
-    @ConfigOption(name = "Line Spacing", desc = "The amount of space between each line.")
-    @ConfigEditorSlider(minValue = 0, maxValue = 20, minStep = 1)
-    public int lineSpacing = 10;
-    @Expose
-    @ConfigOption(
-        name = "Cache Scoreboard on Island Switch",
-        desc = "Will stop the Scoreboard from updating while switching islands.\n" +
-            "Removes the shaking when loading data."
-    )
-    @ConfigEditorBoolean
-    public boolean cacheScoreboardOnIslandSwitch = false;
 
     public enum PowderDisplay {
         AVAILABLE("Available"),
@@ -151,6 +109,11 @@ public class DisplayConfig {
         }
     }
 
+    @Expose
+    @ConfigOption(name = "Number Format", desc = "")
+    @ConfigEditorDropdown
+    public NumberFormat numberFormat = NumberFormat.LONG;
+
     public enum NumberFormat {
         LONG("1,234,567"),
         SHORT("1.2M");
@@ -166,4 +129,48 @@ public class DisplayConfig {
             return displayName;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "SkyBlock Time 24h Format", desc = "Display the current SkyBlock time in 24hr format rather than 12h Format.")
+    @ConfigEditorBoolean
+    public boolean skyblockTime24hFormat = false;
+
+    @Expose
+    @ConfigOption(name = "SkyBlock Time Exact Minutes", desc = "Display the exact minutes in the SkyBlock time, rather than only 10 minute increments.")
+    @ConfigEditorBoolean
+    public boolean skyblockTimeExactMinutes = false;
+
+    @Expose
+    @ConfigOption(name = "Date in Lobby Code", desc = "Show the current date infront of the server name, like Hypixel does.")
+    @ConfigEditorBoolean
+    public boolean dateInLobbyCode = true;
+
+    @Expose
+    @ConfigOption(name = "Lobby Code Date Format", desc = "Select your preferred date format.")
+    @ConfigEditorDropdown
+    public DateFormat dateFormat = DateFormat.US_SLASH_MMDDYYYY;
+
+    @Expose
+    @ConfigOption(name = "Line Spacing", desc = "The amount of space between each line.")
+    @ConfigEditorSlider(minValue = 0, maxValue = 20, minStep = 1)
+    public int lineSpacing = 10;
+
+    @Expose
+    @ConfigOption(name = "Text Alignment", desc = "Will align the text to the left, center or right, while not overriding certain lines, like title or footer.")
+    @ConfigEditorDropdown
+    public RenderUtils.HorizontalAlignment textAlignment = RenderUtils.HorizontalAlignment.LEFT;
+
+    @Expose
+    @ConfigOption(name = "Show Profile Name", desc = "Show profile name instead of the type in the profile element.")
+    @ConfigEditorBoolean
+    public boolean showProfileName = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Cache Scoreboard on Island Switch",
+        desc = "Will stop the Scoreboard from updating while switching islands.\n" +
+            "Removes the shaking when loading data."
+    )
+    @ConfigEditorBoolean
+    public boolean cacheScoreboardOnIslandSwitch = false;
 }

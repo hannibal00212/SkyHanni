@@ -49,49 +49,6 @@ public class DamageIndicatorConfig {
     @ConfigEditorDropdown
     public NameVisibility bossName = NameVisibility.FULL_NAME;
 
-    @Expose
-    @ConfigOption(
-        name = "Select Boss",
-        desc = "Change what bosses the damage indicator should be enabled for."
-    )
-    @ConfigEditorDraggableList
-    //TODO only show currently working and tested features
-    public List<BossCategory> bossesToShow = new ArrayList<>(Arrays.asList(
-        NETHER_MINI_BOSSES,
-        VANQUISHER,
-        REVENANT_HORROR,
-        TARANTULA_BROODFATHER,
-        SVEN_PACKMASTER,
-        VOIDGLOOM_SERAPH,
-        INFERNO_DEMONLORD,
-        DIANA_MOBS,
-        SEA_CREATURES,
-        ARACHNE,
-        BROODMOTHER,
-        THE_RIFT_BOSSES,
-        RIFTSTALKER_BLOODFIEND,
-        REINDRAKE,
-        GARDEN_PESTS
-
-    ));
-    @Expose
-    @ConfigOption(name = "Time to Kill", desc = "Show the time it takes to kill the slayer boss.\n" +
-        "§eRequires Damage Indicator to be active.")
-    @ConfigEditorBoolean
-    public boolean timeToKillSlayer = true;
-    @Expose
-    @ConfigOption(name = "Hide Damage Splash", desc = "Hide damage splashes near the damage indicator.")
-    @ConfigEditorBoolean
-    public boolean hideDamageSplash = false;
-    @Expose
-    @ConfigOption(name = "Damage Over Time", desc = "Show damage and health over time below the damage indicator.")
-    @ConfigEditorBoolean
-    public boolean showDamageOverTime = false;
-    @Expose
-    @ConfigOption(name = "Hide Nametag", desc = "Hide the vanilla nametag of bosses with damage indicator enabled.")
-    @ConfigEditorBoolean
-    public boolean hideVanillaNametag = false;
-
     public enum NameVisibility implements HasLegacyId {
         HIDDEN("Hidden", 0),
         FULL_NAME("Full Name", 1),
@@ -121,6 +78,32 @@ public class DamageIndicatorConfig {
             return displayName;
         }
     }
+
+    @Expose
+    @ConfigOption(
+        name = "Select Boss",
+        desc = "Change what bosses the damage indicator should be enabled for."
+    )
+    @ConfigEditorDraggableList
+    //TODO only show currently working and tested features
+    public List<BossCategory> bossesToShow = new ArrayList<>(Arrays.asList(
+        NETHER_MINI_BOSSES,
+        VANQUISHER,
+        REVENANT_HORROR,
+        TARANTULA_BROODFATHER,
+        SVEN_PACKMASTER,
+        VOIDGLOOM_SERAPH,
+        INFERNO_DEMONLORD,
+        DIANA_MOBS,
+        SEA_CREATURES,
+        ARACHNE,
+        BROODMOTHER,
+        THE_RIFT_BOSSES,
+        RIFTSTALKER_BLOODFIEND,
+        REINDRAKE,
+        GARDEN_PESTS
+
+    ));
 
     public enum BossCategory implements HasLegacyId {
         NETHER_MINI_BOSSES("§bNether Mini Bosses", 1),
@@ -175,6 +158,26 @@ public class DamageIndicatorConfig {
         }
     }
 
+    @Expose
+    @ConfigOption(name = "Hide Damage Splash", desc = "Hide damage splashes near the damage indicator.")
+    @ConfigEditorBoolean
+    public boolean hideDamageSplash = false;
+
+    @Expose
+    @ConfigOption(name = "Damage Over Time", desc = "Show damage and health over time below the damage indicator.")
+    @ConfigEditorBoolean
+    public boolean showDamageOverTime = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Nametag", desc = "Hide the vanilla nametag of bosses with damage indicator enabled.")
+    @ConfigEditorBoolean
+    public boolean hideVanillaNametag = false;
+
+    @Expose
+    @ConfigOption(name = "Time to Kill", desc = "Show the time it takes to kill the slayer boss.\n" +
+        "§eRequires Damage Indicator to be active.")
+    @ConfigEditorBoolean
+    public boolean timeToKillSlayer = true;
 
     @Expose
     @ConfigOption(name = "Ender Slayer", desc = "")

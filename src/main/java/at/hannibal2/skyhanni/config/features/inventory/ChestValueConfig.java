@@ -58,30 +58,6 @@ public class ChestValueConfig {
     @ConfigEditorDropdown
     public SortingTypeEntry sortingType = SortingTypeEntry.DESCENDING;
 
-    @Expose
-    @ConfigOption(name = "Hide below", desc = "Hide items with value below configured amount.\n" +
-        "Items are still counted for the total value.")
-    @ConfigEditorSlider(
-        minValue = 50_000,
-        maxValue = 10_000_000,
-        minStep = 50_000
-    )
-    public int hideBelow = 100_000;
-
-    @Expose
-    @ConfigOption(name = "Value formatting Type", desc = "Format of the price.")
-    @ConfigEditorDropdown
-    public NumberFormatEntry formatType = NumberFormatEntry.SHORT;
-    @Expose
-    @ConfigOption(name = "Item To Show", desc = "Choose how many items are displayed.\n" +
-        "All items in the chest are still counted for the total value.")
-    @ConfigEditorSlider(
-        minValue = 0,
-        maxValue = 54,
-        minStep = 1
-    )
-    public int itemToShow = 15;
-
     public enum SortingTypeEntry implements HasLegacyId {
         DESCENDING("Descending", 0),
         ASCENDING("Ascending", 1),
@@ -110,6 +86,11 @@ public class ChestValueConfig {
         }
     }
 
+    @Expose
+    @ConfigOption(name = "Value formatting Type", desc = "Format of the price.")
+    @ConfigEditorDropdown
+    public NumberFormatEntry formatType = NumberFormatEntry.SHORT;
+
     public enum NumberFormatEntry implements HasLegacyId {
         SHORT("Short", 0),
         LONG("Long", 1);
@@ -137,6 +118,26 @@ public class ChestValueConfig {
             return displayName;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "Item To Show", desc = "Choose how many items are displayed.\n" +
+        "All items in the chest are still counted for the total value.")
+    @ConfigEditorSlider(
+        minValue = 0,
+        maxValue = 54,
+        minStep = 1
+    )
+    public int itemToShow = 15;
+
+    @Expose
+    @ConfigOption(name = "Hide below", desc = "Hide items with value below configured amount.\n" +
+        "Items are still counted for the total value.")
+    @ConfigEditorSlider(
+        minValue = 50_000,
+        maxValue = 10_000_000,
+        minStep = 50_000
+    )
+    public int hideBelow = 100_000;
 
     @Expose
     @ConfigLink(owner = ChestValueConfig.class, field = "enabled")

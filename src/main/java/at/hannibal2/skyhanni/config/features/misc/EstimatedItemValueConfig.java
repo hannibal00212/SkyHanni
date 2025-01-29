@@ -78,19 +78,6 @@ public class EstimatedItemValueConfig {
     @ConfigOption(name = "Change Price Source", desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC.")
     @ConfigEditorDropdown
     public Property<ItemPriceSource> priceSource = Property.of(ItemPriceSource.BAZAAR_INSTANT_SELL);
-    @Expose
-    @ConfigLink(owner = EstimatedItemValueConfig.class, field = "enabled")
-    // TODO rename "position"
-    public Position itemPriceDataPos = new Position(140, 90, false, true);
-
-    @Expose
-    @ConfigOption(
-        name = "Use Attribute Price",
-        desc = "Show composite price for attributes instead of lowest bin. " +
-            "This will drastically decrease the estimated value but might be correct when buying multiple low tier items and combining them."
-    )
-    @ConfigEditorBoolean
-    public Property<Boolean> useAttributeComposite = Property.of(false);
 
     public enum BazaarPriceSource {
         INSTANT_BUY("Instant Buy"),
@@ -107,4 +94,18 @@ public class EstimatedItemValueConfig {
             return displayName;
         }
     }
+
+    @Expose
+    @ConfigOption(
+        name = "Use Attribute Price",
+        desc = "Show composite price for attributes instead of lowest bin. " +
+            "This will drastically decrease the estimated value but might be correct when buying multiple low tier items and combining them."
+    )
+    @ConfigEditorBoolean
+    public Property<Boolean> useAttributeComposite = Property.of(false);
+
+    @Expose
+    @ConfigLink(owner = EstimatedItemValueConfig.class, field = "enabled")
+    // TODO rename "position"
+    public Position itemPriceDataPos = new Position(140, 90, false, true);
 }

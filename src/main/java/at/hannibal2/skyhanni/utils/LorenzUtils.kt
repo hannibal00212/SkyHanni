@@ -281,24 +281,7 @@ object LorenzUtils {
         FMLCommonHandler.instance().handleExit(-1)
     }
 
-    /**
-     * Get the group, otherwise, return null
-     * @param groupName The group name in the pattern
-     */
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.groupOrNull"))
-    fun Matcher.groupOrNull(groupName: String): String? = runCatching { this.group(groupName) }.getOrNull()
-
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.hasGroup"))
-    fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
-
-    @Deprecated("Use IslandTypeTags.ADVANCED_MINING.inAny() instead", ReplaceWith("IslandTypeTags.ADVANCED_MINING.inAny()"))
-    fun inAdvancedMiningIsland() = IslandTypeTags.ADVANCED_MINING.inAny()
-
-    @Deprecated("Use IslandTypeTags.MINING.inAny() instead", ReplaceWith("IslandTypeTags.MINING.inAny()"))
-    fun inMiningIsland() = IslandTypeTags.MINING.inAny()
-
     fun isBetaVersion() = UpdateManager.isCurrentlyBeta()
-    fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland() || MiningApi.inAdvancedMiningIsland()
 
     private var lastGuiTime = SimpleTimeMark.farPast()
 

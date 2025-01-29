@@ -44,16 +44,6 @@ public class MiningEventConfig {
     @ConfigEditorBoolean
     public boolean passedEvents = false;
 
-
-    @Expose
-    @ConfigOption(name = "Sharing Event Data", desc = "Sending Mining Event data to a server. This allows everyone to see more precise mining event timings. Thanks for your help!")
-    @ConfigEditorBoolean
-    public boolean allowDataSharing = true;
-
-    @Expose
-    @ConfigLink(owner = MiningEventConfig.class, field = "enabled")
-    public Position position = new Position(200, 60, false, true);
-
     public enum ShowType {
         ALL("All Mining Islands"),
         CRYSTAL("Crystal Hollows Only"),
@@ -71,4 +61,13 @@ public class MiningEventConfig {
             return displayName;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "Sharing Event Data", desc = "Sending Mining Event data to a server. This allows everyone to see more precise mining event timings. Thanks for your help!")
+    @ConfigEditorBoolean
+    public boolean allowDataSharing = true;
+
+    @Expose
+    @ConfigLink(owner = MiningEventConfig.class, field = "enabled")
+    public Position position = new Position(200, 60, false, true);
 }

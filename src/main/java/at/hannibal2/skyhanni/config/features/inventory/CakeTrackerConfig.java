@@ -35,12 +35,24 @@ public class CakeTrackerConfig {
 
     @Expose
     public CakeTrackerDisplayType displayType = CakeTrackerDisplayType.MISSING_CAKES;
+
+    public enum CakeTrackerDisplayType {
+        MISSING_CAKES,
+        OWNED_CAKES,
+    }
+
     @Expose
     public CakeTrackerDisplayOrderType displayOrderType = CakeTrackerDisplayOrderType.OLDEST_FIRST;
+    public enum CakeTrackerDisplayOrderType {
+        OLDEST_FIRST,
+        NEWEST_FIRST,
+    }
+
     @Expose
     @ConfigOption(name = "Price on Hover", desc = "Show the prices of cakes when hovering over them in the tracker.")
     @ConfigEditorBoolean
     public boolean priceOnHover = true;
+
     @Expose
     @ConfigOption(
         name = "Missing Color",
@@ -48,6 +60,7 @@ public class CakeTrackerConfig {
     )
     @ConfigEditorColour
     public String unobtainedAuctionHighlightColor = LorenzColor.RED.toConfigColor();
+
     @Expose
     @ConfigOption(
         name = "Owned Color",
@@ -55,6 +68,7 @@ public class CakeTrackerConfig {
     )
     @ConfigEditorColour
     public String obtainedAuctionHighlightColor = LorenzColor.GREEN.toConfigColor();
+
     @Expose
     @ConfigOption(
         name = "Max Height",
@@ -62,14 +76,4 @@ public class CakeTrackerConfig {
     )
     @ConfigEditorSlider(minValue = 50, maxValue = 500, minStep = 10)
     public Property<Float> maxHeight = Property.of(250F);
-
-    public enum CakeTrackerDisplayType {
-        MISSING_CAKES,
-        OWNED_CAKES,
-    }
-
-    public enum CakeTrackerDisplayOrderType {
-        OLDEST_FIRST,
-        NEWEST_FIRST,
-    }
 }

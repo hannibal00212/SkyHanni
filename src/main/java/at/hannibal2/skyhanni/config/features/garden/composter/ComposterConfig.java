@@ -31,41 +31,6 @@ public class ComposterConfig {
     @ConfigEditorDropdown
     public RetrieveFromEntry retrieveFrom = RetrieveFromEntry.SACKS;
 
-    @Expose
-    @ConfigOption(
-        name = "Composter Warning",
-        desc = "Warn when the Composter gets close to empty, even outside Garden."
-    )
-    @ConfigEditorBoolean
-    // TODO rename to warnAlmostEmpty
-    public boolean warnAlmostClose = false;
-
-    @Expose
-    @ConfigLink(owner = ComposterConfig.class, field = "overlay")
-    public Position overlayOrganicMatterPos = new Position(140, 152, false, true);
-
-    @Expose
-    @ConfigLink(owner = ComposterConfig.class, field = "overlay")
-    public Position overlayFuelExtrasPos = new Position(-320, 152, false, true);
-
-    @Expose
-    @ConfigOption(
-        name = "Composter Display",
-        desc = "Display the Composter data from the tab list as GUI element."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean displayEnabled = false;
-
-    @Expose
-    @ConfigOption(
-        name = "Outside Garden",
-        desc = "Show Time till Composter is empty outside Garden"
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean displayOutsideGarden = false;
-
     public enum RetrieveFromEntry implements HasLegacyId {
         BAZAAR("Bazaar", 0),
         SACKS("Sacks", 1),
@@ -93,6 +58,41 @@ public class ComposterConfig {
             return displayName;
         }
     }
+
+    @Expose
+    @ConfigLink(owner = ComposterConfig.class, field = "overlay")
+    public Position overlayOrganicMatterPos = new Position(140, 152, false, true);
+
+    @Expose
+    @ConfigLink(owner = ComposterConfig.class, field = "overlay")
+    public Position overlayFuelExtrasPos = new Position(-320, 152, false, true);
+
+    @Expose
+    @ConfigOption(
+        name = "Composter Display",
+        desc = "Display the Composter data from the tab list as GUI element."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean displayEnabled = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Outside Garden",
+        desc = "Show Time till Composter is empty outside Garden"
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean displayOutsideGarden = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Composter Warning",
+        desc = "Warn when the Composter gets close to empty, even outside Garden."
+    )
+    @ConfigEditorBoolean
+    // TODO rename to warnAlmostEmpty
+    public boolean warnAlmostClose = false;
 
     @Expose
     @ConfigOption(

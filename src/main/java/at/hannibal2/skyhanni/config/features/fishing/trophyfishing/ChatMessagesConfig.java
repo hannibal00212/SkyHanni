@@ -28,46 +28,6 @@ public class ChatMessagesConfig {
     @ConfigEditorDropdown
     public DesignFormat design = DesignFormat.STYLE_1;
 
-    @Expose
-    @ConfigOption(name = "Gold Alert", desc = "Send an alert upon catching a gold Trophy Fish.")
-    @ConfigEditorBoolean
-    public boolean goldAlert = false;
-
-    @Expose
-    @ConfigOption(name = "Show Total Amount", desc = "Show total amount of all rarities at the end of the chat message.")
-    @ConfigEditorBoolean
-    public boolean totalAmount = false;
-
-    @Expose
-    @ConfigOption(name = "Trophy Fish Info", desc = "Show information and stats about a Trophy Fish when hovering over a catch message in chat.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean tooltip = true;
-
-    @Expose
-    @ConfigOption(name = "Hide Repeated Catches", desc = "Delete past catches of the same Trophy Fish from chat.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean duplicateHider = false;
-
-    @Expose
-    @ConfigOption(name = "Bronze Duplicates", desc = "Hide duplicate messages for bronze Trophy Fishes from chat.")
-    @ConfigEditorBoolean
-    public boolean bronzeHider = false;
-
-    @Expose
-    @ConfigOption(name = "Silver Duplicates", desc = "Hide duplicate messages for silver Trophy Fishes from chat.")
-    @ConfigEditorBoolean
-    public boolean silverHider = false;
-    @Expose
-    @ConfigOption(name = "Diamond Alert", desc = "Send an alert upon catching a diamond Trophy Fish.")
-    @ConfigEditorBoolean
-    public boolean diamondAlert = false;
-    @Expose
-    @ConfigOption(name = "Play Sound Alert", desc = "Play a sound effect when rare trophy fishes are caught.")
-    @ConfigEditorBoolean
-    public boolean playSound = true;
-
     public enum DesignFormat implements HasLegacyId {
         STYLE_1("Style 1", 0),
         STYLE_2("Style 2", 1),
@@ -95,4 +55,46 @@ public class ChatMessagesConfig {
             return displayName;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "Show Total Amount", desc = "Show total amount of all rarities at the end of the chat message.")
+    @ConfigEditorBoolean
+    public boolean totalAmount = false;
+
+    @Expose
+    @ConfigOption(name = "Trophy Fish Info", desc = "Show information and stats about a Trophy Fish when hovering over a catch message in chat.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean tooltip = true;
+
+    @Expose
+    @ConfigOption(name = "Hide Repeated Catches", desc = "Delete past catches of the same Trophy Fish from chat.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean duplicateHider = false;
+
+    @Expose
+    @ConfigOption(name = "Bronze Duplicates", desc = "Hide duplicate messages for bronze Trophy Fishes from chat.")
+    @ConfigEditorBoolean
+    public boolean bronzeHider = false;
+
+    @Expose
+    @ConfigOption(name = "Silver Duplicates", desc = "Hide duplicate messages for silver Trophy Fishes from chat.")
+    @ConfigEditorBoolean
+    public boolean silverHider = false;
+
+    @Expose
+    @ConfigOption(name = "Gold Alert", desc = "Send an alert upon catching a gold Trophy Fish.")
+    @ConfigEditorBoolean
+    public boolean goldAlert = false;
+
+    @Expose
+    @ConfigOption(name = "Diamond Alert", desc = "Send an alert upon catching a diamond Trophy Fish.")
+    @ConfigEditorBoolean
+    public boolean diamondAlert = false;
+
+    @Expose
+    @ConfigOption(name = "Play Sound Alert", desc = "Play a sound effect when rare trophy fishes are caught.")
+    @ConfigEditorBoolean
+    public boolean playSound = true;
 }

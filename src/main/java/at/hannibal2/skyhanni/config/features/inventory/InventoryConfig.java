@@ -158,14 +158,53 @@ public class InventoryConfig {
         LARVA_HOOK,
         VACUUM_GARDEN
     ));
-    @Expose
-    @ConfigOption(name = "Quick Craft Confirmation",
-        desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
-            "(e.g. armor, weapons, accessories). Sack items can be crafted normally."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean quickCraftingConfirmation = false;
+
+    public enum ItemNumberEntry implements HasLegacyId {
+        MASTER_STAR_TIER("§bMaster Star Tier", 0),
+        MASTER_SKULL_TIER("§bMaster Skull Tier", 1),
+        DUNGEON_HEAD_FLOOR_NUMBER("§bDungeon Head Floor Number", 2),
+        NEW_YEAR_CAKE("§bNew Year Cake", 3),
+        PET_LEVEL("§bPet Level", 4),
+        MINION_TIER("§bMinion Tier", 5),
+        CRIMSON_ARMOR("§bCrimson Armor", 6),
+        KUUDRA_KEY("§bKuudra Key", 8),
+        SKILL_LEVEL("§bSkill Level", 9),
+        COLLECTION_LEVEL("§bCollection Level", 10),
+        RANCHERS_BOOTS_SPEED("§bRancher's Boots speed", 11),
+        LARVA_HOOK("§bLarva Hook", 12),
+        DUNGEON_POTION_LEVEL("§bDungeon Potion Level", 13),
+        VACUUM_GARDEN("§bVacuum (Garden)", 14),
+        TIME_POCKET_ITEMS("§bTime Pocket Items (Jyrre, Truffle, Discrite)", 15),
+        EDITION_NUMBER("§bEdition Number", 16),
+        ENCHANTING_EXP("§bEnchanting EXP (Superpairs)"),
+        BINGO_GOAL_RANK("§bBingo Goal Rank"),
+        SKYBLOCK_LEVEL("§bSkyblock Level"),
+        BESTIARY_LEVEL("§bBestiary Level"),
+        ;
+
+        private final String displayName;
+        private final int legacyId;
+
+        ItemNumberEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        ItemNumberEntry(String displayName) {
+            this(displayName, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Highlight Widgets", desc = "Highlight enabled and disabled widgets in /tab.")
@@ -177,6 +216,16 @@ public class InventoryConfig {
     @ConfigOption(name = " Vacuum Bag Cap", desc = "Cap the Garden Vacuum Bag item number display to 40.")
     @ConfigEditorBoolean
     public boolean vacuumBagCap = true;
+
+    @Expose
+    @ConfigOption(name = "Quick Craft Confirmation",
+        desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
+            "(e.g. armor, weapons, accessories). Sack items can be crafted normally."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean quickCraftingConfirmation = false;
+
     @Expose
     @ConfigOption(name = "Ultimate Enchant Star", desc = "Show a star on Enchanted Books with an Ultimate Enchant.")
     @ConfigEditorBoolean
@@ -232,6 +281,7 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickForEquipment = false;
+
     @Expose
     @ConfigOption(name = "Time Held in Lore", desc = "Show time held for Time Pocket items (Bottle of Jyrre, Dark Cacao Truffle, Discrite) in the lore.")
     @ConfigEditorBoolean
@@ -243,6 +293,13 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickBrewing = false;
+
+    @Expose
+    @ConfigOption(name = "Stonk of Stonk Price", desc = "Show Price per Stonk when taking the minimum bid in Stonks Auction (Richard).")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean stonkOfStonkPrice = true;
+
     @Expose
     @ConfigOption(name = "Minister in Calendar", desc = "Show the Minister with their perk in the Calendar.")
     @ConfigEditorBoolean
@@ -250,76 +307,27 @@ public class InventoryConfig {
     public boolean ministerInCalendar = true;
 
     @Expose
-    @ConfigOption(name = "Stonk of Stonk Price", desc = "Show Price per Stonk when taking the minimum bid in Stonks Auction (Richard).")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean stonkOfStonkPrice = true;
-    @Expose
     @ConfigOption(name = "Show hex as actual color", desc = "Changes the color of hex codes to the actual color.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hexAsColorInLore = true;
+
     @Expose
     @ConfigOption(name = "Essence Shop Helper", desc = "Show extra information about remaining upgrades in essence shops.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean essenceShopHelper = true;
+
     @Expose
     @ConfigOption(name = "Snake Game Keybinds", desc = "Use WASD-Keys to move around in the Abiphone snake game.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean snakeGameKeybinds = true;
+
     @Expose
     @ConfigOption(name = "Highlight Active Beacon Effect", desc = "Highlights the currently selected beacon effect in the beacon inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightActiveBeaconEffect = true;
-
-    public enum ItemNumberEntry implements HasLegacyId {
-        MASTER_STAR_TIER("§bMaster Star Tier", 0),
-        MASTER_SKULL_TIER("§bMaster Skull Tier", 1),
-        DUNGEON_HEAD_FLOOR_NUMBER("§bDungeon Head Floor Number", 2),
-        NEW_YEAR_CAKE("§bNew Year Cake", 3),
-        PET_LEVEL("§bPet Level", 4),
-        MINION_TIER("§bMinion Tier", 5),
-        CRIMSON_ARMOR("§bCrimson Armor", 6),
-        KUUDRA_KEY("§bKuudra Key", 8),
-        SKILL_LEVEL("§bSkill Level", 9),
-        COLLECTION_LEVEL("§bCollection Level", 10),
-        RANCHERS_BOOTS_SPEED("§bRancher's Boots speed", 11),
-        LARVA_HOOK("§bLarva Hook", 12),
-        DUNGEON_POTION_LEVEL("§bDungeon Potion Level", 13),
-        VACUUM_GARDEN("§bVacuum (Garden)", 14),
-        TIME_POCKET_ITEMS("§bTime Pocket Items (Jyrre, Truffle, Discrite)", 15),
-        EDITION_NUMBER("§bEdition Number", 16),
-        ENCHANTING_EXP("§bEnchanting EXP (Superpairs)"),
-        BINGO_GOAL_RANK("§bBingo Goal Rank"),
-        SKYBLOCK_LEVEL("§bSkyblock Level"),
-        BESTIARY_LEVEL("§bBestiary Level"),
-        ;
-
-        private final String displayName;
-        private final int legacyId;
-
-        ItemNumberEntry(String displayName, int legacyId) {
-            this.displayName = displayName;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
-        ItemNumberEntry(String displayName) {
-            this(displayName, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
-        }
-
-        @Override
-        public String toString() {
-            return displayName;
-        }
-    }
 
 }

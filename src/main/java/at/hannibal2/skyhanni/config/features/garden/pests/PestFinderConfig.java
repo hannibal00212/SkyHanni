@@ -39,10 +39,23 @@ public class PestFinderConfig {
     @ConfigEditorDropdown
     public VisibilityType visibilityType = VisibilityType.BOTH;
 
-    @Expose
-    @ConfigOption(name = "No Pests Title", desc = "Show a Title in case of No pests. Useful if you are using the §eGarden Pest Chat Filter")
-    @ConfigEditorBoolean
-    public boolean noPestTitle = false;
+    public enum VisibilityType {
+        BORDER("Border"),
+        NAME("Name"),
+        BOTH("Both"),
+        ;
+
+        private final String displayName;
+
+        VisibilityType(String displayName) {
+            this.displayName = displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
+    }
 
     @Expose
     @ConfigOption(
@@ -65,23 +78,10 @@ public class PestFinderConfig {
     @ConfigLink(owner = PestFinderConfig.class, field = "showDisplay")
     public Position position = new Position(-350, 200, 1.3f);
 
-    public enum VisibilityType {
-        BORDER("Border"),
-        NAME("Name"),
-        BOTH("Both"),
-        ;
-
-        private final String displayName;
-
-        VisibilityType(String displayName) {
-            this.displayName = displayName;
-        }
-
-        @Override
-        public String toString() {
-            return displayName;
-        }
-    }
+    @Expose
+    @ConfigOption(name = "No Pests Title", desc = "Show a Title in case of No pests. Useful if you are using the §eGarden Pest Chat Filter")
+    @ConfigEditorBoolean
+    public boolean noPestTitle = false;
 
     @Expose
     @ConfigOption(name = "Teleport Hotkey", desc = "Press this key to warp to the nearest plot with pests on it.")

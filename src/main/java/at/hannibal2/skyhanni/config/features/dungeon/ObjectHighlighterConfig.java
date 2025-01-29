@@ -17,10 +17,6 @@ public class ObjectHighlighterConfig {
     @ConfigOption(name = "Starred Mobs", desc = "")
     @Accordion
     public StarredConfig starred = new StarredConfig();
-    @Expose
-    @ConfigOption(name = "Fels Skull", desc = "")
-    @Accordion
-    public FelConfig fel = new FelConfig();
 
     public static class StarredConfig {
         @Expose
@@ -48,6 +44,11 @@ public class ObjectHighlighterConfig {
         @ConfigEditorColour
         public Property<String> colour = Property.of("0:60:255:255:0");
     }
+
+    @Expose
+    @ConfigOption(name = "Fels Skull", desc = "")
+    @Accordion
+    public FelConfig fel = new FelConfig();
 
     public static class FelConfig {
 

@@ -30,6 +30,7 @@ public class HoppityEventSummaryLiveDisplayConfig {
     )
     @ConfigEditorInfoText
     public boolean mirrorConfigNote = false;
+
     @Expose
     @ConfigOption(
         name = "Date/Time Display",
@@ -40,40 +41,6 @@ public class HoppityEventSummaryLiveDisplayConfig {
     public List<HoppityDateTimeDisplayType> dateTimeDisplay = new ArrayList<>(Collections.singletonList(
         HoppityDateTimeDisplayType.CURRENT
     ));
-    @Expose
-    @ConfigOption(name = "Date Time Format", desc = "The format of the date and time.")
-    @ConfigEditorDropdown
-    public HoppityDateTimeFormat dateTimeFormat = HoppityDateTimeFormat.RELATIVE;
-    @Expose
-    @ConfigOption(name = "Card Toggle Keybind", desc = "Toggle the GUI element with this keybind.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    public int toggleKeybind = Keyboard.KEY_NONE;
-    @Expose
-    @ConfigOption(
-        name = "Specific Inventories",
-        desc = "§cOnly§r show the card while in certain inventories." +
-            "\n§eIf the list is empty, the card will show in all inventories."
-    )
-    @ConfigEditorDraggableList
-    public List<HoppityLiveDisplayInventoryType> specificInventories = new ArrayList<>(Arrays.asList(
-        HoppityLiveDisplayInventoryType.NO_INVENTORY,
-        HoppityLiveDisplayInventoryType.CHOCOLATE_FACTORY
-    ));
-    @Expose
-    @ConfigOption(name = "Only During Event", desc = "§cOnly§r show the card while Hoppity's Hunt is active.")
-    @ConfigEditorBoolean
-    public boolean onlyDuringEvent = true;
-    @Expose
-    @ConfigOption(name = "Only Holding Egglocator", desc = "§cOnly§r show the card when holding an Egglocator.")
-    @ConfigEditorBoolean
-    public boolean mustHoldEggLocator = false;
-    @Expose
-    @ConfigOption(
-        name = "Only Hoppity Islands",
-        desc = "§cOnly§r show the card while on Islands that spawn Hoppity Eggs (will not show on Garden, Island, Dungeons etc.)."
-    )
-    @ConfigEditorBoolean
-    public boolean onlyHoppityIslands = false;
 
     public enum HoppityDateTimeDisplayType {
         CURRENT("Current Event"),
@@ -110,6 +77,28 @@ public class HoppityEventSummaryLiveDisplayConfig {
         }
     }
 
+    @Expose
+    @ConfigOption(name = "Date Time Format", desc = "The format of the date and time.")
+    @ConfigEditorDropdown
+    public HoppityDateTimeFormat dateTimeFormat = HoppityDateTimeFormat.RELATIVE;
+
+    @Expose
+    @ConfigOption(name = "Card Toggle Keybind", desc = "Toggle the GUI element with this keybind.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int toggleKeybind = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(
+        name = "Specific Inventories",
+        desc = "§cOnly§r show the card while in certain inventories." +
+            "\n§eIf the list is empty, the card will show in all inventories."
+    )
+    @ConfigEditorDraggableList
+    public List<HoppityLiveDisplayInventoryType> specificInventories = new ArrayList<>(Arrays.asList(
+        HoppityLiveDisplayInventoryType.NO_INVENTORY,
+        HoppityLiveDisplayInventoryType.CHOCOLATE_FACTORY
+    ));
+
     public enum HoppityLiveDisplayInventoryType {
         NO_INVENTORY("No Inventory"),
         OWN_INVENTORY("Own Inventory"),
@@ -129,4 +118,22 @@ public class HoppityEventSummaryLiveDisplayConfig {
             return displayName;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "Only During Event", desc = "§cOnly§r show the card while Hoppity's Hunt is active.")
+    @ConfigEditorBoolean
+    public boolean onlyDuringEvent = true;
+
+    @Expose
+    @ConfigOption(name = "Only Holding Egglocator", desc = "§cOnly§r show the card when holding an Egglocator.")
+    @ConfigEditorBoolean
+    public boolean mustHoldEggLocator = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Only Hoppity Islands",
+        desc = "§cOnly§r show the card while on Islands that spawn Hoppity Eggs (will not show on Garden, Island, Dungeons etc.)."
+    )
+    @ConfigEditorBoolean
+    public boolean onlyHoppityIslands = false;
 }
