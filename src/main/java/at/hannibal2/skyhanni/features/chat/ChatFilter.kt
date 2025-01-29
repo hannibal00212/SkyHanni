@@ -216,8 +216,8 @@ object ChatFilter {
         "§6§lRARE DROP! §r§5Crystal Fragment",
     )
 
-    @Suppress("MaxLineLength")
     // Legacy Items
+    @Suppress("MaxLineLength")
     private val legacyItems = listOf(
         "§cYou currently have one or more Legacy Items in your inventory or sacks that are no longer used throughout the game! Exchange them in the Legacy Trades menu, accessed through /legacytrades!"
     )
