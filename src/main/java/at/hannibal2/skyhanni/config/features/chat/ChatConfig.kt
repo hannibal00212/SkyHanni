@@ -170,7 +170,7 @@ class ChatConfig {
     @Expose
     @ConfigOption(
         name = "Remove [Skyhanni] Chat Prefix",
-        desc = "Removes the [Skyhanni] prefix before messages sent from the mod."
+        desc = "Remove the [Skyhanni] prefix before messages sent from the mod."
     )
     @ConfigEditorBoolean
     @FeatureToggle
