@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
@@ -22,9 +23,19 @@ public class GraphConfig {
     public int placeKey = Keyboard.KEY_F;
 
     @Expose
+    @ConfigOption(name = "Toggle Ghost Position", desc = "Creates or removes the Ghost Position. This helps editing nodes tht are in the air.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int toggleGhostPosition = Keyboard.KEY_NONE;
+
+    @Expose
     @ConfigOption(name = "Select Key", desc = "Select the nearest node to be active. Double press to unselect.")
     @ConfigEditorKeybind(defaultKey = -98) // Middle Mouse
     public int selectKey = -98;
+
+    @Expose
+    @ConfigOption(name = "Select near look", desc = "Select the node closest to where you are looking.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int selectRaycastKey = Keyboard.KEY_NONE;
 
     @Expose
     @ConfigOption(name = "Connect Key", desc = "Connect the nearest node with the active node. If the nodes are already connected removes the connection.")
@@ -37,7 +48,7 @@ public class GraphConfig {
     public int exitKey = Keyboard.KEY_HOME;
 
     @Expose
-    @ConfigOption(name = "Edit Key", desc = "While holding the Key, edit the position of the active node with the minecraft movement controls.")
+    @ConfigOption(name = "Edit Key", desc = "While holding the Key, edit the position of the active node or the selection block with the minecraft movement controls.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_TAB)
     public int editKey = Keyboard.KEY_TAB;
 
@@ -77,6 +88,21 @@ public class GraphConfig {
     public int tutorialKey = Keyboard.KEY_K;
 
     @Expose
+    @ConfigOption(name = "Split Key", desc = "Key for splitting an edge that is between the active and the closed node.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int splitKey = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "Dissolve Key", desc = "Dissolve the active node into one edge if it only has two edges.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int dissolveKey = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "Edge Cycle", desc = "Cycles the direction of the edge that is between the active and the closed node. (Used to make one-directional ways)")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_H)
+    public int edgeCycle = Keyboard.KEY_H;
+
+    @Expose
     @ConfigLink(owner = GraphConfig.class, field = "enabled")
     public Position infoDisplay = new Position(20, 20);
 
@@ -85,7 +111,23 @@ public class GraphConfig {
     public Position namedNodesList = new Position(20, 20);
 
     @Expose
+    @ConfigOption(
+        name = "Max Node Distance",
+        desc = "Only render nodes below this distance to the player.")
+    @ConfigEditorSlider(
+        minValue = 10,
+        maxValue = 500,
+        minStep = 10
+    )
+    public int maxNodeDistance = 50;
+
+    @Expose
     @ConfigOption(name = "Shows Stats", desc = "Show funny extra statistics on save. May lag the game a bit.")
     @ConfigEditorBoolean
     public boolean showsStats = true;
+
+    @Expose
+    @ConfigOption(name = "Use as Island Area", desc = "When saving, use the current edited graph as temporary island area for the current island.")
+    @ConfigEditorBoolean
+    public boolean useAsIslandArea = false;
 }

@@ -31,33 +31,14 @@ public class ComposterConfig {
     @ConfigEditorDropdown
     public RetrieveFromEntry retrieveFrom = RetrieveFromEntry.SACKS;
 
-    public enum RetrieveFromEntry implements HasLegacyId {
-        BAZAAR("Bazaar", 0),
-        SACKS("Sacks", 1),
-        ;
-        private final String str;
-        private final int legacyId;
-
-        RetrieveFromEntry(String str, int legacyId) {
-            this.str = str;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
-        RetrieveFromEntry(String str) {
-            this(str, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-    }
+    @Expose
+    @ConfigOption(
+        name = "Composter Warning",
+        desc = "Warn when the Composter gets close to empty, even outside Garden."
+    )
+    @ConfigEditorBoolean
+    // TODO rename to warnAlmostEmpty
+    public boolean warnAlmostClose = false;
 
     @Expose
     @ConfigLink(owner = ComposterConfig.class, field = "overlay")
@@ -85,13 +66,33 @@ public class ComposterConfig {
     @FeatureToggle
     public boolean displayOutsideGarden = false;
 
-    @Expose
-    @ConfigOption(
-        name = "Composter Warning",
-        desc = "Warn when the Composter gets close to empty, even outside Garden."
-    )
-    @ConfigEditorBoolean
-    public boolean warnAlmostClose = false;
+    public enum RetrieveFromEntry implements HasLegacyId {
+        BAZAAR("Bazaar", 0),
+        SACKS("Sacks", 1),
+        ;
+        private final String displayName;
+        private final int legacyId;
+
+        RetrieveFromEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        RetrieveFromEntry(String displayName) {
+            this(displayName, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
+    }
 
     @Expose
     @ConfigOption(

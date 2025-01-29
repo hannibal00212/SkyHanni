@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -22,6 +23,23 @@ public class FlareConfig {
     @ConfigEditorDropdown
     public AlertType alertType = AlertType.CHAT;
 
+    @Expose
+    @ConfigOption(name = "Expire Sound", desc = "Makes a sound when a flare is about to expire.")
+    @ConfigEditorBoolean
+    public boolean expireSound = false;
+    @Expose
+    @ConfigOption(name = "Warn when about to expire", desc = "Select the time in seconds when a flare is about to expire to warn you.")
+    @ConfigEditorSlider(minValue = 1, maxValue = 60, minStep = 1)
+    public int warnWhenAboutToExpire = 5;
+    @Expose
+    @ConfigOption(name = "Flash Screen", desc = "Flashes the screen when a flare is about to expire.")
+    @ConfigEditorBoolean
+    public boolean flashScreen = false;
+    @Expose
+    @ConfigOption(name = "Flash Color", desc = "Color of the screen when flashing")
+    @ConfigEditorColour
+    public String flashColor = "0:153:159:0:5";
+
     public enum AlertType {
         NONE("No alert"),
         CHAT("Chat"),
@@ -29,15 +47,15 @@ public class FlareConfig {
         CHAT_TITLE("Chat & Title"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        AlertType(String str) {
-            this.str = str;
+        AlertType(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -52,15 +70,15 @@ public class FlareConfig {
         BOTH("Both"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        DisplayType(String str) {
-            this.str = str;
+        DisplayType(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -76,15 +94,15 @@ public class FlareConfig {
         CIRCLE("Circle")
         ;
 
-        private final String str;
+        private final String displayName;
 
-        OutlineType(String str) {
-            this.str = str;
+        OutlineType(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

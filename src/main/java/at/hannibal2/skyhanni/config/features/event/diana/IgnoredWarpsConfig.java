@@ -16,4 +16,9 @@ public class IgnoredWarpsConfig {
     @ConfigEditorBoolean
     public boolean wizard = false;
 
+    @Expose
+    @ConfigOption(name = "Stonks", desc = "Ignore the Stonks warp point (because it is new).")
+    @ConfigEditorBoolean
+    public boolean stonks = false;
+
 }

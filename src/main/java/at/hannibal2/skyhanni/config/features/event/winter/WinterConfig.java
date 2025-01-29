@@ -46,4 +46,10 @@ public class WinterConfig {
     @FeatureToggle
     public boolean newYearCakeReminder = true;
 
+    @Expose
+    @ConfigOption(name = "Reindrake Warp Helper", desc = "Sends a clickable message in chat to warp to the Winter Island spawn when a Reindrake spawns.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean reindrakeWarpHelper = true;
+
 }

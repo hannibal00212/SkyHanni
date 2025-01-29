@@ -1,56 +1,58 @@
 package at.hannibal2.skyhanni.features.rift.everywhere
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EnigmaSoulsJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.skyhanni.features.rift.area.dreadfarm.WoodenButtonsHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object EnigmaSoulWaypoints {
 
-    private val config get() = RiftAPI.config.enigmaSoulWaypoints
+    private val config get() = RiftApi.config.enigmaSoulWaypoints
     private var inInventory = false
-    private var soulLocations = mapOf<String, LorenzVec>()
+    var soulLocations = mapOf<String, LorenzVec>()
     private val trackedSouls = mutableListOf<String>()
     private val inventoryUnfound = mutableListOf<String>()
     private var adding = true
 
     private val item by lazy {
-        val neuItem = "SKYBLOCK_ENIGMA_SOUL".asInternalName().getItemStack()
-        Utils.createItemStack(
+        val neuItem = "SKYBLOCK_ENIGMA_SOUL".toInternalName().getItemStack()
+        ItemUtils.createItemStack(
             neuItem.item,
             "§5Toggle Missing",
             "§7Click here to toggle",
             "§7the waypoints for each",
-            "§7missing souls on this page"
+            "§7missing souls on this page",
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
 
@@ -60,8 +62,8 @@ object EnigmaSoulWaypoints {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inInventory = false
         if (!event.inventoryName.contains("Enigma Souls")) return
         inInventory = true
@@ -74,19 +76,22 @@ object EnigmaSoulWaypoints {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         inventoryUnfound.clear()
         adding = true
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inInventory || !isEnabled()) return
 
         if (event.slotId == 31 && inventoryUnfound.isNotEmpty()) {
             event.makePickblock()
+            if (inventoryUnfound.contains("Buttons")) {
+                RiftApi.trackingButtons = !RiftApi.trackingButtons
+            }
             if (adding) {
                 trackedSouls.addAll(inventoryUnfound)
                 adding = false
@@ -97,23 +102,41 @@ object EnigmaSoulWaypoints {
         }
 
         if (event.slot?.stack == null) return
+
         val split = event.slot.stack.displayName.split("Enigma: ")
-        if (split.size == 2) {
-            event.makePickblock()
-            val name = split.last()
-            if (soulLocations.contains(name)) {
-                if (!trackedSouls.contains(name)) {
-                    ChatUtils.chat("§5Tracking the $name Enigma Soul!", prefixColor = "§5")
-                    trackedSouls.add(name)
-                } else {
-                    trackedSouls.remove(name)
-                    ChatUtils.chat("§5No longer tracking the $name Enigma Soul!", prefixColor = "§5")
+        if (split.size != 2) return
+
+        event.makePickblock()
+        val name = split.last()
+        if (!soulLocations.contains(name)) return
+
+        if (name == "Buttons") {
+            RiftApi.trackingButtons = !RiftApi.trackingButtons
+        }
+
+        if (!trackedSouls.contains(name)) {
+            ChatUtils.chat("§5Tracking the $name Enigma Soul!", prefixColor = "§5")
+            if (config.showPathFinder) {
+                soulLocations[name]?.let {
+                    if (!(name == "Buttons" && WoodenButtonsHelper.showButtons())) {
+                        IslandGraphs.pathFind(
+                            it,
+                            "$name Enigma Soul",
+                            config.color.toSpecialColor(),
+                            condition = { config.showPathFinder }
+                        )
+                    }
                 }
             }
+            trackedSouls.add(name)
+        } else {
+            trackedSouls.remove(name)
+            ChatUtils.chat("§5No longer tracking the $name Enigma Soul!", prefixColor = "§5")
+            IslandGraphs.stop()
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled() || !inInventory) return
 
@@ -133,18 +156,18 @@ object EnigmaSoulWaypoints {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         for (soul in trackedSouls) {
             soulLocations[soul]?.let {
-                event.drawWaypointFilled(it, LorenzColor.DARK_PURPLE.toColor(), seeThroughBlocks = true, beacon = true)
-                event.drawDynamicText(it.add(y = 1), "§5${soul.removeSuffix(" Soul")} Soul", 1.5)
+                event.drawWaypointFilled(it, config.color.toSpecialColor(), seeThroughBlocks = true, beacon = true)
+                event.drawDynamicText(it.up(), "§5${soul.removeSuffix(" Soul")} Soul", 1.5)
             }
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EnigmaSoulsJson>("EnigmaSouls")
         val areas = data.areas
@@ -157,8 +180,8 @@ object EnigmaSoulWaypoints {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         val message = event.message.removeColor().trim()
         if (message == "You have already found that Enigma Soul!" || message == "SOUL! You unlocked an Enigma Soul!") {
@@ -179,8 +202,11 @@ object EnigmaSoulWaypoints {
         if (closestSoul in trackedSouls) {
             trackedSouls.remove(closestSoul)
             ChatUtils.chat("§5Found the $closestSoul Enigma Soul!", prefixColor = "§5")
+            if (closestSoul == "Buttons") {
+                RiftApi.trackingButtons = false
+            }
         }
     }
 
-    fun isEnabled() = RiftAPI.inRift() && config.enabled
+    fun isEnabled() = RiftApi.inRift() && config.enabled
 }

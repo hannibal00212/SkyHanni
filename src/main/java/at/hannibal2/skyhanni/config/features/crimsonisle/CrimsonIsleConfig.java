@@ -22,9 +22,19 @@ public class CrimsonIsleConfig {
     public ReputationHelperConfig reputationHelper = new ReputationHelperConfig();
 
     @Expose
-    @ConfigOption(name = "Matriach Helper", desc = "Helper for Heavy Pearls")
+    @ConfigOption(name = "Matriarch Helper", desc = "Helper for Heavy Pearls")
     @Accordion
     public MatriarchHelperConfig matriarchHelper = new MatriarchHelperConfig();
+
+    @Expose
+    @ConfigOption(name = "Miniboss Respawn Timer", desc = "Shows a timer for when minibosses will respawn.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean minibossRespawnTimer = false;
+
+    @Expose
+    @ConfigLink(owner = CrimsonIsleConfig.class, field = "minibossRespawnTimer")
+    public Position minibossTimerPosition = new Position(20, 50);
 
     @Expose
     @ConfigOption(name = "Pablo NPC Helper", desc = "Show a clickable message that grabs the flower needed from your sacks.")

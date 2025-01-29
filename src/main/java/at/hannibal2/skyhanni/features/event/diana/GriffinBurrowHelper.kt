@@ -1,22 +1,24 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.Mayor
-import at.hannibal2.skyhanni.data.MayorAPI.currentMayor
 import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.BurrowDetectEvent
-import at.hannibal2.skyhanni.events.BurrowDugEvent
-import at.hannibal2.skyhanni.events.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.EntityMoveEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
+import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
+import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
@@ -31,16 +33,15 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.init.Blocks
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
 
@@ -49,17 +50,16 @@ object GriffinBurrowHelper {
 
     private val config get() = SkyHanniMod.feature.event.diana
 
-    private val allowedBlocksAboveGround =
-        listOf(
-            Blocks.air,
-            Blocks.leaves,
-            Blocks.leaves2,
-            Blocks.tallgrass,
-            Blocks.double_plant,
-            Blocks.red_flower,
-            Blocks.yellow_flower,
-            Blocks.spruce_fence
-        )
+    private val allowedBlocksAboveGround = listOf(
+        Blocks.air,
+        Blocks.leaves,
+        Blocks.leaves2,
+        Blocks.tallgrass,
+        Blocks.double_plant,
+        Blocks.red_flower,
+        Blocks.yellow_flower,
+        Blocks.spruce_fence,
+    )
 
     var targetLocation: LorenzVec? = null
     private var guessLocation: LorenzVec? = null
@@ -70,11 +70,11 @@ object GriffinBurrowHelper {
     private var testList = listOf<LorenzVec>()
     private var testGriffinSpots = false
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Griffin Burrow Helper")
 
-        if (!DianaAPI.isDoingDiana()) {
+        if (!DianaApi.isDoingDiana()) {
             event.addIrrelevant("not doing diana")
             return
         }
@@ -89,7 +89,7 @@ object GriffinBurrowHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         update()
@@ -134,7 +134,14 @@ object GriffinBurrowHelper {
             }
             locations.addAll(InquisitorWaypointShare.waypoints.values.map { it.location })
         }
-        targetLocation = locations.minByOrNull { it.distanceToPlayer() }
+        val newLocation = locations.minByOrNull { it.distanceToPlayer() }
+        if (targetLocation != newLocation) {
+            targetLocation = newLocation
+            // add island graphs here some day when the hub is fully added in the graph
+//             newLocation?.let {
+//                 IslandGraphs.find(it)
+//             }
+        }
 
         if (config.burrowNearestWarp) {
             targetLocation?.let {
@@ -143,7 +150,7 @@ object GriffinBurrowHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
         EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
 
@@ -151,7 +158,7 @@ object GriffinBurrowHelper {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBurrowDetect(event: BurrowDetectEvent) {
         EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
         particleBurrows = particleBurrows.editCopy { this[event.burrowLocation] = event.type }
@@ -167,23 +174,23 @@ object GriffinBurrowHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBurrowDug(event: BurrowDugEvent) {
         val location = event.burrowLocation
         particleBurrows = particleBurrows.editCopy { remove(location) }
         update()
     }
 
-    @SubscribeEvent
-    fun onPlayerMove(event: EntityMoveEvent) {
+    @HandleEvent
+    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
         if (!isEnabled()) return
-        if (event.distance > 10 && event.entity == Minecraft.getMinecraft().thePlayer) {
+        if (event.distance > 10 && event.isLocalPlayer) {
             update()
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
             particleBurrows = particleBurrows.editCopy { keys.removeIf { this[it] == BurrowType.MOB } }
@@ -207,8 +214,8 @@ object GriffinBurrowHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         resetAllData()
     }
 
@@ -258,8 +265,8 @@ object GriffinBurrowHelper {
         return point.copy(y = gY - 1)
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         showTestLocations(event)
@@ -275,34 +282,32 @@ object GriffinBurrowHelper {
                 if (distance > 10) {
                     // TODO use round(1)
                     val formattedDistance = distance.toInt().addSeparators()
-                    event.drawDynamicText(location.add(y = 1), "§d§lInquisitor §e${formattedDistance}m", 1.7)
+                    event.drawDynamicText(location.up(), "§d§lInquisitor §e${formattedDistance}m", 1.7)
                 } else {
-                    event.drawDynamicText(location.add(y = 1), "§d§lInquisitor", 1.7)
+                    event.drawDynamicText(location.up(), "§d§lInquisitor", 1.7)
                 }
                 if (distance < 5) {
                     InquisitorWaypointShare.maybeRemove(inquis)
                 }
-                event.drawDynamicText(location.add(y = 1), "§eFrom §b${inquis.displayName}", 1.6, yOff = 9f)
+                event.drawDynamicText(location.up(), "§eFrom §b${inquis.displayName}", 1.6, yOff = 9f)
 
                 if (config.inquisitorSharing.showDespawnTime) {
                     val spawnTime = inquis.spawnTime
                     val format = (75.seconds - spawnTime.passedSince()).format()
-                    event.drawDynamicText(location.add(y = 1), "§eDespawns in §b$format", 1.6, yOff = 18f)
+                    event.drawDynamicText(location.up(), "§eDespawns in §b$format", 1.6, yOff = 18f)
                 }
             }
         }
 
         val currentWarp = BurrowWarpHelper.currentWarp
         if (config.lineToNext) {
-            val player = event.exactPlayerEyeLocation()
-
             var color: LorenzColor?
             val renderLocation = if (currentWarp != null) {
                 color = LorenzColor.AQUA
                 currentWarp.location
             } else {
                 color = if (shouldFocusOnInquis) LorenzColor.LIGHT_PURPLE else LorenzColor.WHITE
-                targetLocation?.add(0.5, 0.5, 0.5) ?: return
+                targetLocation?.blockCenter() ?: return
             }
 
             val lineWidth = if (targetLocation in particleBurrows) {
@@ -310,7 +315,7 @@ object GriffinBurrowHelper {
                 3
             } else 2
             if (currentWarp == null) {
-                event.draw3DLine(player, renderLocation, color.toColor(), lineWidth, false)
+                event.drawLineToEye(renderLocation, color.toColor(), lineWidth, false)
             }
         }
 
@@ -324,7 +329,7 @@ object GriffinBurrowHelper {
                 val distance = location.distance(playerLocation)
                 val burrowType = burrow.value
                 event.drawColor(location, burrowType.color, distance > 10)
-                event.drawDynamicText(location.add(y = 1), burrowType.text, 1.5)
+                event.drawDynamicText(location.up(), burrowType.text, 1.5)
             }
         }
 
@@ -334,28 +339,28 @@ object GriffinBurrowHelper {
                 val distance = guessLocation.distance(playerLocation)
                 event.drawColor(guessLocation, LorenzColor.WHITE, distance > 10)
                 val color = if (currentWarp != null && targetLocation == guessLocation) "§b" else "§f"
-                event.drawDynamicText(guessLocation.add(y = 1), "${color}Guess", 1.5)
+                event.drawDynamicText(guessLocation.up(), "${color}Guess", 1.5)
                 if (distance > 5) {
                     val formattedDistance = distance.toInt().addSeparators()
-                    event.drawDynamicText(guessLocation.add(y = 1), "§e${formattedDistance}m", 1.7, yOff = 10f)
+                    event.drawDynamicText(guessLocation.up(), "§e${formattedDistance}m", 1.7, yOff = 10f)
                 }
             }
         }
     }
 
-    private fun showTestLocations(event: LorenzRenderWorldEvent) {
+    private fun showTestLocations(event: SkyHanniRenderWorldEvent) {
         if (!testGriffinSpots) return
         for (location in testList) {
             event.drawColor(location, LorenzColor.WHITE)
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "diana", "event.diana")
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
 
@@ -364,7 +369,7 @@ object GriffinBurrowHelper {
 
         if (particleBurrows.containsKey(location)) {
             DelayedRun.runDelayed(1.seconds) {
-                if (BurrowAPI.lastBurrowRelatedChatMessage.passedSince() > 2.seconds) {
+                if (BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 2.seconds) {
                     if (particleBurrows.containsKey(location)) {
                         // workaround
                         particleBurrows = particleBurrows.editCopy { keys.remove(location) }
@@ -389,19 +394,19 @@ object GriffinBurrowHelper {
         }
     }
 
-    private fun isEnabled() = DianaAPI.isDoingDiana()
+    private fun isEnabled() = DianaApi.isDoingDiana()
 
-    fun setTestBurrow(strings: Array<String>) {
+    private fun setTestBurrow(strings: Array<String>) {
         if (!IslandType.HUB.isInIsland()) {
             ChatUtils.userError("You can only create test burrows on the hub island!")
             return
         }
 
         if (!isEnabled()) {
-            if (currentMayor != Mayor.DIANA) {
+            if (!ElectionCandidate.DIANA.isActive()) {
                 ChatUtils.chatAndOpenConfig(
                     "§cSelect Diana as mayor overwrite!",
-                    SkyHanniMod.feature.dev.debug::assumeMayor
+                    SkyHanniMod.feature.dev.debug::assumeMayor,
                 )
 
             } else {
@@ -435,5 +440,14 @@ object GriffinBurrowHelper {
         val location = LocationUtils.playerLocation().roundLocation()
         particleBurrows = particleBurrows.editCopy { this[location] = type }
         update()
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtestburrow") {
+            description = "Sets a test burrow waypoint at your location"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { setTestBurrow(it) }
+        }
     }
 }

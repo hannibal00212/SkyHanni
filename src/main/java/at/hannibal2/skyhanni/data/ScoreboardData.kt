@@ -1,19 +1,23 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.lastColorCode
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraft.client.Minecraft
+import net.minecraft.network.play.server.S3BPacketScoreboardObjective
 import net.minecraft.network.play.server.S3CPacketUpdateScore
 import net.minecraft.network.play.server.S3EPacketTeams
+import net.minecraft.scoreboard.IScoreObjectiveCriteria
 import net.minecraft.scoreboard.Score
 import net.minecraft.scoreboard.ScorePlayerTeam
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ScoreboardData {
@@ -22,7 +26,8 @@ object ScoreboardData {
 
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
-    var objectiveTitle = ""
+    val objectiveTitle: String get() =
+        Minecraft.getMinecraft().theWorld?.scoreboard?.getObjectiveInDisplaySlot(1)?.displayName.orEmpty()
 
     private var dirty = false
 
@@ -33,10 +38,29 @@ object ScoreboardData {
             val start = split[0]
             var end = if (split.size > 1) split[1] else ""
 
-            val lastColor = start.lastColorCode() ?: ""
+            /**
+             * If the line is split into two parts, we need to remove the color code prefixes from the end part
+             * to prevent the color from being applied to the start of `end`, which would cause the color to be
+             * duplicated in the final output.
+             *
+             * This fucks up different Regex checks if not working correctly, like here:
+             * ```
+             * Pattern: '§8- (§.)+[\w\s]+Dragon§a [\w,.]+§.❤'
+             * Lines: - '§8- §c§aApex Dra§agon§a 486M§c❤'
+             *        - '§8- §c§6Flame Dr§6agon§a 460M§c❤'
+             * ```
+             */
+            val lastColor = start.lastColorCode().orEmpty()
 
-            if (end.startsWith(lastColor)) {
-                end = end.removePrefix(lastColor)
+            // Generate the list of color suffixes
+            val colorSuffixes = lastColor.chunked(2).toMutableList()
+
+            // Iterate through the colorSuffixes to remove matching prefixes from 'end'
+            for (suffix in colorSuffixes.toList()) {
+                if (end.startsWith(suffix)) {
+                    end = end.removePrefix(suffix)
+                    colorSuffixes.remove(suffix)
+                }
             }
 
             add(start + end)
@@ -45,46 +69,85 @@ object ScoreboardData {
 
     @HandleEvent(receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
-        if (event.packet is S3CPacketUpdateScore) {
-            if (event.packet.objectiveName == "update") {
-                dirty = true
+        val packet = event.packet
+        when (packet) {
+            is S3CPacketUpdateScore -> {
+                if (packet.objectiveName == "update") {
+                    dirty = true
+                }
             }
-        }
-        if (event.packet is S3EPacketTeams) {
-            if (event.packet.name.startsWith("team_")) {
-                dirty = true
+            is S3EPacketTeams -> {
+                if (packet.name.startsWith("team_")) {
+                    dirty = true
+                }
+            }
+            is S3BPacketScoreboardObjective -> {
+                val type = packet.func_179817_d()
+                if (type != IScoreObjectiveCriteria.EnumRenderType.INTEGER) return
+                val objectiveName = packet.func_149339_c()
+                if (objectiveName == "health") return
+                val objectiveValue = packet.func_149337_d()
+                ScoreboardTitleUpdateEvent(objectiveValue, objectiveName).post()
             }
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onTick(event: LorenzTickEvent) {
+    private var monitor = false
+    private var lastMonitorState = emptyList<String>()
+    private var lastChangeTime = SimpleTimeMark.farPast()
+
+    private fun monitor() {
+        if (!monitor) return
+        val currentList = fetchScoreboardLines()
+        if (lastMonitorState != currentList) {
+            val time = lastChangeTime.passedSince()
+            lastChangeTime = SimpleTimeMark.now()
+            println("Scoreboard Monitor: (new change after ${time.format(showMilliSeconds = true)})")
+            for (s in currentList) {
+                println("'$s'")
+            }
+        }
+        lastMonitorState = currentList
+        println(" ")
+    }
+
+    @HandleEvent(priority = HandleEvent.HIGHEST)
+    fun onTick(event: SkyHanniTickEvent) {
         if (!dirty) return
         dirty = false
+        monitor()
 
         val list = fetchScoreboardLines().reversed()
         val semiFormatted = list.map { cleanSB(it) }
         if (semiFormatted != sidebarLines) {
-            RawScoreboardUpdateEvent(semiFormatted).postAndCatch()
             sidebarLines = semiFormatted
+            RawScoreboardUpdateEvent(semiFormatted).post()
         }
 
         sidebarLinesRaw = list
         val new = formatLines(list)
         if (new != sidebarLinesFormatted) {
-            ScoreboardUpdateEvent(new).postAndCatch()
+            val old = sidebarLinesFormatted
             sidebarLinesFormatted = new
+            ScoreboardUpdateEvent(new, old).post()
         }
     }
 
-    private fun cleanSB(scoreboard: String): String {
-        return scoreboard.toCharArray().filter { it.code in 21..126 || it.code == 167 }.joinToString(separator = "")
+    fun toggleMonitor() {
+        monitor = !monitor
+        val action = if (monitor) "Enabled" else "Disabled"
+        ChatUtils.chat("$action scoreboard monitoring in the console.")
+
     }
+
+    private fun cleanSB(scoreboard: String) = scoreboard.toCharArray().filter {
+        // 10735 = Rift Blood Effigies symbol
+        it.code in 21..126 || it.code == 167 || it.code == 10735
+    }.joinToString(separator = "")
 
     private fun fetchScoreboardLines(): List<String> {
         val scoreboard = Minecraft.getMinecraft().theWorld?.scoreboard ?: return emptyList()
         val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return emptyList()
-        objectiveTitle = objective.displayName
         var scores = scoreboard.getSortedScores(objective)
         val list = scores.filter { input: Score? ->
             input != null && input.playerName != null && !input.playerName.startsWith("#")

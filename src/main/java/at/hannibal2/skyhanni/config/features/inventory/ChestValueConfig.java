@@ -58,67 +58,20 @@ public class ChestValueConfig {
     @ConfigEditorDropdown
     public SortingTypeEntry sortingType = SortingTypeEntry.DESCENDING;
 
-    public enum SortingTypeEntry implements HasLegacyId {
-        DESCENDING("Descending", 0),
-        ASCENDING("Ascending", 1),
-        ;
-        private final String str;
-        private final int legacyId;
-
-        SortingTypeEntry(String str, int legacyId) {
-            this.str = str;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
-        SortingTypeEntry(String str) {
-            this(str, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-    }
+    @Expose
+    @ConfigOption(name = "Hide below", desc = "Hide items with value below configured amount.\n" +
+        "Items are still counted for the total value.")
+    @ConfigEditorSlider(
+        minValue = 50_000,
+        maxValue = 10_000_000,
+        minStep = 50_000
+    )
+    public int hideBelow = 100_000;
 
     @Expose
     @ConfigOption(name = "Value formatting Type", desc = "Format of the price.")
     @ConfigEditorDropdown
     public NumberFormatEntry formatType = NumberFormatEntry.SHORT;
-
-    public enum NumberFormatEntry implements HasLegacyId {
-        SHORT("Short", 0),
-        LONG("Long", 1);
-
-        private final String str;
-        private final int legacyId;
-
-        NumberFormatEntry(String str, int legacyId) {
-            this.str = str;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
-        NumberFormatEntry(String str) {
-            this(str, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-    }
-
     @Expose
     @ConfigOption(name = "Item To Show", desc = "Choose how many items are displayed.\n" +
         "All items in the chest are still counted for the total value.")
@@ -129,15 +82,61 @@ public class ChestValueConfig {
     )
     public int itemToShow = 15;
 
-    @Expose
-    @ConfigOption(name = "Hide below", desc = "Item item value below configured amount.\n" +
-        "Items are still counted for the total value.")
-    @ConfigEditorSlider(
-        minValue = 50_000,
-        maxValue = 10_000_000,
-        minStep = 50_000
-    )
-    public int hideBelow = 100_000;
+    public enum SortingTypeEntry implements HasLegacyId {
+        DESCENDING("Descending", 0),
+        ASCENDING("Ascending", 1),
+        ;
+        private final String displayName;
+        private final int legacyId;
+
+        SortingTypeEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        SortingTypeEntry(String displayName) {
+            this(displayName, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
+    }
+
+    public enum NumberFormatEntry implements HasLegacyId {
+        SHORT("Short", 0),
+        LONG("Long", 1);
+
+        private final String displayName;
+        private final int legacyId;
+
+        NumberFormatEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        NumberFormatEntry(String displayName) {
+            this(displayName, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
+    }
 
     @Expose
     @ConfigLink(owner = ChestValueConfig.class, field = "enabled")

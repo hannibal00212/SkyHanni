@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 
 object ChocolatePositionChange {
 
-    private val config get() = ChocolateFactoryAPI.config
-    private val storage get() = ChocolateFactoryAPI.profileStorage?.positionChange
+    private val config get() = ChocolateFactoryApi.config
+    private val storage get() = ChocolateFactoryApi.profileStorage?.positionChange
 
     fun update(position: Int?, leaderboard: String) {
         position ?: return

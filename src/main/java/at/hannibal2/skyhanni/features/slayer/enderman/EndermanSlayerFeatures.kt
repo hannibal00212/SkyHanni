@@ -1,42 +1,43 @@
 package at.hannibal2.skyhanni.features.slayer.enderman
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.init.Blocks
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -49,12 +50,11 @@ object EndermanSlayerFeatures {
     private val nukekubiSkulls = mutableSetOf<EntityArmorStand>()
     private var sittingBeacon = mapOf<LorenzVec, SimpleTimeMark>()
     private val logger = LorenzLogger("slayer/enderman")
-    private const val NUKEKUBI_SKULL_TEXTURE =
-        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWIwNzU5NGUyZGYyNzM5MjFhNzdjMTAxZDBiZmRmYTExMTVhYmVkNWI5YjIwMjllYjQ5NmNlYmE5YmRiYjRiMyJ9fX0="
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!IslandType.THE_END.isInIsland()) return
+    private val NUKEKUBI_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("MOB_NUKEKUBI") }
+
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
+    fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         val entity = event.entity
         if (entity in endermenWithBeacons || entity in flyingBeacons) return
 
@@ -65,12 +65,12 @@ object EndermanSlayerFeatures {
 
         if (entity is EntityArmorStand) {
             if (showBeacon()) {
-                val stack = entity.inventory[4] ?: return
+                val stack = entity.getStandHelmet() ?: return
                 if (stack.name == "Beacon" && entity.canBeSeen(15.0)) {
                     flyingBeacons.add(entity)
                     RenderLivingEntityHelper.setEntityColor(
                         entity,
-                        beaconConfig.beaconColor.toChromaColor().withAlpha(1),
+                        beaconConfig.beaconColor.toSpecialColor().addAlpha(1),
                     ) {
                         beaconConfig.highlightBeacon
                     }
@@ -81,11 +81,11 @@ object EndermanSlayerFeatures {
                 }
             }
 
-            if (config.highlightNukekebi && entity.inventory.any { it?.getSkullTexture() == NUKEKUBI_SKULL_TEXTURE } && entity !in nukekubiSkulls) {
+            if (config.highlightNukekebi && entity.hasSkullTexture(NUKEKUBI_SKULL_TEXTURE) && entity !in nukekubiSkulls) {
                 nukekubiSkulls.add(entity)
                 RenderLivingEntityHelper.setEntityColor(
                     entity,
-                    LorenzColor.GOLD.toColor().withAlpha(1),
+                    LorenzColor.GOLD.toColor().addAlpha(1),
                 ) { config.highlightNukekebi }
                 logger.log("Added Nukekubi skulls at ${entity.getLorenzVec()}")
             }
@@ -98,15 +98,13 @@ object EndermanSlayerFeatures {
 
     private fun showBeacon() = beaconConfig.highlightBeacon || beaconConfig.showWarning || beaconConfig.showLine
 
-    @SubscribeEvent
-    fun onWorldRender(event: LorenzRenderWorldEvent) {
-        if (!IslandType.THE_END.isInIsland()) return
-
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (beaconConfig.highlightBeacon) {
             endermenWithBeacons.removeIf { it.isDead || !hasBeaconInHand(it) }
 
             for (location in endermenWithBeacons.map { it.getLorenzVec().add(-0.5, 0.2, -0.5) }) {
-                event.drawColor(location, beaconConfig.beaconColor.toChromaColor(), alpha = 0.5f)
+                event.drawColor(location, beaconConfig.beaconColor.toSpecialColor(), alpha = 0.5f)
             }
         }
 
@@ -115,7 +113,7 @@ object EndermanSlayerFeatures {
         drawNukekubiSkulls(event)
     }
 
-    private fun drawNukekubiSkulls(event: LorenzRenderWorldEvent) {
+    private fun drawNukekubiSkulls(event: SkyHanniRenderWorldEvent) {
         for (skull in nukekubiSkulls) {
             if (skull.isDead) continue
             if (config.highlightNukekebi) {
@@ -131,9 +129,8 @@ object EndermanSlayerFeatures {
                 val skullLocation = event.exactLocation(skull)
                 if (skullLocation.distanceToPlayer() > 20) continue
                 if (!skullLocation.canBeSeen()) continue
-                event.draw3DLine(
-                    event.exactPlayerEyeLocation(),
-                    skullLocation.add(y = 1),
+                event.drawLineToEye(
+                    skullLocation.up(),
                     LorenzColor.GOLD.toColor(),
                     3,
                     true,
@@ -142,7 +139,7 @@ object EndermanSlayerFeatures {
         }
     }
 
-    private fun drawFlyingBeacon(event: LorenzRenderWorldEvent) {
+    private fun drawFlyingBeacon(event: SkyHanniRenderWorldEvent) {
         for (beacon in flyingBeacons) {
             if (beacon.isDead) continue
             if (beaconConfig.highlightBeacon) {
@@ -152,10 +149,9 @@ object EndermanSlayerFeatures {
 
             if (beaconConfig.showLine) {
                 val beaconLocation = event.exactLocation(beacon)
-                event.draw3DLine(
-                    event.exactPlayerEyeLocation(),
+                event.drawLineToEye(
                     beaconLocation.add(0.5, 1.0, 0.5),
-                    beaconConfig.lineColor.toChromaColor(),
+                    beaconConfig.lineColor.toSpecialColor(),
                     beaconConfig.lineWidth,
                     true,
                 )
@@ -163,14 +159,13 @@ object EndermanSlayerFeatures {
         }
     }
 
-    private fun drawSittingBeacon(event: LorenzRenderWorldEvent) {
+    private fun drawSittingBeacon(event: SkyHanniRenderWorldEvent) {
         for ((location, time) in sittingBeacon) {
             if (location.distanceToPlayer() > 20) continue
             if (beaconConfig.showLine) {
-                event.draw3DLine(
-                    event.exactPlayerEyeLocation(),
+                event.drawLineToEye(
                     location.add(0.5, 1.0, 0.5),
-                    beaconConfig.lineColor.toChromaColor(),
+                    beaconConfig.lineColor.toSpecialColor(),
                     beaconConfig.lineWidth,
                     true,
                 )
@@ -179,17 +174,15 @@ object EndermanSlayerFeatures {
             if (beaconConfig.highlightBeacon) {
                 val duration = 5.seconds - time.passedSince()
                 val durationFormat = duration.format(showMilliSeconds = true)
-                event.drawColor(location, beaconConfig.beaconColor.toChromaColor(), alpha = 1f)
-                event.drawWaypointFilled(location, beaconConfig.beaconColor.toChromaColor(), true, true)
+                event.drawColor(location, beaconConfig.beaconColor.toSpecialColor(), alpha = 1f)
+                event.drawWaypointFilled(location, beaconConfig.beaconColor.toSpecialColor(), true, true)
                 event.drawDynamicText(location.add(y = 1), "§4Beacon §b$durationFormat", 1.8)
             }
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!IslandType.THE_END.isInIsland()) return
-
         nukekubiSkulls.removeAll {
             if (it.isDead) {
                 RenderLivingEntityHelper.removeEntityColor(it)
@@ -213,9 +206,8 @@ object EndermanSlayerFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onBlockChange(event: ServerBlockChangeEvent) {
-        if (!IslandType.THE_END.isInIsland()) return
         if (!showBeacon()) return
 
         val location = event.location
@@ -235,8 +227,8 @@ object EndermanSlayerFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         endermenWithBeacons.clear()
         flyingBeacons.clear()
         nukekubiSkulls.clear()
@@ -244,7 +236,7 @@ object EndermanSlayerFeatures {
         logger.log("Reset everything (world change)")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(
             3,

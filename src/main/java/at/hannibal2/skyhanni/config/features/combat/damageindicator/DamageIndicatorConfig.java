@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.ARACHNE;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.BROODMOTHER;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.DIANA_MOBS;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.GARDEN_PESTS;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.INFERNO_DEMONLORD;
@@ -48,36 +49,6 @@ public class DamageIndicatorConfig {
     @ConfigEditorDropdown
     public NameVisibility bossName = NameVisibility.FULL_NAME;
 
-    public enum NameVisibility implements HasLegacyId {
-        HIDDEN("Hidden", 0),
-        FULL_NAME("Full Name", 1),
-        SHORT_NAME("Short Name", 2),
-        ;
-
-        private final String str;
-        private final int legacyId;
-
-        NameVisibility(String str, int legacyId) {
-            this.str = str;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
-        NameVisibility(String str) {
-            this(str, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-    }
-
     @Expose
     @ConfigOption(
         name = "Select Boss",
@@ -96,12 +67,60 @@ public class DamageIndicatorConfig {
         DIANA_MOBS,
         SEA_CREATURES,
         ARACHNE,
+        BROODMOTHER,
         THE_RIFT_BOSSES,
         RIFTSTALKER_BLOODFIEND,
         REINDRAKE,
         GARDEN_PESTS
 
     ));
+    @Expose
+    @ConfigOption(name = "Time to Kill", desc = "Show the time it takes to kill the slayer boss.\n" +
+        "§eRequires Damage Indicator to be active.")
+    @ConfigEditorBoolean
+    public boolean timeToKillSlayer = true;
+    @Expose
+    @ConfigOption(name = "Hide Damage Splash", desc = "Hide damage splashes near the damage indicator.")
+    @ConfigEditorBoolean
+    public boolean hideDamageSplash = false;
+    @Expose
+    @ConfigOption(name = "Damage Over Time", desc = "Show damage and health over time below the damage indicator.")
+    @ConfigEditorBoolean
+    public boolean showDamageOverTime = false;
+    @Expose
+    @ConfigOption(name = "Hide Nametag", desc = "Hide the vanilla nametag of bosses with damage indicator enabled.")
+    @ConfigEditorBoolean
+    public boolean hideVanillaNametag = false;
+
+    public enum NameVisibility implements HasLegacyId {
+        HIDDEN("Hidden", 0),
+        FULL_NAME("Full Name", 1),
+        SHORT_NAME("Short Name", 2),
+        ;
+
+        private final String displayName;
+        private final int legacyId;
+
+        NameVisibility(String displayName, int legacyId) {
+            this.displayName = displayName;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        NameVisibility(String displayName) {
+            this(displayName, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
+    }
 
     public enum BossCategory implements HasLegacyId {
         NETHER_MINI_BOSSES("§bNether Mini Bosses", 1),
@@ -129,19 +148,20 @@ public class DamageIndicatorConfig {
         RIFTSTALKER_BLOODFIEND("§bRiftstalker Bloodfiend", 23),
         REINDRAKE("§6Reindrake", 24),
         GARDEN_PESTS("§aGarden Pests", 25),
+        BROODMOTHER("§bBroodmother")
         ;
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        BossCategory(String str, int legacyId) {
-            this.str = str;
+        BossCategory(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        BossCategory(String str) {
-            this(str, -1);
+        BossCategory(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -151,29 +171,9 @@ public class DamageIndicatorConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
-
-    @Expose
-    @ConfigOption(name = "Hide Damage Splash", desc = "Hide damage splashes near the damage indicator.")
-    @ConfigEditorBoolean
-    public boolean hideDamageSplash = false;
-
-    @Expose
-    @ConfigOption(name = "Damage Over Time", desc = "Show damage and health over time below the damage indicator.")
-    @ConfigEditorBoolean
-    public boolean showDamageOverTime = false;
-
-    @Expose
-    @ConfigOption(name = "Hide Nametag", desc = "Hide the vanilla nametag of bosses with damage indicator enabled.")
-    @ConfigEditorBoolean
-    public boolean hideVanillaNametag = false;
-
-    @Expose
-    @ConfigOption(name = "Time to Kill", desc = "Show the time it takes to kill the slayer boss.")
-    @ConfigEditorBoolean
-    public boolean timeToKillSlayer = true;
 
 
     @Expose

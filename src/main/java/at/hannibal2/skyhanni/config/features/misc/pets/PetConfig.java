@@ -31,6 +31,11 @@ public class PetConfig {
     public PetExperienceToolTipConfig petExperienceToolTip = new PetExperienceToolTipConfig();
 
     @Expose
+    @ConfigOption(name = "Pet Nametag", desc = "")
+    @Accordion
+    public PetNametagConfig nametag = new PetNametagConfig();
+
+    @Expose
     @ConfigOption(name = "Hide Autopet Messages", desc = "Hide the autopet messages from chat.\n" +
         "§eRequires the display to be enabled.")
     @ConfigEditorBoolean
@@ -55,19 +60,19 @@ public class PetConfig {
         XP_SHARE("§5⚘", "Exp Share", "PET_ITEM_EXP_SHARE"),
         TIER_BOOST("§c●", "Tier Boost", "PET_ITEM_TIER_BOOST"),
         ;
-        private final String str;
+        private final String displayName;
         public final String icon;
         public final String item;
 
         PetItemsDisplay(String icon, String name, String item) {
             this.icon = icon;
             this.item = item;
-            this.str = icon + " §ffor " + name;
+            this.displayName = icon + " §ffor " + name;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 }

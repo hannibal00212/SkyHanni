@@ -1,18 +1,20 @@
 package at.hannibal2.skyhanni.features.event.jerry.frozentreasure
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.event.winter.FrozenTreasureConfig.FrozenTreasureDisplayEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -20,11 +22,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object FrozenTreasureTracker {
@@ -33,7 +35,7 @@ object FrozenTreasureTracker {
 
     private val compactPattern by RepoPattern.pattern(
         "event.jerry.frozentreasure.compact",
-        "COMPACT! You found an Enchanted Ice!"
+        "COMPACT! You found an Enchanted Ice!",
     )
 
     private var estimatedIce = 0L
@@ -41,8 +43,9 @@ object FrozenTreasureTracker {
     private var icePerSecond = mutableListOf<Long>()
     private var icePerHour = 0
     private var stoppedChecks = 0
-    private val tracker = SkyHanniTracker("Frozen Treasure Tracker", { Data() }, { it.frozenTreasureTracker })
-    { formatDisplay(drawDisplay(it)) }
+    private val tracker = SkyHanniTracker("Frozen Treasure Tracker", { Data() }, { it.frozenTreasureTracker }) {
+        formatDisplay(drawDisplay(it))
+    }
 
     init {
         FrozenTreasure.entries.forEach { it.chatPattern }
@@ -66,15 +69,15 @@ object FrozenTreasureTracker {
         var treasureCount: MutableMap<FrozenTreasure, Int> = mutableMapOf()
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         icePerHour = 0
         stoppedChecks = 0
         icePerSecond = mutableListOf()
         tracker.update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!onJerryWorkshop()) return
 
@@ -104,8 +107,8 @@ object FrozenTreasureTracker {
         icePerHour = (icePerSecond.average() * 3600).toInt()
     }
 
-    private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
-        val newList = mutableListOf<List<Any>>()
+    private fun formatDisplay(map: List<Searchable>): List<Searchable> {
+        val newList = mutableListOf<Searchable>()
         for (index in config.textFormat) {
             // TODO, change functionality to use enum rather than ordinals
             newList.add(map[index.ordinal])
@@ -113,8 +116,8 @@ object FrozenTreasureTracker {
         return newList
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!ProfileStorageData.loaded) return
         if (!onJerryWorkshop()) return
 
@@ -136,23 +139,23 @@ object FrozenTreasureTracker {
         }
     }
 
-    private fun drawDisplay(data: Data) = buildList<List<Any>> {
+    private fun drawDisplay(data: Data) = buildList<Searchable> {
         calculateIce(data)
-        addAsSingletonList("§e§lFrozen Treasure Tracker")
-        addAsSingletonList("§6${formatNumber(data.treasuresMined)} Treasures Mined")
-        addAsSingletonList("§3${formatNumber(estimatedIce)} Total Ice")
-        addAsSingletonList("§3${formatNumber(icePerHour)} Ice/hr")
-        addAsSingletonList("§8${formatNumber(data.compactProcs)} Compact Procs")
-        addAsSingletonList("")
+        addSearchString("§e§lFrozen Treasure Tracker")
+        addSearchString("§6${formatNumber(data.treasuresMined)} Treasures Mined")
+        addSearchString("§3${formatNumber(estimatedIce)} Total Ice")
+        addSearchString("§3${formatNumber(icePerHour)} Ice/hr")
+        addSearchString("§8${formatNumber(data.compactProcs)} Compact Procs")
+        addSearchString("")
 
         for (treasure in FrozenTreasure.entries) {
             val count = (data.treasureCount[treasure] ?: 0) * if (config.showAsDrops) treasure.defaultAmount else 1
-            addAsSingletonList("§b${formatNumber(count)} ${treasure.displayName}")
+            addSearchString("§b${formatNumber(count)} ${treasure.displayName}", treasure.displayName)
         }
-        addAsSingletonList("")
+        addSearchString("")
     }
 
-    fun formatNumber(amount: Number): String {
+    private fun formatNumber(amount: Number): String {
         if (amount is Int) return amount.addSeparators()
         if (amount is Long) return amount.shortFormat()
         return "$amount"
@@ -166,22 +169,25 @@ object FrozenTreasureTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!config.enabled) return
-        if (!onJerryWorkshop()) return
-        if (config.onlyInCave && !inGlacialCave()) return
-
-        tracker.renderDisplay(config.position)
+    init {
+        tracker.initRenderer(config.position) { shouldShowDisplay() }
     }
 
-    @SubscribeEvent
+    private fun shouldShowDisplay(): Boolean {
+        if (!config.enabled) return false
+        if (!onJerryWorkshop()) return false
+        if (config.onlyInCave && !inGlacialCave()) return false
+
+        return true
+    }
+
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.frozenTreasureTracker", "event.winter.frozenTreasureTracker")
         event.move(
             11,
             "event.winter.frozenTreasureTracker.textFormat",
-            "event.winter.frozenTreasureTracker.textFormat"
+            "event.winter.frozenTreasureTracker.textFormat",
         ) { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, FrozenTreasureDisplayEntry::class.java)
         }
@@ -192,7 +198,12 @@ object FrozenTreasureTracker {
     private fun inGlacialCave() =
         onJerryWorkshop() && ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §3Glacial Cave")
 
-    fun resetCommand() {
-        tracker.resetCommand()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetfrozentreasuretracker") {
+            description = "Resets the Frozen Treasure Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
 }

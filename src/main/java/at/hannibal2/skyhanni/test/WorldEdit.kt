@@ -1,21 +1,21 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 @SkyHanniModule
@@ -52,7 +52,7 @@ object WorldEdit {
         return text
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
         if (event.itemInHand?.getItemId() != "WOOD_AXE") return
@@ -64,36 +64,36 @@ object WorldEdit {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         leftPos = null
         rightPos = null
     }
 
-    @SubscribeEvent
-    fun onRenderWorldLast(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         leftPos?.let { l ->
-            RenderUtils.drawWireframeBoundingBox_nea(
+            RenderUtils.drawWireframeBoundingBoxNea(
                 funAABB(l, l).expandBlock(),
                 Color.RED,
-                event.partialTicks
+                event.partialTicks,
             )
         }
         rightPos?.let { r ->
-            RenderUtils.drawWireframeBoundingBox_nea(
+            RenderUtils.drawWireframeBoundingBoxNea(
                 funAABB(r, r).expandBlock(),
                 Color.BLUE,
-                event.partialTicks
+                event.partialTicks,
             )
         }
         aabb?.let {
-            RenderUtils.drawFilledBoundingBox_nea(
+            RenderUtils.drawFilledBoundingBoxNea(
                 it.expandBlock(),
-                Color(Color.CYAN.withAlpha(60), true),
+                Color.CYAN.addAlpha(60),
                 partialTicks = event.partialTicks,
-                renderRelativeToCamera = false
+                renderRelativeToCamera = false,
             )
         }
     }
@@ -105,7 +105,10 @@ object WorldEdit {
         }
         when (it.firstOrNull()) {
             null, "help" -> {
-                ChatUtils.chat("Use a wood axe and left/right click to select a region in the world. Then use /shworldedit copy or /shworldedit reset.")
+                ChatUtils.chat(
+                    "Use a wood axe and left/right click to select a region in the world. " +
+                        "Then use /shworldedit copy or /shworldedit reset.",
+                )
             }
 
             "copy" -> {

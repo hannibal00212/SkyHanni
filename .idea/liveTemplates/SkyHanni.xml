@@ -1,0 +1,101 @@
+<templateSet group="SkyHanni">
+  <template name="configColor" value="@Expose&#10;@ConfigOption(name = &quot;$Name$&quot;, desc = &quot;$Desc$.&quot;)&#10;@ConfigEditorColour&#10;public String $internalName$ = &quot;0:245:85:255:85&quot;;" description="Template for color config value" toReformat="false" toShortenFQNames="true">
+    <variable name="Name" expression="" defaultValue="Color" alwaysStopAt="true" />
+    <variable name="Desc" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="internalName" expression="camelCase(Name)" defaultValue="" alwaysStopAt="false" />
+    <context>
+      <option name="JAVA_DECLARATION" value="true" />
+    </context>
+  </template>
+  <template name="configBool" value="@Expose&#10;@ConfigOption(name = &quot;$Name$&quot;, desc = &quot;$Desc$.&quot;)&#10;@ConfigEditorBoolean&#10;public boolean $internalName$ = $default$;" description="Template for bool config value" toReformat="false" toShortenFQNames="true">
+    <variable name="Name" expression="" defaultValue="Color" alwaysStopAt="true" />
+    <variable name="Desc" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="internalName" expression="camelCase(Name)" defaultValue="" alwaysStopAt="false" />
+    <variable name="default" expression="enum(&quot;true&quot;,&quot;false&quot;)" defaultValue="false" alwaysStopAt="true" />
+    <context>
+      <option name="JAVA_DECLARATION" value="true" />
+    </context>
+  </template>
+  <template name="eFun" value="@SubscribeEvent&#10;fun on$EventPre$(event : $Event$) {&#10;&#10;}" description="A Event Function" toReformat="true" toShortenFQNames="true">
+    <variable name="Event" expression="completeSmart()" defaultValue="" alwaysStopAt="true" />
+    <variable name="EventPre" expression="capitalize(regularExpression(Event,&quot;Event|\\.&quot;,&quot;&quot;))" defaultValue="" alwaysStopAt="false" />
+    <context>
+      <option name="KOTLIN_CLASS" value="true" />
+      <option name="KOTLIN_OBJECT_DECLARATION" value="true" />
+      <option name="KOTLIN_STATEMENT" value="true" />
+      <option name="KOTLIN_TOPLEVEL" value="true" />
+    </context>
+  </template>
+  <template name="enabled" value="fun isEnabled() = LorenzUtils.inSkyBlock &amp;&amp; $condition$" description="isEnabled Function for Skyhanni Feature" toReformat="true" toShortenFQNames="true">
+    <variable name="condition" expression="completeSmart()" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="KOTLIN_CLASS" value="true" />
+    </context>
+  </template>
+  <template name="configPosition" value="@Expose&#10;@ConfigLink(owner = $owner$.class, field = &quot;$member$&quot;)&#10;private Position $name$ = new Position(20,20);" description="Template for a position" toReformat="false" toShortenFQNames="true">
+    <variable name="name" expression="suggestVariableName()" defaultValue="" alwaysStopAt="true" />
+    <variable name="member" expression="variableOfType(&quot;boolean&quot;)" defaultValue="enable" alwaysStopAt="true" />
+    <variable name="owner" expression="className()" defaultValue="" alwaysStopAt="false" />
+    <context>
+      <option name="JAVA_DECLARATION" value="true" />
+    </context>
+  </template>
+  <template name="&amp;&amp;" value="§" description="Replace &amp;&amp; with §" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="OTHER" value="true" />
+    </context>
+  </template>
+  <template name="configKey" value="@Expose&#10;@ConfigOption(name = &quot;$name$&quot;, desc = &quot;$desc$.&quot;)&#10;@ConfigEditorKeybind(defaultKey = Keyboard.$bind$)&#10;public int $internalName$ = Keyboard.$bind$;" description="Tempalte for Keybind config value" toReformat="false" toShortenFQNames="true">
+    <variable name="name" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="desc" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="bind" expression="completeSmart()" defaultValue="" alwaysStopAt="true" />
+    <variable name="internalName" expression="camelCase(name)" defaultValue="" alwaysStopAt="false" />
+    <context>
+      <option name="JAVA_DECLARATION" value="true" />
+    </context>
+  </template>
+  <template name="configLink" value="@ConfigLink(owner = $owner$.class, field = &quot;$member$&quot;)" description="Auto fill for config link" toReformat="false" toShortenFQNames="true">
+    <variable name="owner" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="member" expression="" defaultValue="" alwaysStopAt="true" />
+  </template>
+  <template name="configAccordion" value="@Expose&#10;@ConfigOption(name = &quot;$Name$&quot;,desc=&quot;&quot;)&#10;@Accordion&#10;public $Class$ $internalName$ = new $Class$();" description="Template for a config accordion" toReformat="false" toShortenFQNames="true">
+    <variable name="Name" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="Class" expression="completeSmart()" defaultValue="" alwaysStopAt="true" />
+    <variable name="internalName" expression="decapitalize(regularExpression(Class,&quot;Config&quot;,&quot;&quot;))" defaultValue="" alwaysStopAt="false" />
+    <context>
+      <option name="JAVA_DECLARATION" value="true" />
+    </context>
+  </template>
+  <template name="configCategory" value="@Expose&#10;@Category(name = &quot;$Name$&quot;,desc=&quot;$desc$&quot;)&#10;public $Class$ $internalName$ = new $Class$();" description="Template for a config category" toReformat="false" toShortenFQNames="true">
+    <variable name="Name" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="desc" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="Class" expression="completeSmart()" defaultValue="" alwaysStopAt="true" />
+    <variable name="internalName" expression="decapitalize(regularExpression(Class,&quot;Config&quot;,&quot;&quot;))" defaultValue="" alwaysStopAt="false" />
+    <context>
+      <option name="JAVA_DECLARATION" value="true" />
+    </context>
+  </template>
+  <template name="fconfig" value="private val config get() = SkyHanniMod.feature" description="Default declartion of feature config" toReformat="true" toShortenFQNames="true">
+    <context>
+      <option name="KOTLIN_OBJECT_DECLARATION" value="true" />
+    </context>
+  </template>
+  <template name="configSlider" value="@Expose&#10;@ConfigOption(name = &quot;$Name$&quot;, desc = &quot;$Desc$.&quot;)&#10;@ConfigEditorSlider(minValue = 1f,maxValue = 10f,minStep = 1f)&#10;public float $internalName$ = 1f;" description="Template for config slider" toReformat="false" toShortenFQNames="true">
+    <variable name="Name" expression="" defaultValue="Color" alwaysStopAt="true" />
+    <variable name="Desc" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="internalName" expression="camelCase(Name)" defaultValue="" alwaysStopAt="false" />
+    <context>
+      <option name="JAVA_DECLARATION" value="true" />
+    </context>
+  </template>
+  <template name="configButton" value="@ConfigOption(name = &quot;$Name$&quot;, desc = &quot;$Desc$.&quot;)&#10;@ConfigEditorButton(buttonText = &quot;$Button$&quot;)&#10;public Runnable $internalName$ = () -&gt; $function$;" description="Template for config button" toReformat="false" toShortenFQNames="true">
+    <variable name="Name" expression="" defaultValue="Color" alwaysStopAt="true" />
+    <variable name="Desc" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="Button" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="internalName" expression="camelCase(Name)" defaultValue="" alwaysStopAt="false" />
+    <variable name="function" expression="completeSmart()" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="JAVA_DECLARATION" value="true" />
+    </context>
+  </template>
+</templateSet>

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStat;
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStatsLine;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
@@ -17,7 +17,7 @@ public class ChunkedStatsConfig {
         desc = "Select the stats you want to display chunked on the scoreboard."
     )
     @ConfigEditorDraggableList
-    public List<ChunkedStat> chunkedStats = new ArrayList<>(ChunkedStat.getEntries());
+    public List<ChunkedStatsLine> chunkedStats = new ArrayList<>(ChunkedStatsLine.getEntries());
 
     @Expose
     @ConfigOption(

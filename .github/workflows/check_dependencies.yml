@@ -1,11 +1,9 @@
 name: Check PR Dependencies
 
+# TODO: Run when other pr gets merged
 on:
     pull_request_target:
         types: [ opened, edited ]
-    push:
-        branches:
-            - beta
 
 jobs:
     check-dependencies:

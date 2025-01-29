@@ -36,7 +36,7 @@ public class GUIConfig {
     @Accordion
     public ChromaConfig chroma = new ChromaConfig();
 
-    @ConfigOption(name = "Edit GUI Locations", desc = "Change the position of SkyHanni's overlays.")
+    @ConfigOption(name = "Edit GUI Locations", desc = "Opens the Position Editor, allows changing the position of SkyHanni's overlays.")
     @ConfigEditorButton(buttonText = "Edit")
     public Runnable positions = () -> GuiEditManager.openGuiPositionEditor(true);
 
@@ -62,9 +62,14 @@ public class GUIConfig {
     public DiscordRPCConfig discordRPC = new DiscordRPCConfig();
 
     @Expose
-    @ConfigOption(name = "Hotbar", desc = "Settings for adjusting the hotbar")
+    @ConfigOption(name = "Hotbar", desc = "Settings for adjusting the hotbar.")
     @Accordion
     public HotbarConfig hotbar = new HotbarConfig();
+
+    @Expose
+    @ConfigOption(name = "XP Bar", desc = "Settings for adjusting the XP bar.")
+    @Accordion
+    public XPBarConfig xpBar = new XPBarConfig();
 
     @Expose
     @ConfigOption(name = "Marked Players", desc = "Players that got marked with §e/shmarkplayer§7.")
@@ -80,6 +85,11 @@ public class GUIConfig {
     @ConfigOption(name = "Custom Text Box", desc = "")
     @Accordion
     public TextBoxConfig customTextBox = new TextBoxConfig();
+
+    @Expose
+    @ConfigOption(name = "Tab Widget", desc = "")
+    @Accordion
+    public TabWidgetConfig tabWidget = new TabWidgetConfig();
 
     @Expose
     @ConfigOption(name = "In-Game Date", desc = "")
@@ -111,6 +121,11 @@ public class GUIConfig {
     @ConfigOption(name = "Real Time 12h Format", desc = "Display the current computer time in 12hr Format rather than 24h Format.")
     @ConfigEditorBoolean
     public boolean realTimeFormatToggle = false;
+
+    @Expose
+    @ConfigOption(name = "Real Time Show Seconds", desc = "Include the current seconds in the Real Time display.")
+    @ConfigEditorBoolean
+    public boolean realTimeShowSeconds = true;
 
     @Expose
     @ConfigLink(owner = GUIConfig.class, field = "realTime")

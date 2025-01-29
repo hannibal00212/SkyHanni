@@ -21,6 +21,12 @@ public class MotesConfig {
     public int burgerStacks = 0;
 
     @Expose
+    @ConfigOption(name = "Motes per Session", desc = "Show how many motes you got this session when leaving the rift.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean motesPerSession = true;
+
+    @Expose
     @ConfigOption(name = "Inventory Value", desc = "")
     @Accordion
     public RiftInventoryValueConfig inventoryValue = new RiftInventoryValueConfig();

@@ -1,21 +1,19 @@
 package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.getCachedIngredients
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
 
 object FirstMinionTier {
 
     fun firstMinionTier(
-        otherItems: Map<NEUInternalName, Int>,
-        minions: MutableMap<String, NEUInternalName>,
-        tierOneMinions: MutableList<NEUInternalName>,
-        tierOneMinionsDone: MutableSet<NEUInternalName>,
+        otherItems: Map<NeuInternalName, Int>,
+        minions: MutableMap<String, NeuInternalName>,
+        tierOneMinions: MutableList<NeuInternalName>,
+        tierOneMinionsDone: MutableSet<NeuInternalName>,
     ) {
         val help = helpMap(otherItems)
         val tierOneMinionsFiltered = getTierOneMinionsFiltered(tierOneMinions, tierOneMinionsDone)
@@ -24,35 +22,35 @@ object FirstMinionTier {
     }
 
     private fun addMoreMinions(
-        tierOneMinionsFiltered: List<NEUInternalName>,
-        help: Map<NEUInternalName, Int>,
-        minions: MutableMap<String, NEUInternalName>,
+        tierOneMinionsFiltered: List<NeuInternalName>,
+        help: Map<NeuInternalName, Int>,
+        minions: MutableMap<String, NeuInternalName>,
     ) {
         for (minionId in tierOneMinionsFiltered) {
-            for (recipe in NEUItems.getRecipes(minionId)) {
-                if (recipe !is CraftingRecipe) continue
+            for (recipe in NeuItems.getRecipes(minionId)) {
+                if (!recipe.isCraftingRecipe()) continue
                 checkOne(recipe, help, minions, minionId)
             }
         }
     }
 
     private fun checkOne(
-        recipe: CraftingRecipe,
-        help: Map<NEUInternalName, Int>,
-        minions: MutableMap<String, NEUInternalName>,
-        minionId: NEUInternalName,
+        recipe: PrimitiveRecipe,
+        help: Map<NeuInternalName, Int>,
+        minions: MutableMap<String, NeuInternalName>,
+        minionId: NeuInternalName,
     ) {
-        if (recipe.getCachedIngredients().any { help.contains(it.internalItemId.asInternalName()) }) {
-            val name = recipe.output.itemStack.name.removeColor()
+        if (recipe.ingredients.any { help.contains(it.internalName) }) {
+            val name = recipe.output?.internalName?.getItemStackOrNull()?.displayName?.removeColor() ?: return
             val abc = name.replace(" I", " 0")
             minions[abc] = minionId.replace("_1", "_0")
         }
     }
 
     private fun addMinion(
-        tierOneMinionsFiltered: List<NEUInternalName>,
-        minions: MutableMap<String, NEUInternalName>,
-        tierOneMinionsDone: MutableSet<NEUInternalName>,
+        tierOneMinionsFiltered: List<NeuInternalName>,
+        minions: MutableMap<String, NeuInternalName>,
+        tierOneMinionsDone: MutableSet<NeuInternalName>,
     ) {
         for (minionId in tierOneMinionsFiltered) {
             val prefix = minionId.asString().dropLast(1)
@@ -72,10 +70,10 @@ object FirstMinionTier {
     }
 
     private fun getTierOneMinionsFiltered(
-        tierOneMinions: MutableList<NEUInternalName>,
-        tierOneMinionsDone: MutableSet<NEUInternalName>,
+        tierOneMinions: MutableList<NeuInternalName>,
+        tierOneMinionsDone: MutableSet<NeuInternalName>,
     ) = tierOneMinions.filter { it !in tierOneMinionsDone }
 
-    private fun helpMap(otherItems: Map<NEUInternalName, Int>) =
+    private fun helpMap(otherItems: Map<NeuInternalName, Int>) =
         otherItems.filter { !it.key.startsWith("WOOD_") }
 }

@@ -17,9 +17,14 @@ public class OptimalSpeedConfig {
     public boolean showOnHUD = false;
 
     @Expose
-    @ConfigOption(name = "Warning Title", desc = "Warn via title when you don't have the optimal speed.")
+    @ConfigOption(name = "Wrong Speed Warning", desc = "Warn via title and chat message when you don't have the optimal speed.")
     @ConfigEditorBoolean
     public boolean warning = false;
+
+    @Expose
+    @ConfigOption(name = "Only Warn With Rancher's", desc = "Only send a warning when wearing Rancher's Boots.")
+    @ConfigEditorBoolean
+    public boolean onlyWarnRanchers = false;
 
     @Expose
     @ConfigOption(name = "Rancher Boots", desc = "Set the optimal speed in the Rancher Boots overlay by clicking on the presets.")

@@ -1,40 +1,38 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ChocolateFactoryTimeTowerManager {
 
-    private val config get() = ChocolateFactoryAPI.config
-    private val profileStorage get() = ChocolateFactoryAPI.profileStorage
+    private val config get() = ChocolateFactoryApi.config
+    private val profileStorage get() = ChocolateFactoryApi.profileStorage
 
     private var lastTimeTowerWarning = SimpleTimeMark.farPast()
+    private var warnAboutNewCharge = false
     private var wasTimeTowerRecentlyActive = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         wasTimeTowerRecentlyActive = false
     }
 
     private const val HOVER_TEXT = "§eClick to run /cf!"
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         val profileStorage = profileStorage ?: return
 
         if (profileStorage.currentTimeTowerEnds.isInPast()) {
@@ -43,26 +41,32 @@ object ChocolateFactoryTimeTowerManager {
 
         checkTimeTowerExpired()
 
-        if (ChocolateFactoryAPI.inChocolateFactory) return
+        if (ChocolateFactoryApi.inChocolateFactory) return
 
-        val nextCharge = profileStorage.nextTimeTower
+        if (timeTowerFullTimeMark().isInPast()) {
+            profileStorage.currentTimeTowerUses = maxCharges()
+        } else {
+            var nextCharge = profileStorage.nextTimeTower
+            while (nextCharge.isInPast() && !nextCharge.isFarPast()) {
+                profileStorage.currentTimeTowerUses++
+                nextCharge += ChocolateFactoryApi.timeTowerChargeDuration()
+                profileStorage.nextTimeTower = nextCharge
+                warnAboutNewCharge = true
+            }
+        }
 
-        if (nextCharge.isInPast() && !nextCharge.isFarPast() && currentCharges() < maxCharges()) {
-            profileStorage.currentTimeTowerUses++
-
-            val nextTimeTower = profileStorage.nextTimeTower + profileStorage.timeTowerCooldown.hours
-            profileStorage.nextTimeTower = nextTimeTower
-
+        if (currentCharges() > 0 && currentCharges() < maxCharges()) {
             if (!config.timeTowerWarning || timeTowerActive()) return
+            if (!warnAboutNewCharge) return
             ChatUtils.clickableChat(
-                "Your Time Tower has another charge available §7(${timeTowerCharges()})§e, " +
-                    "Click here to use one.",
+                "Your Time Tower has an available charge §7(${timeTowerCharges()})§e. " +
+                    "Click here to open the Chocolate Factory menu.",
                 onClick = { HypixelCommands.chocolateFactory() },
                 HOVER_TEXT,
             )
             SoundUtils.playBeepSound()
             lastTimeTowerWarning = SimpleTimeMark.now()
-            return
+            warnAboutNewCharge = false
         }
         checkTimeTowerWarning(false)
     }
@@ -72,7 +76,8 @@ object ChocolateFactoryTimeTowerManager {
         if (!isTimeTowerActive && wasTimeTowerRecentlyActive && config.timeTowerReminder && currentCharges() > 0) {
             val charges = StringUtils.pluralize(currentCharges(), "charge", "charges", withNumber = true)
             ChatUtils.clickableChat(
-                "§cYour Time Tower just expired and has $charges remaining. Click here to use one.",
+                "§cYour Time Tower just expired and has $charges remaining. " +
+                    "Click here to open the Chocolate Factory Menu.",
                 onClick = {
                     HypixelCommands.chocolateFactory()
                 },
@@ -84,19 +89,21 @@ object ChocolateFactoryTimeTowerManager {
     }
 
     fun checkTimeTowerWarning(inInventory: Boolean) {
-        if (!ChocolateFactoryAPI.isEnabled()) return
+        if (!ChocolateFactoryApi.isEnabled()) return
         if (!config.timeTowerWarning) return
         if (!timeTowerFull()) return
         if (ReminderUtils.isBusy()) return
+        if (maxCharges() == 0) return
 
         val warningSeparation = if (inInventory) 30.seconds else 5.minutes
         if (lastTimeTowerWarning.passedSince() < warningSeparation) return
 
-        ChatUtils.clickableChat(
-            "§cYour Time Tower is full §7(${timeTowerCharges()})§c, " +
-                "Use one to avoid wasting time tower usages!",
-            onClick = { HypixelCommands.chocolateFactory() },
-            HOVER_TEXT,
+        ChatUtils.clickToActionOrDisable(
+            "§cYour Time Tower is full §7(${timeTowerCharges()})§c, Use one to avoid wasting time tower usages! " +
+                "Click here to open the Chocolate Factory menu.",
+            config::timeTowerWarning,
+            actionName = "open Chocolate Factory",
+            action = { HypixelCommands.chocolateFactory() },
         )
         SoundUtils.playBeepSound()
         lastTimeTowerWarning = SimpleTimeMark.now()
@@ -130,7 +137,7 @@ object ChocolateFactoryTimeTowerManager {
         if (timeTowerFull()) return SimpleTimeMark.farPast()
         val nextChargeDuration = profileStorage.nextTimeTower
         val remainingChargesAfter = profileStorage.maxTimeTowerUses - (profileStorage.currentTimeTowerUses + 1)
-        val endTime = nextChargeDuration + ChocolateFactoryAPI.timeTowerChargeDuration() * remainingChargesAfter
+        val endTime = nextChargeDuration + ChocolateFactoryApi.timeTowerChargeDuration() * remainingChargesAfter
 
         return endTime
     }
@@ -143,7 +150,7 @@ object ChocolateFactoryTimeTowerManager {
         return endTime - currentTime
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileChange(event: ProfileJoinEvent) {
         lastTimeTowerWarning = SimpleTimeMark.farPast()
     }

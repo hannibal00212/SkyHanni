@@ -16,6 +16,7 @@ import java.util.List;
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.ACCEPTED;
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.COINS_SPENT;
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.COPPER;
+import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.COPPER_DYE;
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.DEDICATION_IV;
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.DENIED;
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.FARMING_EXP;
@@ -55,7 +56,8 @@ public class DropsStatisticsConfig {
         COINS_SPENT,
         OVERGROWN_GRASS,
         GREEN_BANDANA,
-        DEDICATION_IV
+        DEDICATION_IV,
+        COPPER_DYE
     ));
 
     /**
@@ -89,19 +91,20 @@ public class DropsStatisticsConfig {
         CULTIVATING_I("§b1 §9Cultivating I", 15),
         REPLENISH_I("§b1 §9Replenish I", 16),
         DELICATE("§b1 §9Delicate V"),
+        COPPER_DYE("§b1 §8Copper Dye"),
         ;
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        DropsStatisticsTextEntry(String str, int legacyId) {
-            this.str = str;
+        DropsStatisticsTextEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        DropsStatisticsTextEntry(String str) {
-            this(str, -1);
+        DropsStatisticsTextEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -111,7 +114,7 @@ public class DropsStatisticsConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

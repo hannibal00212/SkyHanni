@@ -19,7 +19,7 @@ object SoundUtils {
     val centuryActiveTimerAlert by lazy { createSound("skyhanni:centurytimer.active", 1f) }
 
     fun ISound.playSound() {
-        Minecraft.getMinecraft().addScheduledTask {
+        DelayedRun.onThread.execute {
             val gameSettings = Minecraft.getMinecraft().gameSettings
             val oldLevel = gameSettings.getSoundLevel(SoundCategory.PLAYERS)
             if (!SkyHanniMod.feature.misc.maintainGameVolume) {
@@ -27,18 +27,14 @@ object SoundUtils {
             }
             try {
                 Minecraft.getMinecraft().soundHandler.playSound(this)
+            } catch (e: IllegalArgumentException) {
+                if (e.message?.startsWith("value already present:") == true) return@execute
+                ErrorManager.logErrorWithData(e, "Failed to play a sound", "soundLocation" to this.soundLocation)
             } catch (e: Exception) {
-                if (e is IllegalArgumentException) {
-                    e.message?.let {
-                        if (it.startsWith("value already present:")) {
-                            println("SkyHanni Sound error: $it")
-                            return@addScheduledTask
-                        }
-                    }
-                }
+
                 ErrorManager.logErrorWithData(
                     e, "Failed to play a sound",
-                    "soundLocation" to this.soundLocation
+                    "soundLocation" to this.soundLocation,
                 )
             } finally {
                 if (!SkyHanniMod.feature.misc.maintainGameVolume) {

@@ -1,17 +1,17 @@
 package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.misc.PartyCommandsConfig
-import at.hannibal2.skyhanni.data.FriendAPI
-import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.FriendApi
+import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
-import at.hannibal2.skyhanni.events.TabCompletionEvent
+import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -37,7 +37,7 @@ object PartyChatCommands {
             requiresPartyLead = true,
             executable = {
                 HypixelCommands.partyTransfer(it.cleanedAuthor)
-            }
+            },
         ),
         PartyChatCommand(
             listOf("pw", "warp", "warpus"),
@@ -46,7 +46,7 @@ object PartyChatCommands {
             executable = {
                 lastWarp = SimpleTimeMark.now()
                 HypixelCommands.partyWarp()
-            }
+            },
         ),
         PartyChatCommand(
             listOf("allinv", "allinvite"),
@@ -55,7 +55,7 @@ object PartyChatCommands {
             executable = {
                 lastAllInvite = SimpleTimeMark.now()
                 HypixelCommands.partyAllInvite()
-            }
+            },
         ),
     )
 
@@ -68,7 +68,7 @@ object PartyChatCommands {
     }
 
     private fun isTrustedUser(name: String): Boolean {
-        val friend = FriendAPI.getAllFriends().find { it.name == name }
+        val friend = FriendApi.getAllFriends().find { it.name == name }
         return when (config.defaultRequiredTrustLevel) {
             PartyCommandsConfig.TrustedUser.FRIENDS -> friend != null
             PartyCommandsConfig.TrustedUser.BEST_FRIENDS -> friend?.bestFriend == true
@@ -83,7 +83,7 @@ object PartyChatCommands {
         return storage.blacklistedUsers.any { it.equals(name, ignoreCase = true) }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPartyCommand(event: PartyChatEvent) {
         if (event.message.firstOrNull() !in commandPrefixes) return
         val commandLabel = event.message.substring(1).substringBefore(' ')
@@ -92,7 +92,7 @@ object PartyChatCommands {
 
         if (name == LorenzUtils.getPlayerName()) return
         if (!command.isEnabled()) return
-        if (command.requiresPartyLead && PartyAPI.partyLeader != LorenzUtils.getPlayerName()) return
+        if (command.requiresPartyLead && PartyApi.partyLeader != LorenzUtils.getPlayerName()) return
         if (isBlockedUser(name)) {
             if (config.showIgnoredReminder) ChatUtils.clickableChat(
                 "§cIgnoring chat command from ${event.author}. " +
@@ -114,9 +114,9 @@ object PartyChatCommands {
         command.executable(event)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabComplete(event: TabCompletionEvent) {
-        if (PartyAPI.partyLeader == null) return
+        if (PartyApi.partyLeader == null) return
         val prefix = event.fullText.firstOrNull() ?: return
         if (prefix !in commandPrefixes) return
 
@@ -200,8 +200,8 @@ object PartyChatCommands {
         var message = "Ignored player list:"
         if (blacklist.size > 15) {
             message += "\n§e"
-            blacklist.forEachIndexed { i, it ->
-                message += it
+            blacklist.forEachIndexed { i, blacklistedMessage ->
+                message += blacklistedMessage
                 if (i < blacklist.size - 1) {
                     message += ", "
                 }

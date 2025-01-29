@@ -29,7 +29,8 @@ public class TotemOfCorruptionConfig {
     public int distanceThreshold = 16;
 
     @Expose
-    @ConfigOption(name = "Hide Particles", desc = "Hide the particles of the Totem of Corruption.")
+    @ConfigOption(name = "Hide Particles", desc = "Hide the particles of the Totem of Corruption.\n" +
+        "§eRequires the Overlay to be active.")
     @ConfigEditorBoolean
     public boolean hideParticles = true;
 
@@ -44,15 +45,15 @@ public class TotemOfCorruptionConfig {
         WIREFRAME("Wireframe"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        OutlineType(String str) {
-            this.str = str;
+        OutlineType(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

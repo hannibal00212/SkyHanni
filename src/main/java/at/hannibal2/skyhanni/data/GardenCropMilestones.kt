@@ -1,57 +1,66 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
-import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object GardenCropMilestones {
 
     private val patternGroup = RepoPattern.group("data.garden.milestone")
+
+    /**
+     * REGEX-TEST: §7Harvest §fWheat §7on your Garden to
+     * REGEX-TEST: §7Harvest §fCocoa Beans §7on your
+     */
     private val cropPattern by patternGroup.pattern(
         "crop",
         "§7Harvest §f(?<name>.*) §7on .*",
     )
+
+    /**
+     * REGEX-TEST: §7Total: §a36,967,397
+     */
     val totalPattern by patternGroup.pattern(
         "total",
         "§7Total: §a(?<name>.*)",
     )
 
-    private val config get() = GardenAPI.config.cropMilestones
+    private val config get() = GardenApi.config.cropMilestones
 
     fun getCropTypeByLore(itemStack: ItemStack): CropType? {
-        itemStack.getLore().matchFirst(cropPattern) {
+        cropPattern.firstMatcher(itemStack.getLore()) {
             val name = group("name")
             return CropType.getByNameOrNull(name)
         }
         return null
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Crop Milestones") return
 
         for ((_, stack) in event.inventoryItems) {
             val crop = getCropTypeByLore(stack) ?: continue
-            stack.getLore().matchFirst(totalPattern) {
+            totalPattern.firstMatcher(stack.getLore()) {
                 val amount = group("name").formatLong()
                 crop.setCounter(amount)
             }
         }
-        CropMilestoneUpdateEvent().postAndCatch()
+        CropMilestoneUpdateEvent.post()
         GardenCropMilestonesCommunityFix.openInventory(event.inventoryItems)
     }
 
@@ -97,7 +106,7 @@ object GardenCropMilestones {
 
     var cropMilestoneData: Map<CropType, List<Int>> = emptyMap()
 
-    val cropCounter: MutableMap<CropType, Long>? get() = GardenAPI.storage?.cropCounter
+    val cropCounter: MutableMap<CropType, Long>? get() = GardenApi.storage?.cropCounter
 
     // TODO make nullable
     fun CropType.getCounter() = cropCounter?.get(this) ?: 0
@@ -183,7 +192,7 @@ object GardenCropMilestones {
         return (progress - startCrops).toDouble() / (end - startCrops)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         cropMilestoneData = event.getConstant<GardenJson>("Garden").cropMilestones
     }

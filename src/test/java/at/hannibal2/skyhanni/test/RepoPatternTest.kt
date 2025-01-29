@@ -35,9 +35,9 @@ object RepoPatternTest {
         RepoPatternManager.loadPatternsFromDump(
             RepoPatternDump(
                 regexes = mapOf(
-                    simpleRepoPattern.key to remoteValue
-                )
-            )
+                    simpleRepoPattern.key to remoteValue,
+                ),
+            ),
         )
 
         val isRemoteWorking = simplePattern.pattern() == remoteValue
@@ -67,9 +67,9 @@ object RepoPatternTest {
             RepoPatternDump(
                 regexes = mapOf(
                     listPatterns.key + ".1" to remoteValue1,
-                    listPatterns.key + ".2" to remoteValue2
-                )
-            )
+                    listPatterns.key + ".2" to remoteValue2,
+                ),
+            ),
         )
 
         val isRemoteWorking = list[0].pattern() == remoteValue1 && list[1].pattern() == remoteValue2
@@ -80,8 +80,8 @@ object RepoPatternTest {
             RepoPatternDump(
                 regexes = mapOf(
                     listPatterns.key + ".1" to remoteValue3,
-                )
-            )
+                ),
+            ),
         )
 
         val isRemoteSingleWorking = list[0].pattern() == remoteValue3 && list.size == 1
@@ -92,8 +92,8 @@ object RepoPatternTest {
             RepoPatternDump(
                 regexes = mapOf(
                     listPatterns.key to remoteValue4,
-                )
-            )
+                ),
+            ),
         )
 
         val isRemoteListToSingleWorking = list.isEmpty()
@@ -116,8 +116,8 @@ object RepoPatternTest {
         val remoteValue3 = "I'm remote 3."
         val remoteValue4 = "I'm remote 4."
 
-        val isLocalWorking = group.getUnusedPatterns()
-            .isEmpty() && pattern1.pattern() == simpleLocalePattern1 && pattern2.pattern() == simpleLocalePattern2
+        val isLocalWorking =
+            group.getUnusedPatterns().isEmpty() && pattern1.pattern() == simpleLocalePattern1 && pattern2.pattern() == simpleLocalePattern2
 
         assert(isLocalWorking)
 
@@ -125,13 +125,13 @@ object RepoPatternTest {
             RepoPatternDump(
                 regexes = mapOf(
                     groupInfo.prefix + ".a" to remoteValue1,
-                    groupInfo.prefix + ".b" to remoteValue2
-                )
-            )
+                    groupInfo.prefix + ".b" to remoteValue2,
+                ),
+            ),
         )
 
-        val isRemoteWorking = group.getUnusedPatterns()
-            .isEmpty() && pattern1.pattern() == remoteValue1 && pattern2.pattern() == remoteValue2
+        val isRemoteWorking =
+            group.getUnusedPatterns().isEmpty() && pattern1.pattern() == remoteValue1 && pattern2.pattern() == remoteValue2
 
         assert(isRemoteWorking)
 
@@ -140,9 +140,9 @@ object RepoPatternTest {
                 regexes = mapOf(
                     groupInfo.prefix + ".a" to remoteValue3,
                     groupInfo.prefix + ".b" to remoteValue2,
-                    groupInfo.prefix + ".c" to remoteValue4
-                )
-            )
+                    groupInfo.prefix + ".c" to remoteValue4,
+                ),
+            ),
         )
 
         val unused = group.getUnusedPatterns()
@@ -166,8 +166,8 @@ object RepoPatternTest {
         val remoteValue3 = "I'm remote 3."
         val remoteValue4 = "I'm remote 4."
 
-        val isLocalWorking = group.getUnusedPatterns()
-            .isEmpty() && list[0].pattern() == simpleLocalePattern1 && list[1].pattern() == simpleLocalePattern2
+        val isLocalWorking =
+            group.getUnusedPatterns().isEmpty() && list[0].pattern() == simpleLocalePattern1 && list[1].pattern() == simpleLocalePattern2
 
         assert(isLocalWorking)
 
@@ -175,14 +175,12 @@ object RepoPatternTest {
             RepoPatternDump(
                 regexes = mapOf(
                     groupInfo.prefix + ".a.1" to remoteValue1,
-                    groupInfo.prefix + ".a.2" to remoteValue2
-                )
-            )
+                    groupInfo.prefix + ".a.2" to remoteValue2,
+                ),
+            ),
         )
 
-        val unused0 = group.getUnusedPatterns()
-        val isRemoteWorking = group.getUnusedPatterns()
-            .isEmpty() && list[0].pattern() == remoteValue1 && list[1].pattern() == remoteValue2
+        val isRemoteWorking = group.getUnusedPatterns().isEmpty() && list[0].pattern() == remoteValue1 && list[1].pattern() == remoteValue2
 
         assert(isRemoteWorking)
 
@@ -191,9 +189,9 @@ object RepoPatternTest {
                 regexes = mapOf(
                     groupInfo.prefix + ".a.1" to remoteValue3,
                     groupInfo.prefix + ".a.2" to remoteValue2,
-                    groupInfo.prefix + ".b" to remoteValue4
-                )
-            )
+                    groupInfo.prefix + ".b" to remoteValue4,
+                ),
+            ),
         )
 
         val unused = group.getUnusedPatterns()

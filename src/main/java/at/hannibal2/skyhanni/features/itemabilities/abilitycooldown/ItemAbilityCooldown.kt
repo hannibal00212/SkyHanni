@@ -1,16 +1,17 @@
 package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -22,9 +23,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.between
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.max
 
 @SkyHanniModule
@@ -44,21 +43,35 @@ object ItemAbilityCooldown {
     private val patternGroup = RepoPattern.group("item.abilities.cooldown")
     private val youAlignedOthersPattern by patternGroup.pattern(
         "alignedother",
-        "§eYou aligned §r§a.* §r§eother player(s)?!"
+        "§eYou aligned §r§a.* §r§eother players?!",
     )
     private val youBuffedYourselfPattern by patternGroup.pattern(
         "buffedyourself",
-        "§aYou buffed yourself for §r§c\\+\\d+❁ Strength"
+        "§aYou buffed yourself for §r§c\\+\\d+❁ Strength",
+    )
+
+    /**
+     * REGEX-TEST: §63,848/3,473❤     §b-24 Mana (§6Instant Transmission§b)     §b2,507/2,507✎ Mana
+     */
+    private val abilityUsePattern by patternGroup.pattern(
+        "abilityuse",
+        ".*§b-\\d+ Mana \\(§6(?<type>.*)§b\\).*",
     )
 
     private var lastAbility = ""
     private var items = mapOf<String, List<ItemText>>()
     private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
-    private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
-    private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
-    private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
+    private val recentItemsInHand = InventoryUtils.recentItemsInHand.values
+    private val WEIRD_TUBA = "WEIRD_TUBA".toInternalName()
+    private val WEIRDER_TUBA = "WEIRDER_TUBA".toInternalName()
+    private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".toInternalName()
+    private val WARNING_FLARE = "WARNING_FLARE".toInternalName()
+    private val ALERT_FLARE = "ALERT_FLARE".toInternalName()
+    private val SOS_FLARE = "SOS_FLARE".toInternalName()
+    private val TOTEM_OF_CORRUPTION = "TOTEM_OF_CORRUPTION".toInternalName()
 
-    @SubscribeEvent
+
+    @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         when {
             // Hyperion
@@ -86,8 +99,8 @@ object ItemAbilityCooldown {
                 if (event.pitch == 1f && event.volume == 1f) {
                     val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
                     if (!internalName.equalsOneOf(
-                            "SHADOW_FURY".asInternalName(),
-                            "STARRED_SHADOW_FURY".asInternalName()
+                            "SHADOW_FURY".toInternalName(),
+                            "STARRED_SHADOW_FURY".toInternalName(),
                         )
                     ) return
 
@@ -168,14 +181,14 @@ object ItemAbilityCooldown {
                 ItemAbility.STAFF_OF_THE_VOLCANO.sound()
             }
             // Holy Ice
-            event.soundName == "random.drink" && event.pitch.round(1) == 1.8f && event.volume == 1.0f -> {
+            event.soundName == "random.drink" && event.pitch.roundTo(1) == 1.8f && event.volume == 1.0f -> {
                 ItemAbility.HOLY_ICE.sound()
             }
             // Royal Pigeon
             event.soundName == "mob.bat.idle" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
                 ItemAbility.ROYAL_PIGEON.sound()
             }
-
+            // Wand of Strength
             event.soundName == "random.eat" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
                 ItemAbility.WAND_OF_STRENGTH.sound()
             }
@@ -183,13 +196,34 @@ object ItemAbilityCooldown {
             event.soundName == "fire.ignite" && event.pitch == 0.74603176f && event.volume == 1.0f -> {
                 ItemAbility.TACTICAL_INSERTION.activate(LorenzColor.DARK_PURPLE, 3_000)
             }
+
             event.soundName == "mob.zombie.remedy" && event.pitch == 1.8888888f && event.volume == 0.7f -> {
                 ItemAbility.TACTICAL_INSERTION.activate(null, 17_000)
+            }
+            // Totem of Corruption
+            event.soundName == "random.wood_click" && event.pitch == 0.84126985f && event.volume == 0.5f -> {
+                if (TOTEM_OF_CORRUPTION in recentItemsInHand) {
+                    ItemAbility.TOTEM_OF_CORRUPTION.sound()
+                }
+            }
+            // Enrager
+            event.soundName == "mob.enderdragon.growl" && event.pitch == 0.4920635f && event.volume == 2.0f -> {
+                ItemAbility.ENRAGER.sound()
+            }
+
+            // Blaze Slayer Flares
+            event.soundName == "fireworks.launch" && event.pitch == 1.0f && event.volume == 3.0f -> {
+                if (WARNING_FLARE in recentItemsInHand || ALERT_FLARE in recentItemsInHand) {
+                    ItemAbility.ALERT_FLARE.sound()
+                }
+                if (SOS_FLARE in recentItemsInHand) {
+                    ItemAbility.SOS_FLARE.sound()
+                }
             }
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemClick(event: ItemClickEvent) {
         if (AshfangFreezeCooldown.isCurrentlyFrozen()) return
         handleItemClick(event.itemInHand)
@@ -202,15 +236,15 @@ object ItemAbilityCooldown {
         }
     }
 
-    @SubscribeEvent
-    fun onIslandChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         for (ability in ItemAbility.entries) {
             ability.lastActivation = 0L
             ability.specialColor = null
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
 
@@ -237,9 +271,8 @@ object ItemAbilityCooldown {
     }
 
     private fun handleOldAbilities(message: String) {
-        // TODO use regex
-        if (message.contains(" (§6") && message.contains("§b) ")) {
-            val name: String = message.between(" (§6", "§b) ")
+        abilityUsePattern.matchMatcher(message) {
+            val name = group("type")
             if (name == lastAbility) return
             lastAbility = name
             for (ability in ItemAbility.entries) {
@@ -261,8 +294,8 @@ object ItemAbilityCooldown {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
 
         checkHotBar(event.isMod(10))
@@ -276,7 +309,7 @@ object ItemAbilityCooldown {
         items = abilityItems.entries.associateByTo(
             mutableMapOf(),
             { it.key.getIdentifier() },
-            { kp -> kp.value.map { createItemText(it) } }
+            { kp -> kp.value.map { createItemText(it) } },
         ).mapKeysNotNull { it.key }
 
     }
@@ -307,7 +340,7 @@ object ItemAbilityCooldown {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!isEnabled()) return
 
@@ -329,7 +362,7 @@ object ItemAbilityCooldown {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItem(event: RenderGuiItemOverlayEvent) {
         if (!isEnabled()) return
         if (!config.itemAbilityCooldownBackground) return
@@ -356,16 +389,16 @@ object ItemAbilityCooldown {
 
     private fun ItemStack.getIdentifier() = getItemUuid() ?: getItemId()
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message
         if (message == "§dCreeper Veil §r§aActivated!") {
             ItemAbility.WITHER_CLOAK.activate(LorenzColor.LIGHT_PURPLE)
         }
-        if (message == "§dCreeper Veil §r§cDe-activated! §r§8(Expired)"
-            || message == "§cNot enough mana! §r§dCreeper Veil §r§cDe-activated!"
+        if (message == "§dCreeper Veil §r§cDe-activated! §r§8(Expired)" ||
+            message == "§cNot enough mana! §r§dCreeper Veil §r§cDe-activated!"
         ) {
             ItemAbility.WITHER_CLOAK.activate()
         }
@@ -387,7 +420,7 @@ object ItemAbilityCooldown {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "itemAbilities", "inventory.itemAbilities")
     }

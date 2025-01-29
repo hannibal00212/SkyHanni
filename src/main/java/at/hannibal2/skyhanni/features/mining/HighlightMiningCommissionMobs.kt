@@ -1,14 +1,15 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -19,7 +20,6 @@ import net.minecraft.entity.monster.EntityEndermite
 import net.minecraft.entity.monster.EntityIronGolem
 import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntitySlime
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object HighlightMiningCommissionMobs {
@@ -53,10 +53,9 @@ object HighlightMiningCommissionMobs {
         CH_GOBLIN_SLAYER("Goblin Slayer", { it.name == "Weakling " }),
 
         // new commissions
-        ;
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(2)) return
@@ -66,14 +65,13 @@ object HighlightMiningCommissionMobs {
             if (type.isMob(entity)) {
                 RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                     entity,
-                    LorenzColor.YELLOW.toColor().withAlpha(127)
-                )
-                { isEnabled() && type in active }
+                    LorenzColor.YELLOW.toColor().addAlpha(127),
+                ) { isEnabled() && type in active }
             }
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
 
@@ -89,7 +87,7 @@ object HighlightMiningCommissionMobs {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
         if (!isEnabled()) return
 
@@ -98,14 +96,13 @@ object HighlightMiningCommissionMobs {
             if (type.isMob(entity)) {
                 RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                     entity,
-                    LorenzColor.YELLOW.toColor().withAlpha(127)
-                )
-                { isEnabled() && type in active }
+                    LorenzColor.YELLOW.toColor().addAlpha(127),
+                ) { isEnabled() && type in active }
             }
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.mining", "mining")
     }

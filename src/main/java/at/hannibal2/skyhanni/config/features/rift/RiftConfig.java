@@ -31,7 +31,7 @@ public class RiftConfig {
     public RiftAreasConfig area = new RiftAreasConfig();
 
     @Expose
-    @Category(name = "Motes", desc = "Motes Sell Price")
+    @Category(name = "Motes", desc = "")
     public MotesConfig motes = new MotesConfig();
 
     @Expose

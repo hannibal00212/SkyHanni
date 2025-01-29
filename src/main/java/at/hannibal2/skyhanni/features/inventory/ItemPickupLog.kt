@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -16,12 +17,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
@@ -30,7 +32,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Objects
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
@@ -42,7 +43,7 @@ object ItemPickupLog {
             "§a+256",
             { entry, prefix ->
                 val formattedAmount = if (config.shorten) entry.amount.shortFormat() else entry.amount.addSeparators()
-                Renderable.string("${prefix}${formattedAmount}")
+                Renderable.string("$prefix$formattedAmount")
             },
         ),
         ICON(
@@ -66,7 +67,7 @@ object ItemPickupLog {
         override fun toString() = display
     }
 
-    data class PickupEntry(val name: String, var amount: Long, val neuInternalName: NEUInternalName?) {
+    data class PickupEntry(val name: String, var amount: Long, val neuInternalName: NeuInternalName?) {
         var timeUntilExpiry = SimpleTimeMark.now()
 
         fun updateAmount(change: Long) {
@@ -78,15 +79,20 @@ object ItemPickupLog {
     }
 
     private val config get() = SkyHanniMod.feature.inventory.itemPickupLogConfig
-    private val coinIcon = "COIN_TALISMAN".asInternalName()
+    private val coinIcon = "COIN_TALISMAN".toInternalName()
 
-    private var itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
-    private var itemsAddedToInventory = mutableMapOf<Int, PickupEntry>()
-    private var itemsRemovedFromInventory = mutableMapOf<Int, PickupEntry>()
+    private val itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
+    private val itemsAddedToInventory = mutableMapOf<Int, PickupEntry>()
+    private val itemsRemovedFromInventory = mutableMapOf<Int, PickupEntry>()
     private var display: Renderable? = null
     private var dirty = false
 
     private val patternGroup = RepoPattern.group("itempickuplog")
+
+    /**
+     * REGEX-TEST: Mite Gel x33
+     * REGEX-TEST: Sludge Juice
+     */
     private val shopPattern by patternGroup.pattern(
         "shoppattern",
         "^(?<itemName>.+?)(?: x\\d+)?\$",
@@ -97,24 +103,27 @@ object ItemPickupLog {
         "SKYBLOCK_MENU",
         "CANCEL_PARKOUR_ITEM",
         "CANCEL_RACE_ITEM",
+        "MAXOR_ENERGY_CRYSTAL",
+        "ELLE_SUPPLIES",
+        "ELLE_FUEL_CELL",
     )
-    private val bannedItemsConverted = bannedItemsPattern.map { it.toString().asInternalName() }
+    private val bannedItemsConverted = bannedItemsPattern.map { it.toString().toInternalName() }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         display?.let { config.pos.renderRenderable(it, posLabel = "Item Pickup Log Display") }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         if (!isEnabled()) return
         itemList.clear()
         itemsAddedToInventory.clear()
         itemsRemovedFromInventory.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSackChange(event: SackChangeEvent) {
         if (!isEnabled() || !config.sack) return
 
@@ -126,42 +135,42 @@ object ItemPickupLog {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled() || !config.coins || !worldChangeCooldown()) return
 
         updateItem(0, PickupEntry("§6Coins", event.coins.absoluteValue.toLong(), coinIcon), coinIcon.getItemStack(), event.coins < 0)
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
-        if (InventoryUtils.inInventory()) return
-
         val oldItemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
 
         oldItemList.putAll(itemList)
 
-        itemList.clear()
+        if (!InventoryUtils.inInventory()) {
+            itemList.clear()
 
-        val inventoryItems = InventoryUtils.getItemsInOwnInventory().toMutableList()
-        val cursorItem = Minecraft.getMinecraft().thePlayer.inventory?.itemStack
+            val inventoryItems = InventoryUtils.getItemsInOwnInventory().toMutableList()
+            val cursorItem = Minecraft.getMinecraft().thePlayer?.inventory?.itemStack
 
-        if (cursorItem != null) {
-            val hash = cursorItem.hash()
-            //this prevents items inside hypixel guis counting when picked up
-            if (oldItemList.contains(hash)) {
-                inventoryItems.add(cursorItem)
+            if (cursorItem != null) {
+                val hash = cursorItem.hash()
+                // this prevents items inside hypixel guis counting when picked up
+                if (oldItemList.contains(hash)) {
+                    inventoryItems.add(cursorItem)
+                }
             }
-        }
 
-        for (itemStack in inventoryItems) {
-            val hash = itemStack.hash()
-            val old = itemList[hash]
-            if (old != null) {
-                itemList[hash] = old.copy(second = old.second + itemStack.stackSize)
-            } else {
-                itemList[hash] = itemStack to itemStack.stackSize
+            for (itemStack in inventoryItems) {
+                val hash = itemStack.hash()
+                val old = itemList[hash]
+                if (old != null) {
+                    itemList[hash] = old.copy(second = old.second + itemStack.stackSize)
+                } else {
+                    itemList[hash] = itemStack to itemStack.stackSize
+                }
             }
         }
 
@@ -199,14 +208,12 @@ object ItemPickupLog {
         dirty = true
     }
 
-    private fun renderList(prefix: String, entry: PickupEntry) = Renderable.horizontalContainer(
-        buildList {
-            val displayLayout: List<DisplayLayout> = config.displayLayout
-            for (item in displayLayout) {
-                add(item.renderable(entry, prefix))
-            }
-        },
-    )
+    private fun renderList(prefix: String, entry: PickupEntry) = Renderable.line {
+        val displayLayout: List<DisplayLayout> = config.displayLayout
+        for (item in displayLayout) {
+            add(item.renderable(entry, prefix))
+        }
+    }
 
     private fun checkForDuplicateItems(
         list: MutableMap<Int, Pair<ItemStack, Int>>,
@@ -229,13 +236,9 @@ object ItemPickupLog {
     }
 
     private fun isBannedItem(item: ItemStack): Boolean {
-        if (item.getInternalNameOrNull()?.startsWith("MAP") == true) {
-            return true
-        }
-
-        if (bannedItemsConverted.contains(item.getInternalNameOrNull())) {
-            return true
-        }
+        val internalName = item.getInternalNameOrNull() ?: return true
+        if (internalName.startsWith("MAP") == true) return true
+        if (internalName in bannedItemsConverted) return true
 
         if (item.getExtraAttributes()?.hasKey("quiver_arrow") == true) {
             return true
@@ -254,13 +257,12 @@ object ItemPickupLog {
 
     private fun ItemStack.hash(): Int {
         var displayName = this.displayName.removeColor()
-        val matcher = shopPattern.matcher(displayName)
-        if (matcher.matches()) {
-            displayName = matcher.group("itemName")
+        shopPattern.matchMatcher(displayName) {
+            displayName = group("itemName")
         }
         return Objects.hash(
             this.getInternalNameOrNull(),
-            displayName.removeColor(),
+            displayName,
             this.getItemRarityOrNull(),
         )
     }

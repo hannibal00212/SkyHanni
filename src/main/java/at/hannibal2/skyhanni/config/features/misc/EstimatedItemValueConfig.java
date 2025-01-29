@@ -40,6 +40,15 @@ public class EstimatedItemValueConfig {
     public Property<Integer> enchantmentsCap = Property.of(7);
 
     @Expose
+    @ConfigOption(name = "Star Material Cap", desc = "Only show the top # most expensive parts of star prices.")
+    @ConfigEditorSlider(
+        minValue = 1,
+        maxValue = 15,
+        minStep = 1
+    )
+    public Property<Integer> starMaterialCap = Property.of(3);
+
+    @Expose
     @ConfigOption(name = "Show Exact Price", desc = "Show the exact total price instead of the compact number.")
     @ConfigEditorBoolean
     public Property<Boolean> exactPrice = Property.of(false);
@@ -69,22 +78,10 @@ public class EstimatedItemValueConfig {
     @ConfigOption(name = "Change Price Source", desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC.")
     @ConfigEditorDropdown
     public Property<ItemPriceSource> priceSource = Property.of(ItemPriceSource.BAZAAR_INSTANT_SELL);
-
-    public enum BazaarPriceSource {
-        INSTANT_BUY("Instant Buy"),
-        BUY_ORDER("Buy Order"),
-        ;
-        private final String str;
-
-        BazaarPriceSource(String str) {
-            this.str = str;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-    }
+    @Expose
+    @ConfigLink(owner = EstimatedItemValueConfig.class, field = "enabled")
+    // TODO rename "position"
+    public Position itemPriceDataPos = new Position(140, 90, false, true);
 
     @Expose
     @ConfigOption(
@@ -95,7 +92,19 @@ public class EstimatedItemValueConfig {
     @ConfigEditorBoolean
     public Property<Boolean> useAttributeComposite = Property.of(false);
 
-    @Expose
-    @ConfigLink(owner = EstimatedItemValueConfig.class, field = "enabled")
-    public Position itemPriceDataPos = new Position(140, 90, false, true);
+    public enum BazaarPriceSource {
+        INSTANT_BUY("Instant Buy"),
+        BUY_ORDER("Buy Order"),
+        ;
+        private final String displayName;
+
+        BazaarPriceSource(String displayName) {
+            this.displayName = displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
+    }
 }

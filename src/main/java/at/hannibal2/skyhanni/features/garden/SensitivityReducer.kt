@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.SensitivityReducerConfig
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
 
@@ -31,9 +31,9 @@ object SensitivityReducer {
     private val mc get() = Minecraft.getMinecraft()
     private val gameSettings = mc.gameSettings
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!GardenAPI.inGarden()) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
+        if (!GardenApi.inGarden()) {
             if (isToggled && lastCheckCooldown.passedSince() > 1.seconds) {
                 lastCheckCooldown = SimpleTimeMark.now()
                 isToggled = false
@@ -66,7 +66,7 @@ object SensitivityReducer {
             else -> return
         }
         if (isToggled && lastCheckCooldown.passedSince() > 1.seconds) {
-            if (GardenAPI.onBarnPlot && config.onlyPlot.get()) {
+            if (GardenApi.onBarnPlot && config.onlyPlot.get()) {
                 isToggled = false
                 restoreSensitivity()
             }
@@ -78,13 +78,13 @@ object SensitivityReducer {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.reducingFactor.afterChange {
             reloadSensitivity()
         }
         config.onlyPlot.afterChange {
-            if (isToggled && config.onlyPlot.get() && GardenAPI.onBarnPlot) {
+            if (isToggled && config.onlyPlot.get() && GardenApi.onBarnPlot) {
                 restoreSensitivity()
                 isToggled = false
             }
@@ -104,7 +104,7 @@ object SensitivityReducer {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!(isToggled || isManualToggle)) return
         if (!config.showGUI) return
@@ -113,7 +113,7 @@ object SensitivityReducer {
     }
 
     private fun isHoldingTool(): Boolean {
-        return GardenAPI.toolInHand != null
+        return GardenApi.toolInHand != null
     }
 
     private fun isHoldingKey(): Boolean {
@@ -126,7 +126,7 @@ object SensitivityReducer {
 
     fun manualToggle() {
         if (isToggled) {
-            ChatUtils.chat("This command is disabled while the Sensitivity is lowered.")
+            ChatUtils.userError("This command is disabled while the Sensitivity is lowered!")
             return
         }
         isManualToggle = !isManualToggle
@@ -142,7 +142,7 @@ object SensitivityReducer {
         if (!LockMouseLook.lockedMouse) {
             storage.savedMouseloweredSensitivity = gameSettings.mouseSensitivity
             val newSens = doTheMath(storage.savedMouseloweredSensitivity)
-            gameSettings?.mouseSensitivity = newSens
+            gameSettings.mouseSensitivity = newSens
         } else {
             storage.savedMouseloweredSensitivity = storage.savedMouselockedSensitivity
         }
@@ -150,12 +150,12 @@ object SensitivityReducer {
     }
 
     private fun restoreSensitivity(showMessage: Boolean = false) {
-        if (!LockMouseLook.lockedMouse) gameSettings?.mouseSensitivity = storage.savedMouseloweredSensitivity
+        if (!LockMouseLook.lockedMouse) gameSettings.mouseSensitivity = storage.savedMouseloweredSensitivity
         if (showMessage) ChatUtils.chat("§bMouse sensitivity is now restored.")
     }
 
     private fun toggle(state: Boolean) {
-        if (config.onlyPlot.get() && GardenAPI.onBarnPlot) return
+        if (config.onlyPlot.get() && GardenApi.onBarnPlot) return
         if (config.onGround.get() && !mc.thePlayer.onGround) return
         if (!isToggled) {
             lowerSensitivity()
@@ -169,7 +169,7 @@ object SensitivityReducer {
         else (divisor * (input - LOCKED)) + LOCKED
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         val divisor = config.reducingFactor.get()
         val expectedLoweredSensitivity = doTheMath(gameSettings.mouseSensitivity, true)
@@ -181,11 +181,11 @@ object SensitivityReducer {
         }
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Garden Sensitivity Reducer")
 
-        if (!GardenAPI.inGarden()) {
+        if (!GardenApi.inGarden()) {
             event.addIrrelevant("not in garden")
             return
         }
@@ -199,7 +199,7 @@ object SensitivityReducer {
             add("Current Sensitivity: ${gameSettings.mouseSensitivity}")
             add("Stored Sensitivity: ${storage.savedMouseloweredSensitivity}")
             add("onGround: ${mc.thePlayer.onGround}")
-            add("onBarn: ${GardenAPI.onBarnPlot}")
+            add("onBarn: ${GardenApi.onBarnPlot}")
             add("enabled: ${isToggled || isManualToggle}")
             add("--- config ---")
             add("mode: ${config.mode.name}")
