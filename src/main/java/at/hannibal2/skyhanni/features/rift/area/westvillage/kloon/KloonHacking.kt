@@ -32,7 +32,7 @@ object KloonHacking {
 
     private val colorPattern by RepoPattern.pattern(
         "rift.area.westvillage.kloon.color",
-        "You've set the color of this terminal to (?<color>.*)!"
+        "You've set the color of this terminal to (?<color>.*)!",
     )
 
     private var wearingHelmet = false
