@@ -30,6 +30,9 @@ object KloonHacking {
 
     private val config get() = RiftApi.config.area.westVillage.hacking
 
+    /**
+     * REGEX-TEST: You've set the color of this terminal to RED!
+     */
     private val colorPattern by RepoPattern.pattern(
         "rift.area.westvillage.kloon.color",
         "You've set the color of this terminal to (?<color>.*)!",
