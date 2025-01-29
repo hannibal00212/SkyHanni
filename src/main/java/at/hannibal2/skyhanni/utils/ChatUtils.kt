@@ -159,7 +159,7 @@ object ChatUtils {
         oneTimeClick: Boolean = false,
         replaceSameMessage: Boolean = false,
     ) {
-        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
+        val msgPrefix = if (prefix && !config.removeChatPrefix) prefixColor + CHAT_PREFIX else ""
 
         val rawText = msgPrefix + message
         val text = Text.text(rawText) {
@@ -201,7 +201,7 @@ object ChatUtils {
         prefix: Boolean = true,
         prefixColor: String = "§e",
     ) {
-        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
+        val msgPrefix = if (prefix && !config.removeChatPrefix) prefixColor + CHAT_PREFIX else ""
 
         chat(
             Text.text(msgPrefix + message) {
@@ -232,7 +232,7 @@ object ChatUtils {
         prefix: Boolean = true,
         prefixColor: String = "§e",
     ) {
-        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
+        val msgPrefix = if (prefix && !config.removeChatPrefix) prefixColor + CHAT_PREFIX else ""
         chat(
             Text.text(msgPrefix + message) {
                 this.url = url
@@ -255,7 +255,7 @@ object ChatUtils {
         prefix: Boolean = true,
         prefixColor: String = "§e",
     ) {
-        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
+        val msgPrefix = if (prefix && !config.removeChatPrefix) prefixColor + CHAT_PREFIX else ""
         chat(Text.join(components).prefix(msgPrefix))
     }
 
