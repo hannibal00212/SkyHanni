@@ -27,9 +27,13 @@ import kotlin.time.Duration.Companion.seconds
 object NpcVisitorFix {
     private val staticVisitors = listOf("Jacob", "Anita")
 
+    /**
+     * REGEX-TEST: §aChanging Barn skin to §r§fDefault§r§a!
+     * REGEX-TEST: §aChanging Barn skin to §r§5Mansion Heights§r§a!
+     */
     private val barnSkinChangePattern by RepoPattern.pattern(
         "garden.barn.skin.change",
-        "§aChanging Barn skin to §r.*"
+        "§aChanging Barn skin to §r.*",
     )
 
     @HandleEvent

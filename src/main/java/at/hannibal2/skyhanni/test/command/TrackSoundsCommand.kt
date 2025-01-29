@@ -2,10 +2,12 @@ package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -18,7 +20,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.mojang.realmsclient.gui.ChatFormatting
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -39,7 +40,7 @@ object TrackSoundsCommand {
     private var worldSounds: Map<LorenzVec, List<PlaySoundEvent>> = emptyMap()
 
     // TODO write abstract code for this and TrackParticlesCommand
-    fun command(args: Array<String>) {
+    private fun command(args: Array<String>) {
         if (!LorenzUtils.inSkyBlock) {
             ChatUtils.userError("This command only works in SkyBlock!")
             return
@@ -72,8 +73,8 @@ object TrackSoundsCommand {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isRecording) return
 
         val soundsToDisplay = sounds.takeWhile { startTime.passedSince() - it.first < 3.seconds }
@@ -109,7 +110,7 @@ object TrackSoundsCommand {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (cutOffTime.isInPast()) return
         for ((key, value) in worldSounds) {
             if (value.size != 1) {
@@ -135,6 +136,15 @@ object TrackSoundsCommand {
                     scaleMultiplier = 0.8,
                 )
             }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtracksounds") {
+            description = "Tracks the sounds for the specified duration (in seconds) and copies it to the clipboard"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { command(it) }
         }
     }
 }

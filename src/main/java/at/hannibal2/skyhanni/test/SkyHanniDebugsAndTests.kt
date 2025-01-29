@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
@@ -13,7 +15,7 @@ import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
@@ -103,7 +105,7 @@ object SkyHanniDebugsAndTests {
     private var testLocation: LorenzVec? = null
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         testLocation?.let {
             event.drawWaypointFilled(it, LorenzColor.WHITE.toColor())
             event.drawDynamicText(it, "Test", 1.5)
@@ -183,7 +185,7 @@ object SkyHanniDebugsAndTests {
         }
     }
 
-    fun resetConfigCommand() {
+    private fun resetConfigCommand() {
         ChatUtils.clickableChat(
             "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to proceed.",
             onClick = { resetConfig() },
@@ -204,7 +206,7 @@ object SkyHanniDebugsAndTests {
             // initializing a new config manager, calling firstLoad, and setting it as the config manager in use.
             val configManager = ConfigManager()
             configManager.firstLoad()
-            SkyHanniMod.Companion::class.java.enclosingClass.getDeclaredField("configManager").makeAccessible()
+            SkyHanniMod::class.java.enclosingClass.getDeclaredField("configManager").makeAccessible()
                 .set(SkyHanniMod, configManager)
 
             // resetting the MoulConfigProcessor in use
@@ -648,5 +650,16 @@ object SkyHanniDebugsAndTests {
         event.move(3, "dev.showItemRarity", "dev.debug.showItemRarity")
         event.move(3, "dev.copyInternalName", "dev.debug.copyInternalName")
         event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetconfig") {
+            description = "Reloads the config manager and rendering processors of MoulConfig. " +
+                "This §cWILL RESET §7your config, but also update the config files " +
+                "(names, description, orderings and stuff)."
+            category = CommandCategory.DEVELOPER_TEST
+            callback { resetConfigCommand() }
+        }
     }
 }

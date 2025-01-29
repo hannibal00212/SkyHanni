@@ -108,6 +108,7 @@ object ChocolateFactoryApi {
     private var chocolateFactoryMilestones: MutableList<MilestoneJson> = mutableListOf()
     private var chocolateShopMilestones: MutableList<MilestoneJson> = mutableListOf()
     private var maxPrestige = 6
+    var cfShortcutIndex = 16
 
     var inChocolateFactory = false
     var chocolateFactoryPaused = false
@@ -166,6 +167,7 @@ object ChocolateFactoryApi {
         rabbitHitmanIndex = data.rabbitHitmanIndex
         maxRabbits = data.maxRabbits
         maxPrestige = data.maxPrestige
+        cfShortcutIndex = data.cfShortcutIndex
         chocolateMilestones = data.chocolateMilestones
         hitmanCosts = data.hitmanCosts
         chocolateFactoryMilestones = data.chocolateFactoryMilestones.toMutableList()

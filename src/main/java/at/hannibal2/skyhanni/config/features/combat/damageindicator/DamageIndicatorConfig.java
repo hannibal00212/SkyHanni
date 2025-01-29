@@ -55,17 +55,17 @@ public class DamageIndicatorConfig {
         SHORT_NAME("Short Name", 2),
         ;
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        NameVisibility(String str, int legacyId) {
-            this.str = str;
+        NameVisibility(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        NameVisibility(String str) {
-            this(str, -1);
+        NameVisibility(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -75,7 +75,7 @@ public class DamageIndicatorConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -134,17 +134,17 @@ public class DamageIndicatorConfig {
         BROODMOTHER("§bBroodmother")
         ;
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        BossCategory(String str, int legacyId) {
-            this.str = str;
+        BossCategory(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        BossCategory(String str) {
-            this(str, -1);
+        BossCategory(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -154,7 +154,7 @@ public class DamageIndicatorConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

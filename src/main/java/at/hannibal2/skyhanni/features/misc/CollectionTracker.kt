@@ -3,8 +3,9 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -21,7 +22,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.percentWithColorCode
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
 
 @SkyHanniModule
@@ -47,7 +47,7 @@ object CollectionTracker {
     private val OBSOLITE = "OBSOLITE".toInternalName()
     private val TIMITE = "TIMITE".toInternalName()
 
-    fun command(args: Array<String>) {
+    private fun command(args: Array<String>) {
         if (args.isEmpty()) {
             if (internalName == null) {
                 ChatUtils.userError("/shtrackcollection <item name> [goal amount]")
@@ -192,8 +192,8 @@ object CollectionTracker {
             .map { it.displayName.removeColor().replace(" ", "_") }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         val thePlayer = Minecraft.getMinecraft().thePlayer ?: return
         thePlayer.worldObj ?: return
 
@@ -236,5 +236,13 @@ object CollectionTracker {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         SkyHanniMod.feature.misc.collectionCounterPos.renderStringsAndItems(display, posLabel = "Collection Tracker")
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtrackcollection") {
+            description = "Tracks your collection gain over time"
+            callback { command(it) }
+        }
     }
 }
