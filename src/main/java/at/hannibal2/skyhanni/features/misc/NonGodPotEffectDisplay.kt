@@ -115,43 +115,49 @@ object NonGodPotEffectDisplay {
         when (event.message) {
             "§aYou cleared all of your active effects!" -> {
                 effectDuration.clear()
-                PestWarning.repellentMultiplier = 1
                 update()
             }
+
             "§aYou ate a §r§aRe-heated Gummy Polar Bear§r§a!" -> {
                 effectDuration[NonGodPotEffect.SMOLDERING] = Timer(1.hours)
                 update()
             }
+
             "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f! Press TAB or type /effects to view your active effects!" -> {
                 effectDuration[NonGodPotEffect.GLOWY] = Timer(1.hours)
                 update()
             }
+
             "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f! Press TAB or type /effects to view your active effects!" -> {
                 effectDuration[NonGodPotEffect.WISP] = Timer(5.minutes)
                 update()
             }
+
             "§eYou consumed a §r§fGreat Spook Potion§r§e!" -> {
                 effectDuration[NonGodPotEffect.GREAT_SPOOK] = Timer(24.hours)
                 update()
             }
+
             "§a§lBUFF! §fYou have gained §r§6Harvest Harbinger V§r§f! Press TAB or type /effects to view your active effects!" -> {
                 effectDuration[NonGodPotEffect.HARVEST_HARBINGER] = Timer(25.minutes)
                 update()
             }
+
             "§a§lYUM! §r§2Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
                 effectDuration[NonGodPotEffect.PEST_REPELLENT] = Timer(1.hours)
-                PestWarning.repellentMultiplier = 2
                 update()
             }
+
             "§a§lYUM! §r§2Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
                 effectDuration[NonGodPotEffect.PEST_REPELLENT_MAX] = Timer(1.hours)
-                PestWarning.repellentMultiplier = 4
                 update()
             }
+
             "§e[NPC] §6King Yolkar§f: §rThis egg will help me stomach my pain." -> {
                 effectDuration[NonGodPotEffect.GOBLIN] = Timer(20.minutes)
                 update()
             }
+
             "§cThe Goblin King's §r§afoul stench §r§chas dissipated!" -> {
                 effectDuration.remove(NonGodPotEffect.GOBLIN)
                 update()
