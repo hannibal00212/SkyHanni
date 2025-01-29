@@ -13,7 +13,10 @@ class PotentialBugsProvider : RuleSetProvider {
     override fun instance(config: Config): RuleSet {
         return RuleSet(
             ruleSetId,
-            listOf(StorageNeedsExpose(config)),
+            listOf(
+                ImmutableTypesWithExpectedInteriorMutabilityInConfig(config),
+                StorageNeedsExpose(config),
+            ),
         )
     }
 }
