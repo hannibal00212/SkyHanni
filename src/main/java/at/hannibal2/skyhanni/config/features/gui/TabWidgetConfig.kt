@@ -35,7 +35,7 @@ class TabWidgetConfig {
     @Expose
     @ConfigOption(name = "Widgets", desc = "")
     @ConfigEditorDraggableList
-    var display: Property<List<TabWidgetDisplay>> = Property.of(mutableListOf())
+    var display: Property<MutableList<TabWidgetDisplay>> = Property.of(mutableListOf())
 
     @Expose
     @ConfigLink(owner = TabWidgetConfig::class, field = "enabled")
