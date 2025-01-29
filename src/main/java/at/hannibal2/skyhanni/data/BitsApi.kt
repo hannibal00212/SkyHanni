@@ -281,7 +281,7 @@ object BitsApi {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
-        val stacks = event.inventoryItems.values.toList()
+        val stacks = event.inventoryItems.values
 
         when {
             UtilsPatterns.skyblockMenuGuiPattern.matches(event.inventoryName) -> handleSkyBlockMenu(stacks)
@@ -290,7 +290,7 @@ object BitsApi {
         }
     }
 
-    private fun handleSkyBlockMenu(stacks: List<ItemStack>) {
+    private fun handleSkyBlockMenu(stacks: Collection<ItemStack>) {
         val cookieStack = stacks.lastOrNull { cookieGuiStackPattern.matches(it.displayName) }
 
         // If the cookie stack is null, then the player should not have any bits to claim
@@ -323,42 +323,38 @@ object BitsApi {
         }
     }
 
-    private fun handleFameRankGui(stacks: List<ItemStack>) {
+    private fun handleFameRankGui(stacks: Collection<ItemStack>) {
         processFameRankStacks(stacks)
         processBitsStacks(stacks)
         processCookieStacks(stacks)
     }
 
-    private fun processFameRankStacks(stacks: List<ItemStack>) {
+    private fun processFameRankStacks(stacks: Collection<ItemStack>) {
         val stack = stacks.firstOrNull { fameRankGuiStackPattern.matches(it.displayName) } ?: return
+        fun fameRankOrNull(rank: String) {
+            currentFameRank = getFameRankByNameOrNull(rank)
+                ?: return ErrorManager.logErrorWithData(
+                    FameRankNotFoundException(rank),
+                    "FameRank $rank not found",
+                    "Rank" to rank,
+                    "Lore" to stack.getLore(),
+                    "FameRanks" to FameRanks.fameRanks,
+                )
+        }
         for (line in stack.getLore()) {
             fameRankCommunityShopPattern.matchMatcher(line) {
                 val rank = group("rank")
-                currentFameRank = getFameRankByNameOrNull(rank)
-                    ?: return ErrorManager.logErrorWithData(
-                        FameRankNotFoundException(rank),
-                        "FameRank $rank not found",
-                        "Rank" to rank,
-                        "Lore" to stack.getLore(),
-                        "FameRanks" to FameRanks.fameRanks,
-                    )
+                fameRankOrNull(rank)
             }
 
             fameRankSBMenuPattern.matchMatcher(line) {
                 val rank = group("rank")
-                currentFameRank = getFameRankByNameOrNull(rank)
-                    ?: return ErrorManager.logErrorWithData(
-                        FameRankNotFoundException(rank),
-                        "FameRank $rank not found",
-                        "Rank" to rank,
-                        "Lore" to stack.getLore(),
-                        "FameRanks" to FameRanks.fameRanks,
-                    )
+                fameRankOrNull(rank)
             }
         }
     }
 
-    private fun processBitsStacks(stacks: List<ItemStack>) {
+    private fun processBitsStacks(stacks: Collection<ItemStack>) {
         val stack = stacks.firstOrNull { bitsStackPattern.matches(it.displayName) } ?: return
         var foundAvailable = false
         var foundBits = false
@@ -382,7 +378,7 @@ object BitsApi {
         }
     }
 
-    private fun processCookieStacks(stacks: List<ItemStack>) {
+    private fun processCookieStacks(stacks: Collection<ItemStack>) {
         val stack = stacks.firstOrNull { cookieGuiStackPattern.matches(it.displayName) } ?: return
         for (line in stack.getLore()) {
             cookieDurationPattern.matchMatcher(line) {
@@ -399,11 +395,11 @@ object BitsApi {
         }
     }
 
-    private fun handleMuseumGui(stacks: List<ItemStack>) {
+    private fun handleMuseumGui(stacks: Collection<ItemStack>) {
         val stack = stacks.firstOrNull { museumRewardStackPattern.matches(it.displayName) } ?: return
 
         museumMilestonePattern.firstMatcher(stack.getLore()) {
-            museumMilestone = group("milestone").toInt()
+            museumMilestone = group("milestone").formatInt()
         }
     }
 
