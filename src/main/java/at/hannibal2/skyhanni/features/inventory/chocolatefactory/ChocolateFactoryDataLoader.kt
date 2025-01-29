@@ -276,7 +276,6 @@ object ChocolateFactoryDataLoader {
     }
 
     private fun clearData() {
-        ChocolateFactoryApi.inChocolateFactory = false
         ChocolateFactoryApi.chocolateFactoryPaused = false
         ChocolateFactoryApi.factoryUpgrades = emptyList()
         ChocolateFactoryApi.bestAffordableSlot = -1
