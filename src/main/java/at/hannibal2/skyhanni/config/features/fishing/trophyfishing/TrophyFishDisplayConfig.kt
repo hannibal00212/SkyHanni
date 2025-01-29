@@ -12,7 +12,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.input.Keyboard
-import java.util.*
 
 class TrophyFishDisplayConfig {
     @Expose
@@ -91,8 +90,8 @@ class TrophyFishDisplayConfig {
             TextPart.BRONZE,
             TextPart.SILVER,
             TextPart.GOLD,
-            TextPart.DIAMOND
-        )
+            TextPart.DIAMOND,
+        ),
     )
 
     enum class TextPart(private val displayName: String) {
@@ -119,7 +118,7 @@ class TrophyFishDisplayConfig {
     var showCheckmark: Property<Boolean> = Property.of(false)
 
     @Expose
-    @ConfigOption(name = "Only Show Missing", desc = "Only show Trophy Fishes that are still missing at this rarity.")
+    @ConfigOption(name = "Only Show Missing", desc = "Only show Trophy Fish that are still missing at this rarity.")
     @ConfigEditorDropdown
     var onlyShowMissing: Property<HideCaught> = Property.of(HideCaught.NONE)
 
@@ -133,6 +132,14 @@ class TrophyFishDisplayConfig {
 
         override fun toString() = displayName
     }
+
+    @Expose
+    @ConfigOption(
+        name = "Show If Caught Higher Tier",
+        desc = "Show Trophy Fish missing at the chosen tier even if a higher tier has already been caught.",
+    )
+    @ConfigEditorBoolean
+    var showCaughtHigher: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigLink(owner = TrophyFishDisplayConfig::class, field = "enabled")
