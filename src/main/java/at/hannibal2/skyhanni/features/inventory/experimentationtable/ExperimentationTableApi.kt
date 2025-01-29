@@ -4,10 +4,12 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils.openInventoryName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -25,26 +27,15 @@ object ExperimentationTableApi {
 
     val inTable get() = inventoriesPattern.matches(openInventoryName())
 
-    fun inDistanceToTable(max: Double): Boolean {
-        val vec = LorenzVec.getBlockBelowPlayer()
-        return storage?.tablePos?.let { it.distance(vec) <= max } ?: false
-    }
+    var openExperiment: Experiment? = null
 
-    fun getCurrentExperiment(): Experiment? =
-        superpairsPattern.matchMatcher(openInventoryName()) {
-            Experiment.entries.find { it.nameString == group("experiment") }
-        }
-
-    @HandleEvent
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND || !inTable) return
-
-        val entity = EntityUtils.getEntities<EntityArmorStand>().find {
-            it.wearingSkullTexture(EXPERIMENTATION_TABLE_SKULL)
-        } ?: return
-        val vec = entity.getLorenzVec()
-        if (storage?.tablePos != vec) storage?.tablePos = vec
-    }
+    val superpairInventory = InventoryDetector(
+        openInventory = { name ->
+            openExperiment = superpairsPattern.matchMatcher(name) {
+                Experiment.entries.find { it.nameString == group("experiment") }
+            }
+        },
+    ) { name -> superpairsPattern.matches(name) }
 
     private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
     private val patternGroup = RepoPattern.group("enchanting.experiments")
@@ -138,7 +129,7 @@ object ExperimentationTableApi {
      */
     val remainingClicksPattern by patternGroup.pattern(
         "clicks",
-        "Remaining Clicks: (?<clicks>\\d+)"
+        "Remaining Clicks: (?<clicks>\\d+)",
     )
 
     /**
@@ -173,6 +164,25 @@ object ExperimentationTableApi {
         "guardianpet",
         "§[956d]Guardian.*",
     )
+
+    @Deprecated("outdated", ReplaceWith("this.openExperiment"))
+    fun getCurrentExperiment(): Experiment? = openExperiment
+
+    @HandleEvent
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND || !inTable) return
+
+        val entity = EntityUtils.getEntities<EntityArmorStand>().find {
+            it.wearingSkullTexture(EXPERIMENTATION_TABLE_SKULL)
+        } ?: return
+        val vec = entity.getLorenzVec()
+        if (storage?.tablePos != vec) storage?.tablePos = vec
+    }
+
+    fun inDistanceToTable(max: Double): Boolean {
+        val vec = LorenzVec.getBlockBelowPlayer()
+        return storage?.tablePos?.let { it.distance(vec) <= max } ?: false
+    }
 
     fun hasGuardianPet(): Boolean = petNamePattern.matches(PetApi.currentPet)
 }
