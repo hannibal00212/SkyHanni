@@ -27,6 +27,11 @@ public class CrimsonIsleConfig {
     public MatriarchHelperConfig matriarchHelper = new MatriarchHelperConfig();
 
     @Expose
+    @ConfigOption(name = "Atoms HitBox", desc = "")
+    @Accordion
+    public AtomHitBoxConfig atomHitBox = new AtomHitBoxConfig();
+
+    @Expose
     @ConfigOption(name = "Miniboss Respawn Timer", desc = "Shows a timer for when minibosses will respawn.")
     @ConfigEditorBoolean
     @FeatureToggle
