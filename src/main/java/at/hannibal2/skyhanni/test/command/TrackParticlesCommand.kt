@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -37,7 +39,7 @@ object TrackParticlesCommand {
     private var worldParticles: Map<LorenzVec, List<ReceiveParticleEvent>> = emptyMap()
 
     // TODO write abstract code for this and TrackSoundsCommand
-    fun command(args: Array<String>) {
+    private fun command(args: Array<String>) {
         if (!LorenzUtils.inSkyBlock) {
             ChatUtils.userError("This command only works in SkyBlock!")
             return
@@ -127,6 +129,15 @@ object TrackParticlesCommand {
                     scaleMultiplier = 0.8,
                 )
             }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtrackparticles") {
+            description = "Tracks the particles for the specified duration (in seconds) and copies it to the clipboard"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { command(it) }
         }
     }
 }
