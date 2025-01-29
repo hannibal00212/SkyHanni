@@ -31,7 +31,6 @@ class InventoryDetector(
 
     @SkyHanniModule
     companion object {
-
         private val detectors = mutableListOf<InventoryDetector>()
 
         @HandleEvent(priority = HandleEvent.HIGHEST)
