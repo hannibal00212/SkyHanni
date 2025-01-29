@@ -88,11 +88,6 @@ public class DiscordRPCConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Show Button for EliteBot", desc = "Add a button to the RPC that opens your EliteBot profile.")
-    @ConfigEditorBoolean
-    public Property<Boolean> showEliteBotButton = Property.of(true);
-
-    @Expose
     @ConfigOption(name = "Dynamic Fallback", desc = "What to show when none of your \"Dynamic Priority\" statuses are active.")
     @ConfigEditorDropdown
     public Property<LineEntry> auto = Property.of(NOTHING);
@@ -101,6 +96,11 @@ public class DiscordRPCConfig {
     @ConfigOption(name = "Show Button for SkyCrypt", desc = "Add a button to the RPC that opens your SkyCrypt profile.")
     @ConfigEditorBoolean
     public Property<Boolean> showSkyCryptButton = Property.of(true);
+
+    @Expose
+    @ConfigOption(name = "Show Button for EliteBot", desc = "Add a button to the RPC that opens your EliteBot profile.")
+    @ConfigEditorBoolean
+    public Property<Boolean> showEliteBotButton = Property.of(true);
 
     public enum LineEntry implements HasLegacyId {
         NOTHING("Nothing", 0),

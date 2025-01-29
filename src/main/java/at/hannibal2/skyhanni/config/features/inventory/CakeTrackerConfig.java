@@ -43,6 +43,7 @@ public class CakeTrackerConfig {
 
     @Expose
     public CakeTrackerDisplayOrderType displayOrderType = CakeTrackerDisplayOrderType.OLDEST_FIRST;
+
     public enum CakeTrackerDisplayOrderType {
         OLDEST_FIRST,
         NEWEST_FIRST,

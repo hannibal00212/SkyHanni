@@ -138,7 +138,7 @@ public class InventoryConfig {
     @ConfigOption(name = "New Year Cake Tracker", desc = "")
     @Accordion
     public CakeTrackerConfig cakeTracker = new CakeTrackerConfig();
-  
+
     @Expose
     @ConfigOption(name = "Magical Power Display", desc = "")
     @Accordion
@@ -227,12 +227,6 @@ public class InventoryConfig {
     public boolean quickCraftingConfirmation = false;
 
     @Expose
-    @ConfigOption(name = "Ultimate Enchant Star", desc = "Show a star on Enchanted Books with an Ultimate Enchant.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean ultimateEnchantStar = false;
-
-    @Expose
     @ConfigOption(name = "Sack Name", desc = "Show an abbreviation of the sack name.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -249,12 +243,12 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean itemStars = false;
+
     @Expose
-    @ConfigOption(name = "Shift Click NPC sell", desc = "Change normal clicks to shift clicks in npc inventory for selling.")
+    @ConfigOption(name = "Ultimate Enchant Star", desc = "Show a star on Enchanted Books with an Ultimate Enchant.")
     @ConfigEditorBoolean
     @FeatureToggle
-    // TODO rename to shiftClickNpcSell
-    public boolean shiftClickNPCSell = false;
+    public boolean ultimateEnchantStar = false;
 
     @Expose
     @ConfigOption(name = "Missing Tasks", desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.")
@@ -283,16 +277,23 @@ public class InventoryConfig {
     public boolean shiftClickForEquipment = false;
 
     @Expose
-    @ConfigOption(name = "Time Held in Lore", desc = "Show time held for Time Pocket items (Bottle of Jyrre, Dark Cacao Truffle, Discrite) in the lore.")
+    @ConfigOption(name = "Shift Click NPC sell", desc = "Change normal clicks to shift clicks in npc inventory for selling.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean timeHeldInLore = false;
+    // TODO rename to shiftClickNpcSell
+    public boolean shiftClickNPCSell = false;
 
     @Expose
     @ConfigOption(name = "Shift Click Brewing", desc = "Change normal clicks to shift clicks in Brewing Stand inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickBrewing = false;
+
+    @Expose
+    @ConfigOption(name = "Time Held in Lore", desc = "Show time held for Time Pocket items (Bottle of Jyrre, Dark Cacao Truffle, Discrite) in the lore.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean timeHeldInLore = false;
 
     @Expose
     @ConfigOption(name = "Stonk of Stonk Price", desc = "Show Price per Stonk when taking the minimum bid in Stonks Auction (Richard).")
