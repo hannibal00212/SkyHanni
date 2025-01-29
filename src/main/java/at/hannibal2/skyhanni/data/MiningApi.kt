@@ -182,7 +182,7 @@ object MiningApi {
     @Deprecated("Use IslandTypeTags.MINING.inAny() instead", ReplaceWith("IslandTypeTags.MINING.inAny()"))
     fun inMiningIsland() = IslandTypeTags.MINING.inAny()
 
-    @Deprecated("Use IslandTypeTags.COLD_MINING.inAny() instead", ReplaceWith("IslandTypeTags.COLD_MINING.inAny()"))
+    @Deprecated("Use IslandTypeTags.IS_COLD.inAny() instead", ReplaceWith("IslandTypeTags.IS_COLD.inAny()"))
     fun inColdIsland() = IslandTypeTags.IS_COLD.inAny()
 
     @HandleEvent

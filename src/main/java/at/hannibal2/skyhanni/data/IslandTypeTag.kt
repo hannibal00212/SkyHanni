@@ -62,6 +62,12 @@ object IslandTypeTags {
         IslandType.PRIVATE_ISLAND_GUEST,
     )
 
+    val GARDEN_ISLAND = IslandTypeTag(
+        "garden_island",
+        IslandType.GARDEN,
+        IslandType.GARDEN_GUEST,
+    )
+
     // Mining
     val IS_COLD = IslandTypeTag(
         "is_cold",
@@ -89,36 +95,6 @@ object IslandTypeTags {
         IslandType.THE_END,
         IslandType.CRIMSON_ISLE,
         IslandType.SPIDER_DEN,
-    )
-
-    // Custom Scoreboard
-    val SB_BITS_NOT_SHOWN = IslandTypeTag(
-        "custom_scoreboard_bits_not_shown",
-        IslandType.CATACOMBS,
-        IslandType.KUUDRA_ARENA,
-    )
-    val SB_GEMS_NOT_SHOWN = IslandTypeTag(
-        "custom_scoreboard_gems_not_shown",
-        SB_BITS_NOT_SHOWN,
-        IslandType.THE_RIFT,
-    )
-    val SB_MOTES_SHOWN = IslandTypeTag(
-        "custom_scoreboard_motes_shown",
-        IslandType.THE_RIFT,
-    )
-    val SB_COINS_NOT_SHOWN = IslandTypeTag(
-        "custom_scoreboard_coins_not_shown",
-        SB_MOTES_SHOWN,
-    )
-    val SB_COPPER_SHOWN = IslandTypeTag(
-        "custom_scoreboard_copper_shown",
-        IslandType.GARDEN,
-    )
-    val SB_PARTY_SHOWN = IslandTypeTag(
-        "custom_scoreboard_party_shown",
-        IslandType.DUNGEON_HUB,
-        IslandType.KUUDRA_ARENA,
-        IslandType.CRIMSON_ISLE,
     )
 
     // Misc
