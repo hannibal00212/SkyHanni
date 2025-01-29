@@ -2,14 +2,15 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.entity.EntityLivingBase
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object TerracottaPhase {
@@ -28,8 +29,8 @@ object TerracottaPhase {
         "§c\\[BOSS] Sadan§r§f: ENOUGH!",
     )
 
-    @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
         if (terracottaStartPattern.matches(event.message)) {
             inTerracottaPhase = true
         } else if (terracottaEndPattern.matches(event.message)) {
@@ -38,13 +39,13 @@ object TerracottaPhase {
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
         if (isActive() && config.hideDamageSplash && DamageIndicatorManager.isDamageSplash(event.entity)) {
             event.cancel()
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (isActive() && config.hideParticles) {
             event.cancel()
@@ -53,5 +54,5 @@ object TerracottaPhase {
 
     private fun isActive() = inTerracottaPhase && isEnabled()
 
-    private fun isEnabled() = DungeonApi.inBossRoom && DungeonApi.getCurrentBoss() == DungeonFloor.F6
+    private fun isEnabled() = DungeonAPI.inBossRoom && DungeonAPI.getCurrentBoss() == DungeonFloor.F6
 }

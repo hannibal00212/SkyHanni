@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // TODO Remove all removeColor calls in this class. Deal with the color code in regex.
 // TODO also fix up this all being coded very poorly and having the same patterns in multiple places
@@ -38,7 +39,6 @@ object DungeonFinderFeatures {
         "price",
         "(?i).*(?:[0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?MIL).*",
     )
-
     /**
      * REGEX-TEST: §7§7Note: §f3m comp carry
      * REGEX-TEST: §7§7Note: §f250k comp carry
@@ -115,12 +115,11 @@ object DungeonFinderFeatures {
     )
 
     /**
-     * REGEX-TEST: Floor VII
      * REGEX-TEST: Floor: Floor VII
      */
     private val floorPattern by patternGroup.pattern(
         "floor",
-        "Floor:? .*",
+        "Floor .*",
     )
     private val anyFloorPattern by patternGroup.pattern(
         "floor.any",
@@ -323,7 +322,7 @@ object DungeonFinderFeatures {
                     val playerName = group("playerName")
                     val className = group("className")
                     val level = group("level").toInt()
-                    val color = DungeonApi.getColor(level)
+                    val color = DungeonAPI.getColor(level)
                     if (config.coloredClassLevel) toolTip[index] = " §b$playerName§f: §e$className $color$level"
                     classNames.remove(className)
                 }
@@ -343,8 +342,8 @@ object DungeonFinderFeatures {
         return map
     }
 
-    @HandleEvent
-    fun onToolTip(event: ToolTipEvent) {
+    @SubscribeEvent
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
 
@@ -373,7 +372,7 @@ object DungeonFinderFeatures {
         event.stackTip = (floorStackSize[slot.slotIndex]?.takeIf { it.isNotEmpty() } ?: return)
     }
 
-    @HandleEvent
+    @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (!inInventory) return

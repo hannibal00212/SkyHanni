@@ -10,28 +10,26 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addButton
-import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.addLine
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -42,7 +40,7 @@ import net.minecraft.item.ItemStack
 object ChestValue {
 
     private val config get() = SkyHanniMod.feature.inventory.chestValueConfig
-    private var display = emptyList<Renderable>()
+    private var display = emptyList<List<Any>>()
     private var chestItems = mapOf<String, Item>()
     private val inInventory get() = isValidStorage()
     private var inOwnInventory = false
@@ -50,7 +48,7 @@ object ChestValue {
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (DungeonApi.inDungeon() && !config.enableInDungeons) return
+        if (DungeonAPI.inDungeon() && !config.enableInDungeons) return
         if (!inOwnInventory) {
             if (InventoryUtils.openInventoryName() == "") return
         }
@@ -58,9 +56,10 @@ object ChestValue {
         if (!config.showDuringEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
         if (inInventory) {
-            config.position.renderRenderables(
+            config.position.renderStringsAndItems(
                 display,
                 extraSpace = -1,
+                itemScale = 0.7,
                 posLabel = featureName(),
             )
         }
@@ -95,23 +94,26 @@ object ChestValue {
         display = drawDisplay()
     }
 
-    private fun drawDisplay() = buildList {
+    private fun drawDisplay(): List<List<Any>> {
+        val newDisplay = mutableListOf<List<Any>>()
+
         init()
 
-        if (chestItems.isEmpty()) return@buildList
+        if (chestItems.isEmpty()) return newDisplay
 
-        addList()
-        addButton()
+        addList(newDisplay)
+        addButton(newDisplay)
+
+        return newDisplay
     }
 
-    private fun MutableList<Renderable>.addList() {
+    private fun addList(newDisplay: MutableList<List<Any>>) {
         val sortedList = sortedList()
         var totalPrice = 0.0
         var rendered = 0
 
         val amountShowing = if (config.itemToShow > sortedList.size) sortedList.size else config.itemToShow
-        addString("§7${featureName()}: §o(Showing $amountShowing of ${sortedList.size} items)")
-
+        newDisplay.addAsSingletonList("§7${featureName()}: §o(Showing $amountShowing of ${sortedList.size} items)")
         for ((index, amount, stack, total, tips) in sortedList) {
             totalPrice += total
             if (rendered >= config.itemToShow) continue
@@ -120,23 +122,26 @@ object ChestValue {
             val width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(textAmount)
             val name = "${stack.itemName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
             val price = "§6${(total).formatPrice()}"
-            val text = if (config.alignedDisplay) "$name $price"
-            else "${stack.itemName} §7x$amount: §6${total.formatPrice()}"
-
-            addLine {
-                val renderable = Renderable.hoverTips(
-                    text,
-                    tips,
-                    stack = stack,
-                    highlightsOnHoverSlots = if (config.enableHighlight) index else emptyList(),
-                )
-                addString(" §7- ")
-                if (config.showStacks) addItemStack(stack)
-                add(renderable)
-            }
+            val text = if (config.alignedDisplay)
+                "$name $price"
+            else
+                "${stack.itemName} §7x$amount: §6${total.formatPrice()}"
+            newDisplay.add(
+                buildList {
+                    val renderable = Renderable.hoverTips(
+                        text,
+                        tips,
+                        stack = stack,
+                        highlightsOnHoverSlots = if (config.enableHighlight) index else emptyList(),
+                    )
+                    add(" §7- ")
+                    if (config.showStacks) add(stack)
+                    add(renderable)
+                },
+            )
             rendered++
         }
-        addString("§aTotal value: §6${totalPrice.formatPrice()} coins")
+        newDisplay.addAsSingletonList("§aTotal value: §6${totalPrice.formatPrice()} coins")
     }
 
     private fun sortedList() = when (config.sortingType) {
@@ -145,28 +150,29 @@ object ChestValue {
         else -> chestItems.values.sortedByDescending { it.total }
     }
 
-    // TODO: Avoid Ordinal
-    private fun MutableList<Renderable>.addButton() {
-        addButton(
-            prefix = "§7Sorted By: ",
-            getName = SortType.entries[config.sortingType.ordinal].longName,
+    private fun addButton(newDisplay: MutableList<List<Any>>) {
+        newDisplay.addButton(
+            "§7Sorted By: ",
+            getName = SortType.entries[config.sortingType.ordinal].longName, // todo avoid ordinal
             onChange = {
+                // todo avoid ordinals
                 config.sortingType = SortingTypeEntry.entries[(config.sortingType.ordinal + 1) % 2]
                 update()
             },
         )
 
-        addButton(
-            prefix = "§7Value format: ",
-            getName = FormatType.entries[config.formatType.ordinal].type,
+        newDisplay.addButton(
+            "§7Value format: ",
+            getName = FormatType.entries[config.formatType.ordinal].type, // todo avoid ordinal
             onChange = {
+                // todo avoid ordinal
                 config.formatType = NumberFormatEntry.entries[(config.formatType.ordinal + 1) % 2]
                 update()
             },
         )
 
-        addButton(
-            prefix = "§7Display Type: ",
+        newDisplay.addButton(
+            "§7Display Type: ",
             getName = DisplayType.entries[if (config.alignedDisplay) 1 else 0].type,
             onChange = {
                 config.alignedDisplay = !config.alignedDisplay
