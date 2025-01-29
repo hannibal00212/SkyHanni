@@ -36,16 +36,18 @@ object DungeonSecretChime {
 
     @HandleEvent
     fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
-        if (!isEnabled() || event.mob.name != "Dungeon Secret Bat") return
-        playSound()
+        if (isEnabled() && event.mob.name == "Dungeon Secret Bat") {
+            playSound()
+        }
     }
 
     @HandleEvent
     fun onItemPickup(event: EntityRemovedEvent<EntityItem>) {
         if (!isEnabled()) return
         val itemName = event.entity.entityItem.displayName
-        if (NeuInternalName.fromItemName(itemName) !in dungeonSecretItems) return
-        playSound()
+        if (NeuInternalName.fromItemName(itemName) in dungeonSecretItems) {
+            playSound()
+        }
     }
 
     @HandleEvent
@@ -81,7 +83,7 @@ object DungeonSecretChime {
         dungeonSecretItems = data.dungeonSecretItems
     }
 
-    fun isEnabled() = !DungeonApi.inBossRoom && DungeonApi.inDungeon() && config.enabled
+    private fun isEnabled() = DungeonApi.inDungeon() && !DungeonApi.inBossRoom && config.enabled
 
     @JvmStatic
     fun playSound() {
