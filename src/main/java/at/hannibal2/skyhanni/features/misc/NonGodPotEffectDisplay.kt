@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.pests.PestWarning
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -114,6 +115,7 @@ object NonGodPotEffectDisplay {
         when (event.message) {
             "§aYou cleared all of your active effects!" -> {
                 effectDuration.clear()
+                PestWarning.repellentMultiplier = 1
                 update()
             }
 
@@ -144,11 +146,13 @@ object NonGodPotEffectDisplay {
 
             "§a§lYUM! §r§2Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
                 effectDuration[NonGodPotEffect.PEST_REPELLENT] = Timer(1.hours)
+                PestWarning.repellentMultiplier = 2
                 update()
             }
 
             "§a§lYUM! §r§2Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
                 effectDuration[NonGodPotEffect.PEST_REPELLENT_MAX] = Timer(1.hours)
+                PestWarning.repellentMultiplier = 4
                 update()
             }
 
@@ -165,6 +169,12 @@ object NonGodPotEffectDisplay {
     }
 
     private fun update() {
+        if (effectDuration[NonGodPotEffect.PEST_REPELLENT]?.ended == true ||
+            effectDuration[NonGodPotEffect.PEST_REPELLENT_MAX]?.ended == true
+        ) {
+            PestWarning.repellentMultiplier = 1
+        }
+
         if (effectDuration.values.removeIf { it.ended }) {
             // to fetch the real amount of active pots
             totalEffectsCount = 0
