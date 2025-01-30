@@ -776,4 +776,12 @@ class ProfileSpecificStorage {
 
     @Expose
     var enchantedClockBoosts: MutableMap<EnchantedClockHelper.SimpleBoostType, EnchantedClockHelper.Status> = enumMapOf()
+
+    data class CakeCounterData(
+        @Expose var cakesEaten: Int = -1,
+        @Expose var soulsFound: Int = -1,
+    )
+
+    @Expose
+    var cakeCounterData: CakeCounterData = CakeCounterData()
 }
