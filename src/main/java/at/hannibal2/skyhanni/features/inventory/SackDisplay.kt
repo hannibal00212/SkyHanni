@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
+import at.hannibal2.skyhanni.utils.renderables.buildSearchableTable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 
 @SkyHanniModule
@@ -39,9 +40,9 @@ object SackDisplay {
     private val config get() = SkyHanniMod.feature.inventory.sackDisplay
 
     private val MAGMA_FISH = "MAGMA_FISH".toInternalName()
-    private val normalSacksTextInput = SearchTextInput()
-    private val runeSacksTextInput = SearchTextInput()
-    private val gemstoneSacksTextInput = SearchTextInput()
+    private val textInputs = mutableMapOf<String, SearchTextInput>()
+
+    private fun getSackTextInput(name: String) = textInputs.getOrPut(name) { SearchTextInput() }
 
     init {
         RenderDisplayHelper(
@@ -89,7 +90,7 @@ object SackDisplay {
         val sortedPairs = sort(sackItems)
         val amountShowing = if (config.itemToShow > sortedPairs.size) sortedPairs.size else config.itemToShow
         addString("§7Items in Sacks: §o(Rendering $amountShowing of ${sortedPairs.size} items)")
-        val searchables = buildList {
+        val table = buildMap {
             for ((itemName, item) in sortedPairs) {
                 val (internalName, colorCode, total, magmaFish) = item
                 val stored = item.stored
@@ -100,7 +101,7 @@ object SackDisplay {
                 if (rendered >= config.itemToShow) continue
                 if (stored == 0 && !config.showEmpty) continue
 
-                val searchable = buildList {
+                val row = buildList {
                     addString(" §7- ")
                     addItemStack(internalName)
                     // TODO move replace into itemName
@@ -163,13 +164,13 @@ object SackDisplay {
                         addItemStack(MAGMA_FISH)
                     }
                     if (config.showPrice && price != 0L) addAlignedNumber("§6${format(price)}")
-                }.toSearchable(itemName)
-                add(searchable)
+                }
+                put(row, itemName)
                 rendered++
             }
         }
 
-        add(searchables.buildSearchBox(normalSacksTextInput))
+        add(table.buildSearchableTable(getSackTextInput(InventoryUtils.openInventoryName())))
 
         if (SackApi.isTrophySack) addString("§cTotal Magmafish: §6${totalMagmaFish.addSeparators()}")
         return totalPrice
@@ -244,10 +245,10 @@ object SackDisplay {
     private fun MutableList<Renderable>.drawRunesDisplay() {
         if (SackApi.runeItem.isEmpty()) return
         addString("§7Runes:")
-        val searchables = buildList {
+        val table = buildMap {
             for ((name, rune) in sort(SackApi.runeItem.toList())) {
                 val (stack, lv1, lv2, lv3) = rune
-                val searchable = buildList {
+                val row = buildList {
                     addString(" §7- ")
                     stack?.let { addItemStack(it) }
                     add(
@@ -260,20 +261,20 @@ object SackDisplay {
                     addAlignedNumber("§e$lv1")
                     addAlignedNumber("§e$lv2")
                     addAlignedNumber("§e$lv3")
-                }.toSearchable(name)
-                add(searchable)
+                }
+                put(row, name)
             }
         }
-        add(searchables.buildSearchBox(runeSacksTextInput))
+        add(table.buildSearchableTable(getSackTextInput("rune")))
     }
 
     private fun MutableList<Renderable>.drawGemstoneDisplay(): Long {
         if (SackApi.gemstoneItem.isEmpty()) return 0L
         addString("§7Gemstones:")
         var totalPrice = 0L
-        val searchables = buildList {
+        val table = buildMap {
             for ((name, gem) in sort(SackApi.gemstoneItem.toList())) {
-                val searchable = buildList {
+                val row = buildList {
                     addString(" §7- ")
                     addItemStack(gem.internalName)
                     add(
@@ -291,12 +292,12 @@ object SackDisplay {
                     val price = gem.priceSum
                     totalPrice += price
                     if (config.showPrice && price != 0L) addAlignedNumber("§7(§6${format(price)}§7)")
-                }.toSearchable(name)
-                add(searchable)
+                }
+                put(row, name)
             }
         }
 
-        add(searchables.buildSearchBox(gemstoneSacksTextInput))
+        add(table.buildSearchableTable(getSackTextInput("gemstone")))
         return totalPrice
     }
 
