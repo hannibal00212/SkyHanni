@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
-import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.annotations.Expose
 
@@ -47,7 +46,7 @@ object CorpseTracker {
             corpsesLooted = enumMapOf()
         }
 
-        override fun getDescription(timesGained: Long): List<String> {
+        override fun getDescription(bucket: CorpseType?, timesGained: Long): List<String> {
             val divisor = 1.coerceAtLeast(
                 selectedBucket?.let {
                     corpsesLooted[it]?.toInt()

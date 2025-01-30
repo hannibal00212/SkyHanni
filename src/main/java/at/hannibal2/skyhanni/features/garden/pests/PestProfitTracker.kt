@@ -92,7 +92,7 @@ object PestProfitTracker {
             pestKills.clear()
         }
 
-        override fun getDescription(timesGained: Long): List<String> {
+        override fun getDescription(bucket: PestType?, timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / getTotalPestCount()
             val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
             return listOf(

@@ -3,21 +3,28 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
 import com.google.gson.annotations.Expose
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl
 
-abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
+abstract class BucketedItemTrackerData<E : Enum<E>> : ItemTrackerData() {
 
-    abstract fun resetItems()
+    @Deprecated("Use getBucketItems(bucket) instead", ReplaceWith("getBucketItems(bucket)"))
+    override fun getDescription(timesGained: Long): List<String> =
+        throw UnsupportedOperationException("Use getDescription(bucket, timesGained) instead")
 
-    abstract fun getDescription(timesGained: Long): List<String>
+    abstract fun getDescription(bucket: E?, timesGained: Long): List<String>
+
+    @Deprecated("Use getBucketItems(bucket) instead", ReplaceWith("getBucketItems(bucket)"))
+    override fun getCoinName(item: TrackedItem): String =
+        throw UnsupportedOperationException("Use getCoinName(bucket, item) instead")
 
     abstract fun getCoinName(bucket: E?, item: TrackedItem): String
 
-    abstract fun getCoinDescription(bucket: E?, item: TrackedItem): List<String>
+    @Deprecated("Use getBucketItems(bucket) instead", ReplaceWith("getBucketItems(bucket)"))
+    override fun getCoinDescription(item: TrackedItem): List<String> =
+        throw UnsupportedOperationException("Use getCoinDescription(bucket, item) instead")
 
-    open fun getCustomPricePer(internalName: NeuInternalName) = SkyHanniTracker.getPricePer(internalName)
+    abstract fun getCoinDescription(bucket: E?, item: TrackedItem): List<String>
 
     abstract fun E.isBucketSelectable(): Boolean
 
@@ -57,15 +64,18 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
         selectedBucket?.javaClass?.enumConstants
             ?: (this.javaClass.genericSuperclass as? ParameterizedTypeImpl)?.actualTypeArguments?.firstOrNull()?.let { type ->
                 (type as? Class<E>)?.enumConstants
-            } ?: ErrorManager.skyHanniError(
-            "Unable to retrieve enum constants for E in BucketedItemTrackerData",
-            "selectedBucket" to selectedBucket,
-            "dataClass" to this.javaClass.superclass.name,
-        )
+            } ?: throwBucketInitError()
     }
+
+    private fun throwBucketInitError(): Nothing = ErrorManager.skyHanniError(
+        "Unable to retrieve enum constants for E in BucketedItemTrackerData",
+        "selectedBucket" to selectedBucket,
+        "dataClass" to this.javaClass.superclass.name,
+    )
 
     @Expose
     var selectedBucket: E? = null
+
     @Expose
     private val bucketedItems: MutableMap<E, MutableMap<NeuInternalName, TrackedItem>> = HashMap()
 
@@ -73,9 +83,11 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
     private fun getPoppedBuckets(): MutableList<E> = bucketedItems.toMutableMap().filter {
         it.value.isNotEmpty()
     }.keys.toMutableList()
+
     fun getItemsProp(): MutableMap<NeuInternalName, TrackedItem> = selectedBucket?.let {
         getBucket(it)
     } ?: flattenBucketsItems()
+
     fun selectNextSequentialBucket(): E? {
         // Move to the next ordinal, or wrap to null if at the last value
         val nextOrdinal = selectedBucket?.let { it.ordinal + 1 } // Only calculate if selectedBucket is non-null
