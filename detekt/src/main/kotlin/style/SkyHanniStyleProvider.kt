@@ -13,6 +13,7 @@ class SkyHanniStyleProvider : RuleSetProvider {
         return RuleSet(ruleSetId, listOf(
             InSkyBlockEarlyReturn(config),
             IsInIslandEarlyReturn(config),
+            OnlyOnIslandSpecificity(config),
         ))
     }
 }

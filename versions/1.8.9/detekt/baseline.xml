@@ -11,7 +11,6 @@
     <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$arrayOf(x, y, z)</ID>
     <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$arrayOf(x.toFloat(), y.toFloat(), z.toFloat())</ID>
     <ID>CyclomaticComplexMethod:AdvancedPlayerList.kt$AdvancedPlayerList$fun newSorting(original: List&lt;String&gt;): List&lt;String&gt;</ID>
-    <ID>CyclomaticComplexMethod:BitsApi.kt$BitsApi$@HandleEvent fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent)</ID>
     <ID>CyclomaticComplexMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun calculateMoneyPerHour(debugList: MutableList&lt;List&lt;Any&gt;&gt;): Map&lt;NeuInternalName, Array&lt;Double&gt;&gt;</ID>
     <ID>CyclomaticComplexMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>
     <ID>CyclomaticComplexMethod:DamageIndicatorManager.kt$DamageIndicatorManager$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
@@ -38,7 +37,6 @@
     <ID>InjectDispatcher:ElectionApi.kt$ElectionApi$IO</ID>
     <ID>InjectDispatcher:GardenNextJacobContest.kt$GardenNextJacobContest$IO</ID>
     <ID>InjectDispatcher:HypixelBazaarFetcher.kt$HypixelBazaarFetcher$IO</ID>
-    <ID>LongMethod:BitsApi.kt$BitsApi$@HandleEvent fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent)</ID>
     <ID>LongMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>
     <ID>LongMethod:DamageIndicatorManager.kt$DamageIndicatorManager$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
     <ID>LongMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>

@@ -1,10 +1,13 @@
 package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.effects.EffectDurationChangeEvent
 import at.hannibal2.skyhanni.events.effects.EffectDurationChangeType
@@ -22,6 +25,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @SkyHanniModule
 object EffectApi {
@@ -85,6 +90,14 @@ object EffectApi {
         "inventory.effects.effecttimeleft",
         "§7Remaining: §f(?<time>[\\d:]+)",
     )
+
+    /**
+     * REGEX-TEST:  Repellent: §r§9MAX §r§7(12s)
+     */
+    private val repellentPattern by RepoPattern.pattern(
+        "misc.nongodpot.repellant",
+        " Repellent: §r§[97a](?<tier>\\w+)?(?: §r§7\\((?<time>\\d)s\\))?",
+    )
     // </editor-fold>
 
     private val profileStorage get() = ProfileStorageData.profileSpecific
@@ -95,7 +108,6 @@ object EffectApi {
         val isMixin: Boolean = false,
         val inventoryItemName: String = tabListName,
     ) {
-
         SMOLDERING("§aSmoldering Polarization I"),
         GLOWY("§2Mushed Glowy Tonic I"),
         WISP("§bWisp's Ice-Flavored Water I"),
@@ -151,63 +163,55 @@ object EffectApi {
         var changeType: EffectDurationChangeType? = null
         var duration: Duration? = null
 
-        if (event.message == "§aYou ate a §r§aRe-heated Gummy Polar Bear§r§a!") {
-            effect = NonGodPotEffect.SMOLDERING
-            changeType = EffectDurationChangeType.SET
-            duration = 1.hours
+        when (event.message) {
+            "§aYou ate a §r§aRe-heated Gummy Polar Bear§r§a!" -> {
+                effect = NonGodPotEffect.SMOLDERING
+                changeType = EffectDurationChangeType.SET
+                duration = 1.hours
+            }
+            "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f! Press TAB or type /effects to view your active effects!" -> {
+                effect = NonGodPotEffect.GLOWY
+                changeType = EffectDurationChangeType.SET
+                duration = 1.hours
+            }
+            "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f! Press TAB or type /effects to view your active effects!" -> {
+                effect = NonGodPotEffect.WISP
+                changeType = EffectDurationChangeType.SET
+                duration = 5.minutes
+            }
+            "§eYou consumed a §r§fGreat Spook Potion§r§e!" -> {
+                effect = NonGodPotEffect.GREAT_SPOOK
+                changeType = EffectDurationChangeType.SET
+                duration = 24.hours
+            }
+            "§a§lBUFF! §fYou have gained §r§6Harvest Harbinger V§r§f! Press TAB or type /effects to view your active effects!" -> {
+                effect = NonGodPotEffect.HARVEST_HARBINGER
+                changeType = EffectDurationChangeType.SET
+                duration = 25.minutes
+            }
+            "§a§lYUM! §r§2Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
+                effect = NonGodPotEffect.PEST_REPELLENT
+                changeType = EffectDurationChangeType.SET
+                duration = 1.hours
+            }
+            "§a§lYUM! §r§2Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
+                effect = NonGodPotEffect.PEST_REPELLENT_MAX
+                changeType = EffectDurationChangeType.SET
+                duration = 1.hours
+            }
+            "§e[NPC] §6King Yolkar§f: §rThese eggs will help me stomach my pain." -> {
+                effect = NonGodPotEffect.GOBLIN
+                changeType = EffectDurationChangeType.SET
+                duration = 20.minutes
+            }
+            "§cThe Goblin King's §r§afoul stench §r§chas dissipated!" -> {
+                effect = NonGodPotEffect.GOBLIN
+                changeType = EffectDurationChangeType.REMOVE
+            }
+            else -> return
         }
 
-        if (event.message == "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f! Press TAB or type /effects to view your active effects!") {
-            effect = NonGodPotEffect.GLOWY
-            changeType = EffectDurationChangeType.SET
-            duration = 1.hours
-        }
-
-        if (event.message == "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f! Press TAB or type /effects to view your active effects!") {
-            effect = NonGodPotEffect.WISP
-            changeType = EffectDurationChangeType.SET
-            duration = 5.minutes
-        }
-
-        if (event.message == "§eYou consumed a §r§fGreat Spook Potion§r§e!") {
-            effect = NonGodPotEffect.GREAT_SPOOK
-            changeType = EffectDurationChangeType.SET
-            duration = 24.hours
-        }
-
-        if (event.message == "§a§lBUFF! §fYou have gained §r§6Harvest Harbinger V§r§f! Press TAB or type /effects to view your active effects!") {
-            effect = NonGodPotEffect.HARVEST_HARBINGER
-            changeType = EffectDurationChangeType.SET
-            duration = 25.minutes
-        }
-
-        if (event.message == "§a§lYUM! §r§2Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!") {
-            effect = NonGodPotEffect.PEST_REPELLENT
-            changeType = EffectDurationChangeType.SET
-            duration = 1.hours
-        }
-
-        if (event.message == "§a§lYUM! §r§2Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!") {
-            effect = NonGodPotEffect.PEST_REPELLENT_MAX
-            changeType = EffectDurationChangeType.SET
-            duration = 1.hours
-        }
-
-        if (event.message == "§e[NPC] §6King Yolkar§f: §rThese eggs will help me stomach my pain.") {
-            effect = NonGodPotEffect.CURSE_OF_GREED
-            changeType = EffectDurationChangeType.SET
-            duration = 20.minutes
-        }
-
-        if (event.message == "§cThe Goblin King's §r§afoul stench §r§chas dissipated!") {
-            effect = NonGodPotEffect.GOBLIN
-            changeType = EffectDurationChangeType.REMOVE
-        }
-
-        effect?.let {
-            if (changeType == null) return@let
-            EffectDurationChangeEvent(it, changeType, duration).post()
-        }
+        EffectDurationChangeEvent(effect, changeType, duration).post()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -227,6 +231,26 @@ object EffectApi {
                         ChatUtils.debug("Error while reading non god pot effects from tab list! line: '$line'")
                     }
                 }
+            }
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.PESTS)) return
+
+        event.lines.firstNotNullOfOrNull {
+            repellentPattern.matchMatcher(it) {
+                // Update repellent timer when near expiration to sync with the in-game countdown delay (which is slow)
+                val time = group("time")?.toIntOrNull() ?: return@matchMatcher
+                val tier = group("tier")
+                val duration = time.toDuration(DurationUnit.SECONDS)
+                val propTier = when (tier) {
+                    "MAX" -> NonGodPotEffect.PEST_REPELLENT_MAX
+                    "REGULAR" -> NonGodPotEffect.PEST_REPELLENT
+                    else -> return@matchMatcher
+                }
+                EffectDurationChangeEvent(propTier, EffectDurationChangeType.SET, duration).post()
             }
         }
     }

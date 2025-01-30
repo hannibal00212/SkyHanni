@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
+import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
@@ -66,8 +67,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 object Commands {
     // Do not add new commands in this class
     // TODO move all command loading away from this class
-
-    val commandList = mutableListOf<CommandBuilder>()
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -249,7 +248,7 @@ object Commands {
         event.register("shupdaterepo") {
             description = "Download the SkyHanni repo again"
             category = CommandCategory.USERS_BUG_FIX
-            callback { SkyHanniMod.repo.updateRepo() }
+            callback { RepoManager.updateRepo() }
         }
         event.register("shtogglehypixelapierrors") {
             description = "Show/hide hypixel api error messages in chat"
@@ -279,7 +278,7 @@ object Commands {
         event.register("shrepostatus") {
             description = "Shows the status of all the mods constants"
             category = CommandCategory.USERS_BUG_FIX
-            callback { SkyHanniMod.repo.displayRepoStatus(false) }
+            callback { RepoManager.displayRepoStatus(false) }
         }
         event.register("shupdate") {
             description = "Updates the mod to the specified update stream."
@@ -434,7 +433,7 @@ object Commands {
         event.register("shreloadlocalrepo") {
             description = "Reloading the local repo data"
             category = CommandCategory.DEVELOPER_TEST
-            callback { SkyHanniMod.repo.reloadLocalRepo() }
+            callback { RepoManager.reloadLocalRepo() }
         }
         event.register("shrepopatterns") {
             description = "See where regexes are loaded from"

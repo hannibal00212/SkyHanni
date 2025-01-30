@@ -4,11 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.EffectApi.NonGodPotEffect
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.effects.EffectDurationChangeEvent
 import at.hannibal2.skyhanni.events.effects.EffectDurationChangeType
@@ -28,6 +31,8 @@ import at.hannibal2.skyhanni.utils.Timer
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @SkyHanniModule
 object NonGodPotEffectDisplay {
@@ -37,6 +42,9 @@ object NonGodPotEffectDisplay {
     private val effectDuration = mutableMapOf<NonGodPotEffect, Timer>()
     private var display = emptyList<String>()
 
+    /**
+     * REGEX-TEST: §7You have §e10 §7non-god effects.
+     */
     private val effectsCountPattern by RepoPattern.pattern(
         "misc.nongodpot.effects",
         "§7You have §e(?<name>\\d+) §7non-god effects\\.",
