@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 class Searchable(val renderable: Renderable, val string: String?)
 
 fun Renderable.toSearchable(searchText: String? = null) = Searchable(this, searchText?.removeColor())
+fun List<Renderable>.toSearchable(searchText: String? = null) = Searchable(Renderable.verticalContainer(this), searchText?.removeColor())
 fun Searchable.toRenderable() = renderable
 fun List<Searchable>.toRenderable() = map { it.toRenderable() }
 fun List<Searchable>.toMap() = associate { it.renderable to it.string }
@@ -39,20 +40,6 @@ fun List<Searchable>.buildSearchableScrollable(
             scrollValue = scrollValue,
             velocity = velocity,
         ),
-        SEARCH_PREFIX,
-        onUpdateSize = {},
-        textInput = textInput,
-        key = key,
-    )
-}
-
-// TODO remove this function entirely, sack display should use a SearchTextInput object per sack name
-@Deprecated("remove this function, instead use a fix SearchTextInput object")
-fun Map<List<Renderable>, String?>.buildSearchableTable(): Renderable {
-    val textInput = SearchTextInput()
-    val key = 0
-    return Renderable.searchBox(
-        Renderable.searchableTable(toMap(), textInput = textInput, key = key + 1),
         SEARCH_PREFIX,
         onUpdateSize = {},
         textInput = textInput,
