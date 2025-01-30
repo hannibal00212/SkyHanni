@@ -52,6 +52,7 @@ object OfflineCakeCounter {
             if (newCakesEaten > cakesEaten) {
                 val cakeDifference = newCakesEaten - cakesEaten
                 val cakesFormat = StringUtils.pluralize(cakeDifference, "Century Cake")
+                val message = "While you were away, players ate §d$cakeDifference§e $cakesFormat"
 
                 soulsFoundPattern.matchMatcher(name) {
                     val newSoulsFound = group("souls").replace(",", "").toInt()
@@ -60,7 +61,7 @@ object OfflineCakeCounter {
                         if (soulsFound != -1) {
                             val soulDifference = newSoulsFound - soulsFound
                             val soulsFormat = StringUtils.pluralize(soulDifference, "Cake Soul")
-                            ChatUtils.chat("While you were away, players ate §d$cakeDifference§e $cakesFormat and found §b$soulDifference§e $soulsFormat.")
+                            ChatUtils.chat("$message and found §b$soulDifference§e $soulsFormat.")
                         }
                         soulsFound = newSoulsFound
                     }
@@ -72,7 +73,7 @@ object OfflineCakeCounter {
                 }
 
                 if (cakesEaten != -1) {
-                    ChatUtils.chat("While you were away, players ate §d$cakeDifference§e $cakesFormat.")
+                    ChatUtils.chat("$message.")
                 }
                 cakesEaten = newCakesEaten
             }
