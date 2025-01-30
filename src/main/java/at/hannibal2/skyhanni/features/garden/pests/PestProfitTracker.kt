@@ -308,7 +308,7 @@ object PestProfitTracker {
         val pestTypeMap: MutableMap<NeuInternalName, PestType> = mutableMapOf()
         val pestKillCountMap: MutableMap<PestType, Long> = mutableMapOf()
         event.move(
-            69,
+            73,
             "#profile.garden.pestProfitTracker.items",
             "#profile.garden.pestProfitTracker.bucketedItems",
         ) { items ->
@@ -337,11 +337,11 @@ object PestProfitTracker {
             ConfigManager.gson.toJsonTree(newItems)
         }
 
-        event.add(69, "#profile.garden.pestProfitTracker.pestKills") {
+        event.add(73, "#profile.garden.pestProfitTracker.pestKills") {
             ConfigManager.gson.toJsonTree(pestKillCountMap)
         }
 
-        event.transform(69, "#profile.garden.pestProfitTracker.totalPestsKills") { entry ->
+        event.transform(73, "#profile.garden.pestProfitTracker.totalPestsKills") { entry ->
             // Subtract all pestKillCountMap values from the totalPestsKills
             JsonPrimitive(
                 entry.asLong - pestKillCountMap.entries.filter {
