@@ -85,7 +85,8 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
             nextOrdinal != null -> buckets[nextOrdinal] // Move to the next enum value
             else -> selectedBucket // Fallback, shouldn't happen
         }
-        return selectedBucket
+        val isBucketSelectable = (selectedBucket?.isBucketSelectable() == true || selectedBucket == null)
+        return if (isBucketSelectable) selectedBucket else selectNextSequentialBucket()
     }
 
     private fun getBucketItems(bucket: E) = bucketedItems[bucket]?.toMutableMap() ?: HashMap()
