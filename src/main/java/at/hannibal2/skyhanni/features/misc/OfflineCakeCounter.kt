@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -48,14 +49,14 @@ object OfflineCakeCounter {
 
         // -1 means that the Cakes Eaten / Souls Found display has never been checked before
         cakesEatenPattern.matchMatcher(name) {
-            val newCakesEaten = group("eaten").replace(",", "").toInt()
+            val newCakesEaten = group("eaten").formatInt()
             if (newCakesEaten > cakesEaten) {
                 val cakeDifference = newCakesEaten - cakesEaten
                 val cakesFormat = StringUtils.pluralize(cakeDifference, "Century Cake")
                 val message = "While you were away, players ate §d$cakeDifference§e $cakesFormat"
 
                 soulsFoundPattern.matchMatcher(name) {
-                    val newSoulsFound = group("souls").replace(",", "").toInt()
+                    val newSoulsFound = group("souls").formatInt()
 
                     if (newSoulsFound > soulsFound) {
                         if (soulsFound != -1) {
