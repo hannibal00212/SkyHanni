@@ -79,10 +79,8 @@ object GuiEditManager {
 
     @JvmStatic
     fun add(position: Position, posLabel: String, width: Int, height: Int) {
-        var name = position.internalName
-        if (name == null) {
-            name = if (posLabel == "none") "none " + StringUtils.generateRandomId() else posLabel
-            position.internalName = name
+        val name = position.getOrSetInternalName {
+            if (posLabel == "none") "none ${StringUtils.generateRandomId()}" else posLabel
         }
         currentPositions[name] = position
         currentBorderSize[posLabel] = Pair(width, height)

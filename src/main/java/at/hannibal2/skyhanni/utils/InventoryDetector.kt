@@ -10,11 +10,11 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
  * The InventoryDetector tracks whether an inventory is open and provides
  * an inventory open consumer and a isInside function to handle inventory check logic.
  *
- * @property onInventoryOpen A callback triggered when the given inventory is detected to be open. Optional.
+ * @property openInventory A callback triggered when the given inventory is detected to be open. Contains the name of the inventory. Optional.
  * @property checkInventoryName Define what inventory name or names we are looking for.
  */
 class InventoryDetector(
-    val onInventoryOpen: () -> Unit = {},
+    val openInventory: (String) -> Unit = {},
     val checkInventoryName: (String) -> Boolean,
 ) {
 
@@ -31,7 +31,6 @@ class InventoryDetector(
 
     @SkyHanniModule
     companion object {
-
         private val detectors = mutableListOf<InventoryDetector>()
 
         @HandleEvent(priority = HandleEvent.HIGHEST)
@@ -55,7 +54,7 @@ class InventoryDetector(
 
         if (inInventory) {
             try {
-                onInventoryOpen()
+                openInventory(inventoryName)
             } catch (e: Exception) {
                 ErrorManager.logErrorWithData(e, "Failed to run inventory open in InventoryDetector")
             }
