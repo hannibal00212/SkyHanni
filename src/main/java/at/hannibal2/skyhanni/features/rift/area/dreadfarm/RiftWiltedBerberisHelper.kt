@@ -52,9 +52,6 @@ object RiftWiltedBerberisHelper {
         Plot(LorenzVec(-42, 72, -155), LorenzVec(-22, 70, -126)),
     )
 
-    val plotCenters = arrayListOf(LorenzVec(0, 0, 0))
-
-
     private var closestPlot: Plot = plots.first()
     private var oldClosest: Plot = closestPlot
     private var fallback = false
@@ -71,13 +68,6 @@ object RiftWiltedBerberisHelper {
         var moving = true
         var y = 0.0
         var lastTime = SimpleTimeMark.now()
-    }
-
-    @HandleEvent
-    fun onLoad(event: FMLLoadEvent) {
-        for (i in 0..5) {
-            plotCenters[i] = plots[i].a.middle(plots[i].b)
-        }
     }
 
     @HandleEvent
