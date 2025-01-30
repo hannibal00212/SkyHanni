@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -55,11 +56,14 @@ object RiftWiltedBerberisHelper {
     val plotCenters = arrayListOf(LorenzVec(0, 0, 0))
 
 
-    private var closestPlot = 0
-    private var oldClosest = 0
+    private var closestPlot: Plot = plots.first()
+    private var oldClosest: Plot = closestPlot
     private var fallback = false
 
-    data class Plot(var a: LorenzVec, var b: LorenzVec)
+    data class Plot(var a: LorenzVec, var b: LorenzVec) {
+        val middle = a.middle(b)
+        val inside: Iterable<BlockPos> get() = BlockPos.getAllInBox(a.toBlockPos(), b.toBlockPos())
+    }
 
     private var altBerberisLocationList = listOf<WiltedBerberis>()
 
@@ -164,17 +168,13 @@ object RiftWiltedBerberisHelper {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(60, "rift.area.dreadfarm.wiltedBerberis.hideparticles", "rift.area.dreadfarm.wiltedBerberis.hideParticles")
+        event.move(73, "rift.area.dreadfarm.wiltedBerberis.hideparticles", "rift.area.dreadfarm.wiltedBerberis.hideParticles")
     }
 
     private fun getClosestPlot() {
         // calculates the player's distance to the center of each plot, then sets closestPlot to the smallest
-        val plotDistances = arrayListOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-        for (i in 0..5) {
-            val plotCenter = plotCenters[i]
-            plotDistances[i] = LocationUtils.playerLocation().distance(plotCenter)
-        }
-        for (i in 0..5) if (plotDistances[i] < plotDistances[closestPlot]) closestPlot = i
+        closestPlot = plots.minBy { it.middle.distanceToPlayer() }
+        ChatUtils.chat(closestPlot.middle.toString())
     }
 
     private fun updateBerberisList() {
@@ -183,9 +183,7 @@ object RiftWiltedBerberisHelper {
         oldClosest = closestPlot
 
         // when a berberis grows in the current plot, add its location to the end of the list
-        val plotCornerA = plots[closestPlot].a.toBlockPos()
-        val plotCornerB = plots[closestPlot].b.toBlockPos()
-        for (block in BlockPos.getAllInBox(plotCornerA, plotCornerB)) {
+        for (block in closestPlot.inside) {
             val blockLocation = block.toLorenzVec()
             if (blockLocation.getBlockAt() == Blocks.deadbush && !berberisLocationList.contains(blockLocation)) {
                 berberisLocationList = berberisLocationList.editCopy { add(blockLocation) }
@@ -197,7 +195,8 @@ object RiftWiltedBerberisHelper {
         // remove first berberis from list if broken and no berberis have grown in the last 1/4 seccond
         // (to stop you from breaking it before they all spawn in)
         while (berberisLocationList.isNotEmpty() && berberisLocationList[0].getBlockAt() != Blocks.deadbush
-            && lastSpawn.passedSince() > 250.milliseconds) {
+            && lastSpawn.passedSince() > 250.milliseconds
+        ) {
             berberisLocationList = berberisLocationList.editCopy { removeFirst() }
             lastUpdated = SimpleTimeMark.now()
         }
@@ -211,8 +210,8 @@ object RiftWiltedBerberisHelper {
         for (berberis in altBerberisLocationList) {
             with(berberis) {
                 // if there is a particle in the same place as where the new helper thinks the next bush is,
-                if (berberisLocationList.isNotEmpty() && (currentParticles.distance(berberisLocationList[0])) < 1.3 &&
-                    currentParticles.distanceToPlayer() <= 20 && y != 0.0
+                if (berberisLocationList.isNotEmpty() && (currentParticles.distance(berberisLocationList[0])) < 1.3
+                    && currentParticles.distanceToPlayer() <= 20 && y != 0.0
                 ) {
                     lastSyncedAt = SimpleTimeMark.now()
                 }
@@ -280,8 +279,7 @@ object RiftWiltedBerberisHelper {
     }
 
     private fun nearestBerberis(location: LorenzVec): WiltedBerberis? =
-        altBerberisLocationList.filter { it.currentParticles.distanceSq(location) < 8 }
-            .minByOrNull { it.currentParticles.distanceSq(location) }
+        altBerberisLocationList.asSequence().map { it to it.currentParticles.distanceSq(location) }.minByOrNull { it.second }?.first
 
     private fun LorenzVec.fixLocation(wiltedBerberis: WiltedBerberis): LorenzVec {
         val x = x - 0.5
