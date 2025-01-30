@@ -54,10 +54,10 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
     }
 
     private fun NeuInternalName.getCleanName(
-        data: Data,
+        items: Map<NeuInternalName, ItemTrackerData.TrackedItem>,
         getCoinName: (ItemTrackerData.TrackedItem) -> String,
     ): String {
-        val item = data.items[this] ?: error("Item not found for $this")
+        val item = items[this] ?: error("Item not found for $this")
         return if (this == SKYBLOCK_COIN) getCoinName.invoke(item) else this.itemName
     }
 
@@ -65,18 +65,27 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
         data: Data,
         filter: (NeuInternalName) -> Boolean,
         lists: MutableList<Searchable>,
+        /**
+         * Extensions to allow for BucketedTrackers to re-use this code block.
+         * The default values are for any 'normal' item tracker, but can in theory
+         * be overridden by any tracker that needs to.
+         */
         itemsAccessor: () -> Map<NeuInternalName, ItemTrackerData.TrackedItem> = { data.items },
         getCoinName: (ItemTrackerData.TrackedItem) -> String = { item -> item.timesGained.toString() },
-        itemRemover: (NeuInternalName) -> Unit = { item ->
+        itemRemover: (NeuInternalName, String) -> Unit = { item, cleanName ->
             modify {
                 it.items.remove(item)
             }
-            ChatUtils.chat("Removed ${item.getCleanName(data, getCoinName)} §efrom $name.")
+            ChatUtils.chat("Removed $cleanName §efrom $name.")
         },
         itemHider: (NeuInternalName, Boolean) -> Unit = { item, currentlyHidden ->
             modify {
                 it.items[item]?.hidden = !currentlyHidden
             }
+        },
+        getLoreList: (NeuInternalName, ItemTrackerData.TrackedItem) -> List<String> = { internalName, item ->
+            if (internalName == SKYBLOCK_COIN) data.getCoinDescription(item)
+            else data.getDescription(item.timesGained)
         },
     ): Double {
         var profit = 0.0
@@ -107,7 +116,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             val amount = itemProfit.totalAmount
             val displayAmount = if (internalName == SKYBLOCK_COIN) itemProfit.timesGained else amount
 
-            val cleanName = internalName.getCleanName(data, getCoinName)
+            val cleanName = internalName.getCleanName(dataItems, getCoinName)
 
             val priceFormat = price.shortFormat()
             val hidden = itemProfit.hidden
@@ -128,11 +137,12 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
                 }
             }
 
-            val lore = buildLore(data, itemProfit, hidden, newDrop, internalName)
+            val loreText = getLoreList.invoke(internalName, itemProfit)
+            val lore = buildLore(loreText, hidden, newDrop, internalName)
             val renderable = if (isInventoryOpen()) Renderable.clickAndHover(
                 listFormat, lore,
                 onClick = {
-                    if (KeyboardManager.isModifierKeyDown()) itemRemover.invoke(internalName)
+                    if (KeyboardManager.isModifierKeyDown()) itemRemover.invoke(internalName, cleanName)
                     else itemHider.invoke(internalName, hidden)
                     update()
                 },
@@ -149,17 +159,12 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
     }
 
     private fun buildLore(
-        data: Data,
-        item: ItemTrackerData.TrackedItem,
+        loreFormat: List<String>,
         hidden: Boolean,
         newDrop: Boolean,
         internalName: NeuInternalName,
     ) = buildList {
-        if (internalName == SKYBLOCK_COIN) {
-            addAll(data.getCoinDescription(item))
-        } else {
-            addAll(data.getDescription(item.timesGained))
-        }
+        addAll(loreFormat)
         add("")
         if (newDrop) {
             add("§aYou obtained this item recently.")

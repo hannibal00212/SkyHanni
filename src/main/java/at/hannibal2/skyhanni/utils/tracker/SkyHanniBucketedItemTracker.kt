@@ -100,8 +100,9 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         lists: MutableList<Searchable>,
         itemsAccessor: () -> Map<NeuInternalName, ItemTrackerData.TrackedItem>,
         getCoinName: (ItemTrackerData.TrackedItem) -> String,
-        itemRemover: (NeuInternalName) -> Unit,
+        itemRemover: (NeuInternalName, String) -> Unit,
         itemHider: (NeuInternalName, Boolean) -> Unit,
+        getLoreList: (NeuInternalName, ItemTrackerData.TrackedItem) -> List<String>,
     ): Double = super.drawItems(
         data = data,
         filter = filter,
@@ -110,16 +111,21 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         getCoinName = { item ->
             data.getCoinName(data.selectedBucket, item)
         },
-        itemRemover = { internalName ->
+        itemRemover = { internalName, cleanName ->
             modify {
                 it.removeItem(data.selectedBucket, internalName)
             }
-            ChatUtils.chat("Removed ${internalName.itemName} §efrom $name.")
+            ChatUtils.chat("Removed $cleanName §efrom $name.")
         },
         itemHider = { internalName, _ ->
             modify {
                 it.toggleItemHide(data.selectedBucket, internalName)
             }
+        },
+        getLoreList = { internalName, item ->
+            val selectedBucket = data.selectedBucket
+            if (internalName == SKYBLOCK_COIN) data.getCoinDescription(selectedBucket, item)
+            else data.getDescription(selectedBucket, item.timesGained)
         },
     )
 }
