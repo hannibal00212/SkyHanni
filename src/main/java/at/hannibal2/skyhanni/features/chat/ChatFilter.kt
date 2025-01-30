@@ -569,6 +569,7 @@ object ChatFilter {
         dungeonConfig.soloStats && DungeonApi.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
         dungeonConfig.fairy && DungeonApi.inDungeon() && message.isPresent("fairy") -> "fairy"
         config.gardenNoPest && GardenApi.inGarden() && PestApi.noPestsChatPattern.matches(message) -> "garden_pest"
+        config.legacyItemsWarning && message.isPresent("legacy_items") -> "legacy_items"
 
         else -> null
     }
@@ -632,7 +633,6 @@ object ChatFilter {
             message.isPresent("winter_island") -> "winter_island"
             message.isPresent("useless_warning") -> "useless_warning"
             message.isPresent("annoying_spam") -> "annoying_spam"
-            message.isPresent("legacy_items") -> "legacy_items"
             else -> null
         }
         return othersMsg != null
