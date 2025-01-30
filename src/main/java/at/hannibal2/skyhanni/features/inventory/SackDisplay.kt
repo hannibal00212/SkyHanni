@@ -29,9 +29,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
-import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.buildSearchableTable
-import at.hannibal2.skyhanni.utils.renderables.toSearchable
 
 @SkyHanniModule
 object SackDisplay {
