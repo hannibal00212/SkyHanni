@@ -71,7 +71,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
          * be overridden by any tracker that needs to.
          */
         itemsAccessor: () -> Map<NeuInternalName, ItemTrackerData.TrackedItem> = { data.items },
-        getCoinName: (ItemTrackerData.TrackedItem) -> String = { item -> item.timesGained.toString() },
+        getCoinName: (ItemTrackerData.TrackedItem) -> String = { item -> data.getCoinName(item) },
         itemRemover: (NeuInternalName, String) -> Unit = { item, cleanName ->
             modify {
                 it.items.remove(item)
