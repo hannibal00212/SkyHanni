@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -174,7 +173,6 @@ object RiftWiltedBerberisHelper {
     private fun getClosestPlot() {
         // calculates the player's distance to the center of each plot, then sets closestPlot to the smallest
         closestPlot = plots.minBy { it.middle.distanceToPlayer() }
-        ChatUtils.chat(closestPlot.middle.toString())
     }
 
     private fun updateBerberisList() {
