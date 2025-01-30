@@ -1,18 +1,24 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.PestTimerTextEntry
 import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.sendTitle
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -46,15 +52,25 @@ object PestSpawnTimer {
 
     var lastSpawnTime = SimpleTimeMark.farPast()
 
-    private var pestCooldownEndTime: SimpleTimeMark? = null
+    private var pestCooldownEndTime = SimpleTimeMark.farPast()
 
     private var lastCropBrokenTime = SimpleTimeMark.farPast()
 
     private var longestCropBrokenTime: Duration = 0.seconds
 
-    @HandleEvent
+    private var pestSpawned = false
+
+    private var hasWarned = false
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
+
+        if (pestSpawned) {
+            hasWarned = false
+            pestSpawned = false
+        }
+
         pestCooldownPattern.firstMatcher(event.widget.lines) {
             val minutes = group("minutes")?.toInt()
             val seconds = group("seconds")?.toInt()
@@ -71,10 +87,6 @@ object PestSpawnTimer {
             if (minutes == null && seconds == null) return
 
             val tablistCooldownEnd = SimpleTimeMark.now() + (minutes?.minutes ?: 0.seconds) + (seconds?.seconds ?: 0.seconds)
-
-            if (pestCooldownEndTime == null) {
-                pestCooldownEndTime = tablistCooldownEnd
-            }
 
             if (shouldSetCooldown(tablistCooldownEnd, minutes, seconds)) {
 
@@ -96,12 +108,14 @@ object PestSpawnTimer {
         if (!lastSpawnTime.isFarPast()) {
             if (longestCropBrokenTime.inWholeSeconds.toInt() <= config.averagePestSpawnTimeout) {
                 pestSpawnTimes.add(spawnTime.inWholeSeconds.toInt())
-                ChatUtils.debug("Added time!")
+                ChatUtils.debug("Added pest spawn time ${spawnTime.format()}")
             }
 
             if (config.pestSpawnChatMessage) {
                 ChatUtils.chat("Pests spawned in §b${spawnTime.format()}")
             }
+
+            pestSpawned = true
         }
 
         longestCropBrokenTime = 0.seconds
@@ -132,6 +146,18 @@ object PestSpawnTimer {
         lastCropBrokenTime = SimpleTimeMark.now()
     }
 
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if ((pestCooldownEndTime - config.cooldownWarningTime.toInt().seconds).isInPast() && !hasWarned && config.pestCooldownOverWarning) {
+            warn()
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onIslandChange(event: IslandChangeEvent) {
+        reset()
+    }
+
     private fun shouldSetCooldown(tabCooldownEnd: SimpleTimeMark, minutes: Int?, seconds: Int?): Boolean {
 
         // tablist can have up to 6 seconds of delay, besides this, there is no scenario where tablist will overestimate cooldown
@@ -146,7 +172,9 @@ object PestSpawnTimer {
         return false
     }
 
-    private fun drawDisplay() = buildList {
+    private fun drawDisplay(): List<Renderable> {
+        val lineMap = mutableMapOf<PestTimerTextEntry, Renderable>()
+
         val lastPestSpawned = if (lastSpawnTime.isFarPast()) {
             "§cNo pest spawned since joining."
         } else {
@@ -154,24 +182,52 @@ object PestSpawnTimer {
             "§eLast pest spawned: §b$timeSinceLastPest ago"
         }
 
-        add(Renderable.string(lastPestSpawned))
+        lineMap[PestTimerTextEntry.PEST_TIMER] = Renderable.string(lastPestSpawned)
 
         val pestCooldown = if (!TabWidget.PESTS.isActive) {
             "§cPests Widget not detected! Enable via /widget!"
         } else {
-            var cooldownValue = pestCooldownEndTime?.timeUntil()?.format() ?: "§cUnknown"
+            var cooldownValue = if (pestCooldownEndTime.isFarPast()) pestCooldownEndTime.timeUntil().format() else "§cUnknown"
             if (cooldownValue == "Soon") cooldownValue = "§aReady!"
 
             "§ePest Cooldown: §b$cooldownValue"
         }
 
-        if (config.pestSpawnCooldown) add(Renderable.string(pestCooldown))
+        lineMap[PestTimerTextEntry.PEST_COOLDOWN] = Renderable.string(pestCooldown)
 
         val averageSpawn = averageSpawnTime.seconds.format()
 
-        if (config.averagePestSpawnTime && averageSpawnTime != 0) {
-            add(Renderable.string("§eAverage time to spawn: §b$averageSpawn"))
+        if (averageSpawnTime != 0) {
+            lineMap[PestTimerTextEntry.AVERAGE_PEST_SPAWN] = Renderable.string("§eAverage time to spawn: §b$averageSpawn")
         }
+
+        return formatDisplay(lineMap)
+    }
+
+    private fun formatDisplay(lineMap: MutableMap<PestTimerTextEntry, Renderable>): List<Renderable> {
+        val newList = mutableListOf<Renderable>()
+        newList.addAll(config.defaultDisplay.mapNotNull { lineMap[it] })
+
+        return newList
+    }
+
+    private fun warn() {
+        sendTitle("§cPests Cooldown Expired!", duration = 3.seconds)
+        ChatUtils.chat("§cPest spawn cooldown has expired!")
+        SoundUtils.playPlingSound()
+        hasWarned = true
+    }
+
+    private fun reset() {
+        pestCooldownEndTime = SimpleTimeMark.farPast()
+
+        lastCropBrokenTime = SimpleTimeMark.farPast()
+
+        longestCropBrokenTime = 0.seconds
+
+        pestSpawned = false
+
+        hasWarned = false
     }
 
     fun isEnabled() = GardenApi.inGarden() && config.enabled
