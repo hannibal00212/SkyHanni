@@ -17,11 +17,17 @@ import net.minecraft.entity.item.EntityArmorStand
 object OfflineCakeCounter {
     private val patternGroup = RepoPattern.group("misc.cakecounter")
 
+    /**
+     * REGEX-TEST: Cakes Eaten: §d9,453,416
+     */
     private val cakesEatenPattern by patternGroup.pattern(
         "cakeseaten",
         "Cakes Eaten: §d(?<eaten>[\\d,]+)",
     )
 
+    /**
+     * REGEX-TEST: Souls Found: §b9,341
+     */
     private val soulsFoundPattern by patternGroup.pattern(
         "soulsfound",
         "Souls Found: §b(?<souls>[\\d,]+)",
