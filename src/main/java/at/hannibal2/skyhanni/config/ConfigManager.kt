@@ -55,7 +55,7 @@ class ConfigManager {
 //             .registerIfBeta(FeatureTogglesByDefaultAdapter)
             .create()
 
-        var configDirectory = File("config/skyhanni")
+        val configDirectory = File("config/skyhanni")
     }
 
     private val logger = LorenzLogger("config_manager")

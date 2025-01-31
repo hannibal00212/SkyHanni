@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -44,9 +45,8 @@ object DungeonBossMessages {
         " Necron§r§c: Before I have to deal with you myself."
     )
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!DungeonApi.inDungeon()) return
         if (!isBoss(event.message)) return
 
         DungeonApi.handleBossMessage(event.message)
