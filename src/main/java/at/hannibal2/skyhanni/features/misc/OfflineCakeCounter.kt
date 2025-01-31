@@ -101,7 +101,8 @@ object OfflineCakeCounter {
             val message = "While you were away, players ate §d$cakeDifference§e $cakesFormat"
 
             if (newSoulsFound != null) {
-                val soulDifference = newSoulsFound!! - soulsFound
+                val newSoulsFound = newSoulsFound ?: return
+                val soulDifference = newSoulsFound - soulsFound
                 val soulsFormat = StringUtils.pluralize(soulDifference, "Cake Soul")
                 ChatUtils.chat(
                     "$message and found §b$soulDifference§e $soulsFormat.",
