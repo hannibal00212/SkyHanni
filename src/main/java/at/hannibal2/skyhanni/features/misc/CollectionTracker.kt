@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -46,7 +47,7 @@ object CollectionTracker {
     private val OBSOLITE = "OBSOLITE".toInternalName()
     private val TIMITE = "TIMITE".toInternalName()
 
-    fun command(args: Array<String>) {
+    private fun command(args: Array<String>) {
         if (args.isEmpty()) {
             if (internalName == null) {
                 ChatUtils.userError("/shtrackcollection <item name> [goal amount]")
@@ -235,5 +236,13 @@ object CollectionTracker {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         SkyHanniMod.feature.misc.collectionCounterPos.renderStringsAndItems(display, posLabel = "Collection Tracker")
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtrackcollection") {
+            description = "Tracks your collection gain over time"
+            callback { command(it) }
+        }
     }
 }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo
 
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -15,6 +16,7 @@ data class GardenJson(
     @Expose @SerializedName("organic_matter") val organicMatter: Map<NeuInternalName, Double>,
     @Expose val fuel: Map<NeuInternalName, Double>,
     @Expose @SerializedName("personal_best_increment") val personalBestIncrement: Map<CropType, Int>,
+    @Expose @SerializedName("pest_rare_drops") val pestRareDrops: Map<PestType, Map<NeuInternalName, Int>>
 )
 
 data class GardenVisitor(

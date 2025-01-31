@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -68,14 +69,14 @@ object TpsCounter {
             val sum = tpsList.sum().toDouble()
             val newTps = (sum / tpsList.size).roundTo(1).coerceIn(0.0..20.0)
             tps = newTps
-            val legacyColor = getColor(newTps)
+            val legacyColor = format(newTps)
             "$legacyColor$newTps"
         }
         display = "§eTPS: $text"
     }
 
     private fun tpsCommand() {
-        val tpsMessage = tps?.let { "${getColor(it)}$it" } ?: tilCalculated
+        val tpsMessage = tps?.let { "${format(it)}$it" } ?: tilCalculated
         ChatUtils.chat("§eTPS: $tpsMessage")
     }
 
@@ -129,6 +130,11 @@ object TpsCounter {
         event.move(2, "misc.tpsDisplayPosition", "gui.tpsDisplayPosition")
     }
 
+    private fun format(tps: Double): String {
+        if (!tps.isFinite()) printError(tps)
+        return getColor(tps)
+    }
+
     private fun getColor(tps: Double) = when {
         tps > 19.8 -> "§2"
         tps > 19 -> "§a"
@@ -136,5 +142,18 @@ object TpsCounter {
         tps > 12 -> "§c"
 
         else -> "§4"
+    }
+
+    private fun printError(tps: Double) {
+        ErrorManager.logErrorStateWithData(
+            "TPS calculation got an error",
+            "tps is $tps",
+            "tps" to tps,
+            "packetsFromLastSecond" to packetsFromLastSecond,
+            "hasRemovedFirstSecond" to hasRemovedFirstSecond,
+            "hasReceivedPacket" to hasReceivedPacket,
+            "tpsList" to tpsList,
+            "timeSinceWorldSwitch" to timeSinceWorldSwitch,
+        )
     }
 }

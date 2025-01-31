@@ -34,7 +34,7 @@ object AshfangHighlights {
     private val gravityOrbs = mutableSetOf<EntityArmorStand>()
     private const val MAX_DISTANCE = 15.0
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.CRIMSON_ISLE)
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onEntityJoin(event: EntityEnterWorldEvent<EntityArmorStand>) {
         if (!AshfangManager.active) return
         val entity = event.entity
@@ -46,7 +46,7 @@ object AshfangHighlights {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.CRIMSON_ISLE)
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onEntityLeave(event: EntityLeaveWorldEvent<EntityArmorStand>) {
         blazingSouls -= event.entity
         gravityOrbs -= event.entity
