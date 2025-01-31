@@ -463,4 +463,24 @@ object CollectionUtils {
         }
     }
 
+    fun <K, V> LinkedHashMap<K, V>.putAt(index: Int, key: K, value: V) {
+        val entries = LinkedHashMap<K, V>()
+        var currentIndex = 0
+
+        for ((existingKey, existingValue) in this) {
+            if (currentIndex == index) {
+                entries[key] = value // Insert at the specified index
+            }
+            entries[existingKey] = existingValue
+            currentIndex++
+        }
+
+        if (index >= size) {
+            entries[key] = value // If index is out of range, append at the end
+        }
+
+        clear()
+        putAll(entries)
+    }
+
 }

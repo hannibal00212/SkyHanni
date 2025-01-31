@@ -59,6 +59,8 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : ItemTrackerData() {
         }
     }
 
+    val selectableBuckets get() = buckets.filter { it.isBucketSelectable() }
+
     private val buckets: Array<E> by lazy {
         @Suppress("UNCHECKED_CAST")
         selectedBucket?.javaClass?.enumConstants
@@ -87,19 +89,6 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : ItemTrackerData() {
     fun getItemsProp(): MutableMap<NeuInternalName, TrackedItem> = selectedBucket?.let {
         getBucket(it)
     } ?: flattenBucketsItems()
-
-    fun selectNextSequentialBucket(): E? {
-        // Move to the next ordinal, or wrap to null if at the last value
-        val nextOrdinal = selectedBucket?.let { it.ordinal + 1 } // Only calculate if selectedBucket is non-null
-        selectedBucket = when {
-            selectedBucket == null -> buckets.first() // If selectedBucket is null, start with the first enum
-            nextOrdinal != null && nextOrdinal >= buckets.size -> null // Wrap to null if we've reached the end
-            nextOrdinal != null -> buckets[nextOrdinal] // Move to the next enum value
-            else -> selectedBucket // Fallback, shouldn't happen
-        }
-        val isBucketSelectable = (selectedBucket?.isBucketSelectable() == true || selectedBucket == null)
-        return if (isBucketSelectable) selectedBucket else selectNextSequentialBucket()
-    }
 
     private fun getBucketItems(bucket: E) = bucketedItems[bucket]?.toMutableMap() ?: HashMap()
     fun getSelectedBucketItems() = selectedBucket?.let { getBucketItems(it) } ?: flattenBucketsItems()

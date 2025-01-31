@@ -151,6 +151,7 @@ object FishingProfitTracker {
         }
 
         if (tracker.isInventoryOpen()) {
+            // TODO change
             addButton(
                 prefix = "§7Category: ",
                 getName = currentCategory + " §7(" + amounts[currentCategory] + ")",

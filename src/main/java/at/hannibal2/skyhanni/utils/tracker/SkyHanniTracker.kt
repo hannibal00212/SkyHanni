@@ -10,8 +10,6 @@ import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchableSelector
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -21,6 +19,7 @@ import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -250,14 +249,15 @@ open class SkyHanniTracker<Data : TrackerData>(
 
     fun addPriceFromButton(lists: MutableList<Searchable>) {
         if (isInventoryOpen()) {
-            lists.addSearchableSelector<ItemPriceSource>(
-                "",
-                getName = { type -> type.sellName },
-                isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
-                onChange = { entry ->
-                    config.priceSource = entry.let { ItemPriceSource.entries[entry.ordinal] } // todo avoid ordinal
+            lists.addButton<ItemPriceSource>(
+                label = "Price Source",
+                current = config.priceSource,
+                getName = { it.sellName },
+                onChange = {
+                    config.priceSource = it
                     update()
                 },
+                universe = ItemPriceSource.entries,
             )
         }
     }

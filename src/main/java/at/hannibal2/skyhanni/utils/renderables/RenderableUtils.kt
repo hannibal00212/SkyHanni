@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.CollectionUtils.putAt
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -96,6 +97,30 @@ internal object RenderableUtils {
         fontRenderer.drawStringWithShadow(text, 0f, 0f, color.rgb)
         GlStateManager.scale(inverseScale, inverseScale, 1.0)
         GlStateManager.translate(-1.0, -1.0, 0.0)
+    }
+
+    inline fun <T> MutableList<Searchable>.addNullableButton(
+        label: String,
+        current: T,
+        crossinline onChange: (T?) -> Unit,
+        universe: List<T>,
+        nullLabel: String,
+    ) {
+        val map = universe.associateWithTo(LinkedHashMap<T?, String>()) { it.toString() }
+        map.putAt(0, null, nullLabel)
+
+        val currentName = map[current] ?: error("unknown entry in map")
+        addButton(
+            label = label,
+            current = currentName,
+            getName = { it },
+            onChange = { new ->
+                onChange(
+                    map.filter { it.value == new }.keys.firstOrNull() ?: error("")
+                )
+            },
+            universe = map.values.toList(),
+        )
     }
 
     inline fun <T> MutableList<Searchable>.addButton(
