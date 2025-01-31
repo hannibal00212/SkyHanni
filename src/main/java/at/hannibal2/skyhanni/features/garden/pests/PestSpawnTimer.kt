@@ -132,7 +132,7 @@ object PestSpawnTimer {
         if (
             (config.onlyWithVacuum && !PestApi.hasVacuumInHand()) &&
             (config.onlyWithFarmingTool && !GardenApi.hasFarmingToolInHand())
-            ) return
+        ) return
 
         config.position.renderRenderables(drawDisplay(), posLabel = "Pest Spawn Timer")
     }
