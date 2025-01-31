@@ -54,7 +54,7 @@ object MobUtils {
         }
     }
 
-    fun rayTraceForMob(entity: Entity, distance: Double, partialTicks: Float, offset: LorenzVec = LorenzVec()) =
+    fun rayTraceForMob(entity: Entity, distance: Double, partialTicks: Float, offset: SkyHanniVec3d = SkyHanniVec3d()) =
         rayTraceForMob(entity, partialTicks, offset)?.takeIf {
             it.baseEntity.distanceTo(entity.getLorenzVec()) <= distance
         }
@@ -63,16 +63,16 @@ object MobUtils {
         entity: Entity,
         distance: Double,
         partialTicks: Float,
-        offset: LorenzVec = LorenzVec(),
+        offset: SkyHanniVec3d = SkyHanniVec3d(),
     ) =
         rayTraceForMobs(entity, partialTicks, offset)?.filter {
             it.baseEntity.distanceTo(entity.getLorenzVec()) <= distance
         }.takeIf { it?.isNotEmpty() ?: false }
 
-    fun rayTraceForMob(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()) =
+    fun rayTraceForMob(entity: Entity, partialTicks: Float, offset: SkyHanniVec3d = SkyHanniVec3d()) =
         rayTraceForMobs(entity, partialTicks, offset)?.firstOrNull()
 
-    fun rayTraceForMobs(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()): List<Mob>? {
+    fun rayTraceForMobs(entity: Entity, partialTicks: Float, offset: SkyHanniVec3d = SkyHanniVec3d()): List<Mob>? {
         val pos = entity.getPositionEyes(partialTicks).toLorenzVec() + offset
         val look = entity.getLook(partialTicks).toLorenzVec().normalize()
         val possibleEntities = MobData.entityToMob.filterKeys {

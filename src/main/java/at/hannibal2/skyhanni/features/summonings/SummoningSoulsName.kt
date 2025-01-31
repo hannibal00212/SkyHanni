@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -26,7 +26,7 @@ object SummoningSoulsName {
     private val SUMMONING_SOUL_TEXTURE by lazy { SkullTextureHolder.getTexture("SUMMONING_SOUL") }
 
     private val souls = mutableMapOf<EntityArmorStand, String>()
-    private val mobsLastLocation = TimeLimitedCache<Int, LorenzVec>(6.minutes)
+    private val mobsLastLocation = TimeLimitedCache<Int, SkyHanniVec3d>(6.minutes)
     private val mobsName = TimeLimitedCache<Int, String>(6.minutes)
 
     @HandleEvent

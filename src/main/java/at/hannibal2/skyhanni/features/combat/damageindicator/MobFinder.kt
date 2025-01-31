@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.LorenzUtils.ignoreDerpy
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -473,7 +473,7 @@ class MobFinder {
             return floor6GiantsSeparateDelay[uuid]!!
         }
 
-        val middle = LorenzVec(-8, 0, 56)
+        val middle = SkyHanniVec3d(-8, 0, 56)
 
         val loc = entity.getLorenzVec()
 

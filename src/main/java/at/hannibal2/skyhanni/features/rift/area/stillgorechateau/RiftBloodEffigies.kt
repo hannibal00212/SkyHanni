@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -50,7 +50,7 @@ object RiftBloodEffigies {
 
     private val config get() = RiftApi.config.area.stillgoreChateau.bloodEffigies
 
-    private var locations: List<LorenzVec> = emptyList()
+    private var locations: List<SkyHanniVec3d> = emptyList()
     private val effigies = (0..5).associateWith { Effigy() }
 
     private val patternGroup = RepoPattern.group("rift.area.stillgore.effegies")

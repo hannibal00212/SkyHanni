@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 
@@ -62,7 +62,7 @@ object JoinCrystalHollows {
         if (!isEnabled()) return
 
         if (inTime()) {
-            val location = LorenzVec(88, 198, -99)
+            val location = SkyHanniVec3d(88, 198, -99)
             event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor())
             event.drawDynamicText(location, "§eBuy Crystal Hollows Pass", 1.3)
         }

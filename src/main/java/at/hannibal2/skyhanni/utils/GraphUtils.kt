@@ -116,11 +116,11 @@ object GraphUtils {
     }
 
     fun findAllShortestDistancesOnCurrentIsland(
-        start: LorenzVec,
+        start: SkyHanniVec3d,
         bailout: (GraphNode) -> Boolean = { false },
     ): DijkstraTree = findDijkstraDistances(nearestNodeOnCurrentIsland(start), bailout)
 
-    fun nearestNodeOnCurrentIsland(location: LorenzVec): GraphNode {
+    fun nearestNodeOnCurrentIsland(location: SkyHanniVec3d): GraphNode {
         val graph = IslandGraphs.currentIslandGraph ?: error("no island found")
         return graph.nodes.minBy { it.position.distanceSq(location) }
     }
@@ -137,7 +137,7 @@ object GraphUtils {
         return distances.findPathToDestination(end)
     }
 
-    fun findShortestPath(start: GraphNode, end: GraphNode): List<LorenzVec> = findShortestPathAsGraph(start, end).toPositionsList()
+    fun findShortestPath(start: GraphNode, end: GraphNode): List<SkyHanniVec3d> = findShortestPathAsGraph(start, end).toPositionsList()
 
     fun findShortestDistance(start: GraphNode, end: GraphNode): Double = findShortestPathAsGraphWithDistance(start, end).second
 }

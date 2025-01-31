@@ -41,7 +41,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -57,8 +57,8 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object DailyQuestHelper {
 
-    private val townBoardMage = LorenzVec(-138, 92, -755)
-    private val townBoardBarbarian = LorenzVec(-572, 100, -687)
+    private val townBoardMage = SkyHanniVec3d(-138, 92, -755)
+    private val townBoardBarbarian = SkyHanniVec3d(-572, 100, -687)
 
     val quests = mutableListOf<Quest>()
     var greatSpook = false

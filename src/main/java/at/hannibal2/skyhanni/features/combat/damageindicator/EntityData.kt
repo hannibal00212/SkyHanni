@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.combat.damageindicator
 
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -23,7 +23,7 @@ class EntityData(
     var nameAbove: String = "",
     var dead: Boolean = false,
     var firstDeath: Boolean = false, // TODO this defines if hp is very low, replace dead with this later
-    var deathLocation: LorenzVec? = null,
+    var deathLocation: SkyHanniVec3d? = null,
 ) {
 
     val timeToKill by lazy {

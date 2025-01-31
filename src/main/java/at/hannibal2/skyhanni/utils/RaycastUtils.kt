@@ -5,8 +5,8 @@ import net.minecraft.client.Minecraft
 object RaycastUtils {
 
     data class Ray(
-        val origin: LorenzVec,
-        val direction: LorenzVec,
+        val origin: SkyHanniVec3d,
+        val direction: SkyHanniVec3d,
     ) {
         init {
             require(direction.isNormalized())
@@ -14,8 +14,8 @@ object RaycastUtils {
     }
 
     data class Plane(
-        val origin: LorenzVec,
-        val normal: LorenzVec,
+        val origin: SkyHanniVec3d,
+        val normal: SkyHanniVec3d,
     ) {
         init {
             require(normal.isNormalized())
@@ -34,7 +34,7 @@ object RaycastUtils {
      */
     fun createOrthogonalPlaneToRayAtPoint(
         ray: Ray,
-        point: LorenzVec,
+        point: SkyHanniVec3d,
     ): Plane {
         return Plane(point, ray.direction)
     }
@@ -42,7 +42,7 @@ object RaycastUtils {
     /**
      * Intersect a plane (of any orientation) with a ray. The ray and plane may not be parallel to each other.
      */
-    fun intersectPlaneWithRay(plane: Plane, ray: Ray): LorenzVec {
+    fun intersectPlaneWithRay(plane: Plane, ray: Ray): SkyHanniVec3d {
 //         require(plane.normal.dotProduct(ray.direction).absoluteValue != 0.0)
         val intersectionPointDistanceAlongRay =
             (plane.normal.dotProduct(plane.origin) - plane.normal.dotProduct(ray.origin)) / plane.normal.dotProduct(ray.direction)
@@ -53,20 +53,20 @@ object RaycastUtils {
      * Finds the distance between the given ray and the point. If the point is behind the ray origin (according to the ray's direction),
      * returns [Double.MAX_VALUE] instead.
      */
-    fun findDistanceToRay(ray: Ray, point: LorenzVec): Double {
+    fun findDistanceToRay(ray: Ray, point: SkyHanniVec3d): Double {
         val plane = createOrthogonalPlaneToRayAtPoint(ray, point)
         val intersectionPoint = intersectPlaneWithRay(plane, ray)
         if ((intersectionPoint - ray.origin).dotProduct(ray.direction) < 0) return Double.MAX_VALUE
         return intersectionPoint.distance(point)
     }
 
-    inline fun <T> createDistanceToRayEstimator(ray: Ray, crossinline position: (T) -> LorenzVec): (T) -> Double {
+    inline fun <T> createDistanceToRayEstimator(ray: Ray, crossinline position: (T) -> SkyHanniVec3d): (T) -> Double {
         return {
             findDistanceToRay(ray, position(it))
         }
     }
 
-    fun <T : Any> List<T>.findClosestPointToRay(ray: Ray, positionExtractor: (T) -> LorenzVec): T? {
+    fun <T : Any> List<T>.findClosestPointToRay(ray: Ray, positionExtractor: (T) -> SkyHanniVec3d): T? {
         return minByOrNull(createDistanceToRayEstimator(ray, positionExtractor))
     }
 

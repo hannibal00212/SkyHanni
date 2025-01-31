@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
@@ -48,7 +48,7 @@ object EndermanSlayerFeatures {
     private val endermenWithBeacons = mutableListOf<EntityEnderman>()
     private val flyingBeacons = mutableSetOf<EntityArmorStand>()
     private val nukekubiSkulls = mutableSetOf<EntityArmorStand>()
-    private var sittingBeacon = mapOf<LorenzVec, SimpleTimeMark>()
+    private var sittingBeacon = mapOf<SkyHanniVec3d, SimpleTimeMark>()
     private val logger = LorenzLogger("slayer/enderman")
 
     private val NUKEKUBI_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("MOB_NUKEKUBI") }
@@ -94,7 +94,7 @@ object EndermanSlayerFeatures {
 
     private fun hasBeaconInHand(enderman: EntityEnderman) = enderman.getBlockInHand()?.block == Blocks.beacon
 
-    private fun canSee(b: LorenzVec) = b.canBeSeen(15.0)
+    private fun canSee(b: SkyHanniVec3d) = b.canBeSeen(15.0)
 
     private fun showBeacon() = beaconConfig.highlightBeacon || beaconConfig.showWarning || beaconConfig.showLine
 

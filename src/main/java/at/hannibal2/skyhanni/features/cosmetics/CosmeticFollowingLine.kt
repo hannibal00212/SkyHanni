@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -26,8 +26,8 @@ object CosmeticFollowingLine {
 
     private val config get() = SkyHanniMod.feature.gui.cosmetic.followingLine
 
-    private var locations = mapOf<LorenzVec, LocationSpot>()
-    private var latestLocations = mapOf<LorenzVec, LocationSpot>()
+    private var locations = mapOf<SkyHanniVec3d, LocationSpot>()
+    private var latestLocations = mapOf<SkyHanniVec3d, LocationSpot>()
 
     class LocationSpot(val time: SimpleTimeMark, val onGround: Boolean)
 

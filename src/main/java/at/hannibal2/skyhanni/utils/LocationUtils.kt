@@ -8,41 +8,41 @@ import kotlin.math.min
 
 object LocationUtils {
 
-    fun canSee(a: LorenzVec, b: LorenzVec, offset: Double? = null): Boolean {
+    fun canSee(a: SkyHanniVec3d, b: SkyHanniVec3d, offset: Double? = null): Boolean {
         return canSee0(a, b) && offset?.let { canSee0(a.add(y = it), b.add(y = it)) } ?: true
     }
 
-    private fun canSee0(a: LorenzVec, b: LorenzVec) =
+    private fun canSee0(a: SkyHanniVec3d, b: SkyHanniVec3d) =
         Minecraft.getMinecraft().theWorld.rayTraceBlocks(a.toVec3(), b.toVec3(), false, true, false) == null
 
     fun playerLocation() = Minecraft.getMinecraft().thePlayer.getLorenzVec()
 
-    fun LorenzVec.distanceToPlayer() = distance(playerLocation())
+    fun SkyHanniVec3d.distanceToPlayer() = distance(playerLocation())
 
-    fun LorenzVec.distanceToPlayerIgnoreY() = distanceIgnoreY(playerLocation())
+    fun SkyHanniVec3d.distanceToPlayerIgnoreY() = distanceIgnoreY(playerLocation())
 
-    fun LorenzVec.distanceSqToPlayer() = distanceSq(playerLocation())
+    fun SkyHanniVec3d.distanceSqToPlayer() = distanceSq(playerLocation())
 
-    fun LorenzVec.distanceToPlayerSqIgnoreY() = distanceSqIgnoreY(playerLocation())
+    fun SkyHanniVec3d.distanceToPlayerSqIgnoreY() = distanceSqIgnoreY(playerLocation())
 
     fun Entity.distanceToPlayer() = getLorenzVec().distanceToPlayer()
 
-    fun Entity.distanceTo(location: LorenzVec) = getLorenzVec().distance(location)
+    fun Entity.distanceTo(location: SkyHanniVec3d) = getLorenzVec().distance(location)
     fun Entity.distanceTo(other: Entity) = getLorenzVec().distance(other.getLorenzVec())
 
-    fun Entity.distanceToIgnoreY(location: LorenzVec) = getLorenzVec().distanceIgnoreY(location)
+    fun Entity.distanceToIgnoreY(location: SkyHanniVec3d) = getLorenzVec().distanceIgnoreY(location)
 
-    fun playerEyeLocation(): LorenzVec {
+    fun playerEyeLocation(): SkyHanniVec3d {
         val player = Minecraft.getMinecraft().thePlayer
         val vec = player.getLorenzVec()
         return vec.up(player.getEyeHeight().toDouble())
     }
 
-    fun AxisAlignedBB.isInside(vec: LorenzVec) = isVecInside(vec.toVec3())
+    fun AxisAlignedBB.isInside(vec: SkyHanniVec3d) = isVecInside(vec.toVec3())
 
     fun AxisAlignedBB.isPlayerInside() = isInside(playerLocation())
 
-    fun LorenzVec.canBeSeen(viewDistance: Number = 150.0, offset: Double? = null): Boolean {
+    fun SkyHanniVec3d.canBeSeen(viewDistance: Number = 150.0, offset: Double? = null): Boolean {
         val a = playerEyeLocation()
         val b = this
         val noBlocks = canSee(a, b, offset)
@@ -51,16 +51,16 @@ object LocationUtils {
         return noBlocks && notTooFar && inFov
     }
 
-    fun LorenzVec.canBeSeen(yOffsetRange: IntRange, radius: Double = 150.0): Boolean =
+    fun SkyHanniVec3d.canBeSeen(yOffsetRange: IntRange, radius: Double = 150.0): Boolean =
         yOffsetRange.any { offset ->
             up(offset).canBeSeen(radius)
         }
 
-    fun AxisAlignedBB.minBox() = LorenzVec(minX, minY, minZ)
+    fun AxisAlignedBB.minBox() = SkyHanniVec3d(minX, minY, minZ)
 
-    fun AxisAlignedBB.maxBox() = LorenzVec(maxX, maxY, maxZ)
+    fun AxisAlignedBB.maxBox() = SkyHanniVec3d(maxX, maxY, maxZ)
 
-    fun AxisAlignedBB.rayIntersects(origin: LorenzVec, direction: LorenzVec): Boolean {
+    fun AxisAlignedBB.rayIntersects(origin: SkyHanniVec3d, direction: SkyHanniVec3d): Boolean {
         // Reference for Algorithm https://tavianator.com/2011/ray_box.html
         val rayDirectionInverse = direction.inverse()
         val t1 = (this.minBox() - origin) * rayDirectionInverse
@@ -120,14 +120,14 @@ object LocationUtils {
         return yaw
     }
 
-    fun calculatePlayerFacingDirection(): LorenzVec {
+    fun calculatePlayerFacingDirection(): SkyHanniVec3d {
         val yaw = calculatePlayerYaw() + 180
         return when {
-            yaw < 45 -> LorenzVec(0, 0, -1)
-            yaw < 135 -> LorenzVec(1, 0, 0)
-            yaw < 225 -> LorenzVec(0, 0, 1)
-            yaw < 315 -> LorenzVec(-1, 0, 0)
-            else -> LorenzVec(0, 0, -1)
+            yaw < 45 -> SkyHanniVec3d(0, 0, -1)
+            yaw < 135 -> SkyHanniVec3d(1, 0, 0)
+            yaw < 225 -> SkyHanniVec3d(0, 0, 1)
+            yaw < 315 -> SkyHanniVec3d(-1, 0, 0)
+            else -> SkyHanniVec3d(0, 0, -1)
         }
     }
 }

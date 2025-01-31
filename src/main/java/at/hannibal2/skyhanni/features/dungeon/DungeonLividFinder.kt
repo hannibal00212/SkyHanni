@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -42,7 +42,7 @@ import net.minecraft.init.Blocks
 @SkyHanniModule
 object DungeonLividFinder {
     private val config get() = SkyHanniMod.feature.dungeon.lividFinder
-    private val blockLocation = LorenzVec(6, 109, 43)
+    private val blockLocation = SkyHanniVec3d(6, 109, 43)
 
     private val isBlind by RecalculatingValue(2.ticks, ::isCurrentlyBlind)
 

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import com.google.gson.annotations.Expose
 
 data class EnigmaSoulsJson(
@@ -9,5 +9,5 @@ data class EnigmaSoulsJson(
 
 data class EnigmaPosition(
     @Expose val name: String,
-    @Expose val position: LorenzVec,
+    @Expose val position: SkyHanniVec3d,
 )

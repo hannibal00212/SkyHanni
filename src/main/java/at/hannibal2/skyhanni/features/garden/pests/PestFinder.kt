@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
@@ -176,7 +176,7 @@ object PestFinder {
 
     private fun drawName(
         plot: GardenPlotApi.Plot,
-        playerLocation: LorenzVec,
+        playerLocation: SkyHanniVec3d,
         event: SkyHanniRenderWorldEvent,
     ) {
         val pests = plot.pests

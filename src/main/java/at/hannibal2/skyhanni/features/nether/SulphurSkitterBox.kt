@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
@@ -27,8 +27,8 @@ import net.minecraft.util.BlockPos
 object SulphurSkitterBox {
 
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.sulphurSkitterBox
-    private var spongeLocations = listOf<LorenzVec>()
-    private var closestSponge: LorenzVec? = null
+    private var spongeLocations = listOf<SkyHanniVec3d>()
+    private var closestSponge: SkyHanniVec3d? = null
     private var renderBox: AxisAlignedBB? = null
     private const val RADIUS = 4
 

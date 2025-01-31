@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isAtFullHealth
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
@@ -31,7 +31,7 @@ object LivingCaveDefenseBlocks {
     private var movingBlocks = mapOf<DefenseBlock, Long>()
     private var staticBlocks = emptyList<DefenseBlock>()
 
-    class DefenseBlock(val entity: EntityOtherPlayerMP, val location: LorenzVec, var hidden: Boolean = false)
+    class DefenseBlock(val entity: EntityOtherPlayerMP, val location: SkyHanniVec3d, var hidden: Boolean = false)
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -130,11 +130,11 @@ object LivingCaveDefenseBlocks {
         }
     }
 
-    private fun getNearestMovingDefenseBlock(location: LorenzVec) =
+    private fun getNearestMovingDefenseBlock(location: SkyHanniVec3d) =
         movingBlocks.keys.filter { it.location.distance(location) < 15 }
             .minByOrNull { it.location.distance(location) }
 
-    private fun getNearestStaticDefenseBlock(location: LorenzVec) =
+    private fun getNearestStaticDefenseBlock(location: SkyHanniVec3d) =
         staticBlocks.filter { it.location.distance(location) < 15 }.minByOrNull { it.location.distance(location) }
 
     @HandleEvent

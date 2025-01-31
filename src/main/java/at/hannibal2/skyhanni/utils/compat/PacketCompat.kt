@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C03PacketPlayer
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
@@ -23,9 +23,9 @@ fun C08PacketPlayerBlockPlacement.getUsedItem(): ItemStack? =
 //$$ Minecraft.getMinecraft().player?.getHeldItem(hand)
 //#endif
 
-fun C03PacketPlayer.getLocation(): LorenzVec =
+fun C03PacketPlayer.getLocation(): SkyHanniVec3d =
     //#if MC < 1.12
-    LorenzVec(positionX, positionY, positionZ)
+    SkyHanniVec3d(positionX, positionY, positionZ)
 //#else
-//$$ LorenzVec(getX(0.0), getY(0.0), getZ(0.0))
+//$$ SkyHanniVec3d(getX(0.0), getY(0.0), getZ(0.0))
 //#endif

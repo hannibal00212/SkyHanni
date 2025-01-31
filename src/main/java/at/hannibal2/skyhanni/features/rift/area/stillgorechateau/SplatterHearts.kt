@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.util.EnumParticleTypes
@@ -17,8 +17,8 @@ object SplatterHearts {
     private val config get() = RiftApi.config.area.stillgoreChateau
     private var lastHearts = SimpleTimeMark.farPast()
 
-    private var shownHearts = setOf<LorenzVec>()
-    private val currentHearts = mutableSetOf<LorenzVec>()
+    private var shownHearts = setOf<SkyHanniVec3d>()
+    private val currentHearts = mutableSetOf<SkyHanniVec3d>()
 
     @HandleEvent
     fun onParticle(event: ReceiveParticleEvent) {

@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -44,7 +44,7 @@ object EntityMovementData {
         val startTime: SimpleTimeMark = SimpleTimeMark.now()
     }
 
-    private val entityLocation = mutableMapOf<Entity, LorenzVec>()
+    private val entityLocation = mutableMapOf<Entity, SkyHanniVec3d>()
 
     fun addToTrack(entity: Entity) {
         if (entity !in entityLocation) {

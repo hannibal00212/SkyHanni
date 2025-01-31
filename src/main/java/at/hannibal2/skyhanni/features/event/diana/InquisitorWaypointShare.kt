@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -101,7 +101,7 @@ object InquisitorWaypointShare {
     class SharedInquisitor(
         val fromPlayer: String,
         val displayName: String,
-        val location: LorenzVec,
+        val location: SkyHanniVec3d,
         val spawnTime: SimpleTimeMark,
     )
 
@@ -291,7 +291,7 @@ object InquisitorWaypointShare {
         val x = group("x").trim().toDoubleOrNull() ?: return false
         val y = group("y").trim().toDoubleOrNull() ?: return false
         val z = group("z").trim().toDoubleOrNull() ?: return false
-        val location = LorenzVec(x, y, z)
+        val location = SkyHanniVec3d(x, y, z)
 
         val name = rawName.cleanPlayerName()
         val displayName = rawName.cleanPlayerName(displayName = true)

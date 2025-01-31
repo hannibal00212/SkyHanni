@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -87,7 +87,7 @@ object CityProjectFeatures {
                 HypixelCommands.warp("hub")
                 EntityMovementData.onNextTeleport(IslandType.HUB) {
                     IslandGraphs.pathFind(
-                        LorenzVec(9.3, 72.0, -103.4),
+                        SkyHanniVec3d(9.3, 72.0, -103.4),
                         "§aCity Project",
                         condition = { config.dailyReminder },
                     )

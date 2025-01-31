@@ -96,7 +96,7 @@ object EntityUtils {
         }
     }
 
-    private fun getArmorStandsInRadius(center: LorenzVec, radius: Double): List<EntityArmorStand> {
+    private fun getArmorStandsInRadius(center: SkyHanniVec3d, radius: Double): List<EntityArmorStand> {
         val a = center.add(-radius, -radius - 3, -radius).toBlockPos()
         val b = center.add(radius, radius + 3, radius).toBlockPos()
         val alignedBB = AxisAlignedBB(a, b)
@@ -137,10 +137,10 @@ object EntityUtils {
     inline fun <reified T : Entity> getEntitiesNextToPlayer(radius: Double): Sequence<T> =
         getEntitiesNearby<T>(LocationUtils.playerLocation(), radius)
 
-    inline fun <reified T : Entity> getEntitiesNearby(location: LorenzVec, radius: Double): Sequence<T> =
+    inline fun <reified T : Entity> getEntitiesNearby(location: SkyHanniVec3d, radius: Double): Sequence<T> =
         getEntities<T>().filter { it.distanceTo(location) < radius }
 
-    inline fun <reified T : Entity> getEntitiesNearbyIgnoreY(location: LorenzVec, radius: Double): Sequence<T> =
+    inline fun <reified T : Entity> getEntitiesNearbyIgnoreY(location: SkyHanniVec3d, radius: Double): Sequence<T> =
         getEntities<T>().filter { it.distanceToIgnoreY(location) < radius }
 
     fun EntityLivingBase.isAtFullHealth() = baseMaxHealth == health.toInt()

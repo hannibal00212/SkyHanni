@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -69,43 +69,43 @@ object AreaMiniBossFeatures {
         val displayName: String,
         val color: LorenzColor,
         val colorOpacity: Int,
-        vararg val spawnLocations: LorenzVec,
+        vararg val spawnLocations: SkyHanniVec3d,
     ) {
         GOLDEN_GHOUL(
             "Golden Ghoul", LorenzColor.YELLOW, 127,
-            LorenzVec(-99, 39, -86),
-            LorenzVec(-128, 42, -138),
+            SkyHanniVec3d(-99, 39, -86),
+            SkyHanniVec3d(-128, 42, -138),
         ),
         OLD_WOLF(
             "Old Wolf", LorenzColor.GOLD, 60,
-            LorenzVec(-248, 123, 54),
-            LorenzVec(-256, 105, 75),
-            LorenzVec(-268, 90, 97),
-            LorenzVec(-258, 94, 75),
-            LorenzVec(-225, 92, 127),
+            SkyHanniVec3d(-248, 123, 54),
+            SkyHanniVec3d(-256, 105, 75),
+            SkyHanniVec3d(-268, 90, 97),
+            SkyHanniVec3d(-258, 94, 75),
+            SkyHanniVec3d(-225, 92, 127),
         ),
         SOUL_OF_THE_ALPHA(
             "Soul of the Alpha", LorenzColor.GOLD, 60,
-            LorenzVec(-381, 56, -94),
-            LorenzVec(-394, 63, -52),
-            LorenzVec(-386, 50, -2),
-            LorenzVec(-396, 58, 29),
+            SkyHanniVec3d(-381, 56, -94),
+            SkyHanniVec3d(-394, 63, -52),
+            SkyHanniVec3d(-386, 50, -2),
+            SkyHanniVec3d(-396, 58, 29),
         ),
         VOIDLING_EXTREMIST(
             "Voidling Extremist", LorenzColor.LIGHT_PURPLE, 127,
-            LorenzVec(-591, 10, -304),
-            LorenzVec(-544, 21, -301),
-            LorenzVec(-593, 26, -328),
-            LorenzVec(-565, 41, -307),
-            LorenzVec(-573, 51, -353),
+            SkyHanniVec3d(-591, 10, -304),
+            SkyHanniVec3d(-544, 21, -301),
+            SkyHanniVec3d(-593, 26, -328),
+            SkyHanniVec3d(-565, 41, -307),
+            SkyHanniVec3d(-573, 51, -353),
         ),
         MILLENNIA_AGED_BLAZE(
             "Millennia-Aged Blaze", LorenzColor.DARK_RED, 60,
-            LorenzVec(-292, 97, -999),
-            LorenzVec(-232, 77, -951),
-            LorenzVec(-304, 73, -952),
-            LorenzVec(-281, 82, -1010),
-            LorenzVec(-342, 86, -1035),
+            SkyHanniVec3d(-292, 97, -999),
+            SkyHanniVec3d(-232, 77, -951),
+            SkyHanniVec3d(-304, 73, -952),
+            SkyHanniVec3d(-281, 82, -1010),
+            SkyHanniVec3d(-342, 86, -1035),
         ),
     }
 }

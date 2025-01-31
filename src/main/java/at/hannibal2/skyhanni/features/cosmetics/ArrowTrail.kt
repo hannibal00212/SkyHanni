@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
@@ -26,7 +26,7 @@ object ArrowTrail {
 
     private val config get() = SkyHanniMod.feature.gui.cosmetic.arrowTrail
 
-    private data class Line(val start: LorenzVec, val end: LorenzVec, val deathTime: SimpleTimeMark)
+    private data class Line(val start: SkyHanniVec3d, val end: SkyHanniVec3d, val deathTime: SimpleTimeMark)
 
     private val listAllArrow: MutableList<Line> = LinkedList<Line>()
     private val listYourArrow: MutableList<Line> = LinkedList<Line>()

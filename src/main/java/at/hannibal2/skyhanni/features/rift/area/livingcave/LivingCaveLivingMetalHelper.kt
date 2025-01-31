@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 
@@ -19,8 +19,8 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 object LivingCaveLivingMetalHelper {
 
     private val config get() = RiftApi.config.area.livingCave.livingCaveLivingMetalConfig
-    private var lastClicked: LorenzVec? = null
-    private var pair: Pair<LorenzVec, LorenzVec>? = null
+    private var lastClicked: SkyHanniVec3d? = null
+    private var pair: Pair<SkyHanniVec3d, SkyHanniVec3d>? = null
     private var startTime = 0L
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)

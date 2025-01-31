@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -26,13 +26,13 @@ import at.hannibal2.skyhanni.utils.StringUtils
 object HoppityEggLocations {
 
     // TODO add gui/command to show total data/missing islands
-    private var collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>
+    private var collectedEggStorage: MutableMap<IslandType, MutableSet<SkyHanniVec3d>>
         get() = ChocolateFactoryApi.profileStorage?.collectedEggLocations ?: mutableMapOf()
         set(value) {
             ChocolateFactoryApi.profileStorage?.collectedEggLocations = value
         }
 
-    var apiEggLocations: Map<IslandType, Map<String, LorenzVec>> = mapOf()
+    var apiEggLocations: Map<IslandType, Map<String, SkyHanniVec3d>> = mapOf()
 
     val islandLocations
         get() = apiEggLocations[LorenzUtils.skyBlockIsland]?.values?.toSet().orEmpty()
@@ -40,11 +40,11 @@ object HoppityEggLocations {
     val islandCollectedLocations
         get() = collectedEggStorage[LorenzUtils.skyBlockIsland]?.toSet().orEmpty()
 
-    fun getEggsIn(islandType: IslandType): Set<LorenzVec> {
+    fun getEggsIn(islandType: IslandType): Set<SkyHanniVec3d> {
         return collectedEggStorage[islandType].orEmpty()
     }
 
-    fun hasCollectedEgg(location: LorenzVec): Boolean = islandCollectedLocations.contains(location)
+    fun hasCollectedEgg(location: SkyHanniVec3d): Boolean = islandCollectedLocations.contains(location)
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -69,7 +69,7 @@ object HoppityEggLocations {
         saveEggLocation(LorenzUtils.skyBlockIsland, location)
     }
 
-    private fun saveEggLocation(island: IslandType, location: LorenzVec) {
+    private fun saveEggLocation(island: IslandType, location: SkyHanniVec3d) {
         val locations = collectedEggStorage.getOrPut(island) { mutableSetOf() }
         locations += location
     }
@@ -90,7 +90,7 @@ object HoppityEggLocations {
 
         val apiCollectedLocations = rawLocations.values.flatten()
 
-        val collectedEggsApiData = mutableMapOf<IslandType, MutableSet<LorenzVec>>()
+        val collectedEggsApiData = mutableMapOf<IslandType, MutableSet<SkyHanniVec3d>>()
 
         for ((island, locationNameToCoords) in apiEggLocations) {
             val coords = apiCollectedLocations.mapNotNull { locationNameToCoords[it] }
@@ -113,7 +113,7 @@ object HoppityEggLocations {
         )
     }
 
-    private fun loadApiCollectedEggs(locations: Map<IslandType, Set<LorenzVec>>) {
+    private fun loadApiCollectedEggs(locations: Map<IslandType, Set<SkyHanniVec3d>>) {
         for ((island, coordinates) in locations.entries) {
             coordinates.forEach { saveEggLocation(island, it) }
         }
@@ -123,7 +123,7 @@ object HoppityEggLocations {
     private var showEggLocationsDebug = false
 
     // to be removed - in case there are any issues with missing locations
-    private var legacyEggLocations: Map<IslandType, Set<LorenzVec>> = mapOf()
+    private var legacyEggLocations: Map<IslandType, Set<SkyHanniVec3d>> = mapOf()
 
     private fun toggleDebug() {
         showEggLocationsDebug = !showEggLocationsDebug

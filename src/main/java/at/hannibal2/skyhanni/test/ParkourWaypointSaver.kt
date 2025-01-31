@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
@@ -22,7 +22,7 @@ object ParkourWaypointSaver {
 
     private val config get() = SkyHanniMod.feature.dev.waypoint
     private var timeLastSaved = SimpleTimeMark.farPast()
-    private var locations = mutableListOf<LorenzVec>()
+    private var locations = mutableListOf<SkyHanniVec3d>()
     private var parkourHelper: ParkourHelper? = null
 
     @HandleEvent
@@ -41,7 +41,7 @@ object ParkourWaypointSaver {
             }
 
             config.saveKey -> {
-                val newLocation = LorenzVec.getBlockBelowPlayer()
+                val newLocation = SkyHanniVec3d.getBlockBelowPlayer()
                 if (locations.isNotEmpty() && newLocation == locations.last()) return
                 locations.add(newLocation)
                 update()
@@ -57,7 +57,7 @@ object ParkourWaypointSaver {
         }
     }
 
-    private fun MutableList<LorenzVec>.copyLocations() {
+    private fun MutableList<SkyHanniVec3d>.copyLocations() {
         val resultList = mutableListOf<String>()
         timeLastSaved = SimpleTimeMark.now()
         for (location in this) {

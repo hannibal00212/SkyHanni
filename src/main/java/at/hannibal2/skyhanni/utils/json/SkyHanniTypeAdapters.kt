@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -38,9 +38,9 @@ object SkyHanniTypeAdapters {
         { this.toInternalName() },
     )
 
-    val VEC_STRING: TypeAdapter<LorenzVec> = SimpleStringTypeAdapter(
-        LorenzVec::asStoredString,
-        LorenzVec::decodeFromString,
+    val VEC_STRING: TypeAdapter<SkyHanniVec3d> = SimpleStringTypeAdapter(
+        SkyHanniVec3d::asStoredString,
+        SkyHanniVec3d::decodeFromString,
     )
 
     val TROPHY_RARITY: TypeAdapter<TrophyRarity> = SimpleStringTypeAdapter(

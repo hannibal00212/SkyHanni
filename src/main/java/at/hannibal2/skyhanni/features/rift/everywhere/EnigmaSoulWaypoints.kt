@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -36,7 +36,7 @@ object EnigmaSoulWaypoints {
 
     private val config get() = RiftApi.config.enigmaSoulWaypoints
     private var inInventory = false
-    var soulLocations = mapOf<String, LorenzVec>()
+    var soulLocations = mapOf<String, SkyHanniVec3d>()
     private val trackedSouls = mutableListOf<String>()
     private val inventoryUnfound = mutableListOf<String>()
     private var adding = true

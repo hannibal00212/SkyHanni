@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -77,7 +77,7 @@ object KingTalismanHelper {
         update()
     }
 
-    private val kingLocation = LorenzVec(129.6, 196.5, 194.1)
+    private val kingLocation = SkyHanniVec3d(129.6, 196.5, 194.1)
     private val kingCircles = listOf(
         "Brammor",
         "Emkam",
@@ -118,7 +118,7 @@ object KingTalismanHelper {
     }
 
     private fun checkOffset() {
-        val king = EntityUtils.getEntitiesNearby<EntityArmorStand>(LorenzVec(129.6, 196.0, 196.7), 2.0)
+        val king = EntityUtils.getEntitiesNearby<EntityArmorStand>(SkyHanniVec3d(129.6, 196.0, 196.7), 2.0)
             .firstOrNull { it.name.startsWith("§6§lKing ") } ?: return
         val foundKing = kingPattern.matchMatcher(king.name) {
             group("name")

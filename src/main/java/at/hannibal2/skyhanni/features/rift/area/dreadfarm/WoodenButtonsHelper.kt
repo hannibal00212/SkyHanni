@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
@@ -48,16 +48,16 @@ object WoodenButtonsHelper {
         "§eYou have hit §r§b\\d+/56 §r§eof the wooden buttons!",
     )
 
-    private var buttonLocations = mapOf<String, List<LorenzVec>>()
-    private var hitButtons = mutableSetOf<LorenzVec>()
-    private var lastHitButton: LorenzVec? = null
+    private var buttonLocations = mapOf<String, List<SkyHanniVec3d>>()
+    private var hitButtons = mutableSetOf<SkyHanniVec3d>()
+    private var lastHitButton: SkyHanniVec3d? = null
     private var currentSpot: GraphNode? = null
     private var lastBlowgunFire = SimpleTimeMark.farPast()
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<RiftWoodenButtonsJson>("rift/RiftWoodenButtons")
-        buttonLocations = mutableMapOf<String, List<LorenzVec>>().apply {
+        buttonLocations = mutableMapOf<String, List<SkyHanniVec3d>>().apply {
             data.houses.forEach { (houseName, spots) ->
                 spots.forEach { spot ->
                     this["$houseName House:${spot.position}"] = spot.buttons

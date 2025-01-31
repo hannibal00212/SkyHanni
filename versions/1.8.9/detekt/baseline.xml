@@ -5,11 +5,11 @@
     <ID>ArrayPrimitive:CropMoneyDisplay.kt$CropMoneyDisplay$Array&lt;Double&gt;</ID>
     <ID>ArrayPrimitive:CropMoneyDisplay.kt$CropMoneyDisplay$arrayOf(npcPrice)</ID>
     <ID>ArrayPrimitive:CropMoneyDisplay.kt$CropMoneyDisplay$arrayOf(sellOffer)</ID>
-    <ID>ArrayPrimitive:LorenzVec.kt$Array&lt;Double&gt;</ID>
-    <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$Array&lt;Double&gt;</ID>
-    <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$Array&lt;Float&gt;</ID>
-    <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$arrayOf(x, y, z)</ID>
-    <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$arrayOf(x.toFloat(), y.toFloat(), z.toFloat())</ID>
+    <ID>ArrayPrimitive:SkyHanniVec3d.kt$Array&lt;Double&gt;</ID>
+    <ID>ArrayPrimitive:SkyHanniVec3d.kt$LorenzVec$Array&lt;Double&gt;</ID>
+    <ID>ArrayPrimitive:SkyHanniVec3d.kt$LorenzVec$Array&lt;Float&gt;</ID>
+    <ID>ArrayPrimitive:SkyHanniVec3d.kt$LorenzVec$arrayOf(x, y, z)</ID>
+    <ID>ArrayPrimitive:SkyHanniVec3d.kt$LorenzVec$arrayOf(x.toFloat(), y.toFloat(), z.toFloat())</ID>
     <ID>CyclomaticComplexMethod:AdvancedPlayerList.kt$AdvancedPlayerList$fun newSorting(original: List&lt;String&gt;): List&lt;String&gt;</ID>
     <ID>CyclomaticComplexMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun calculateMoneyPerHour(debugList: MutableList&lt;List&lt;Any&gt;&gt;): Map&lt;NeuInternalName, Array&lt;Double&gt;&gt;</ID>
     <ID>CyclomaticComplexMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>
@@ -70,8 +70,8 @@
     <ID>NoNameShadowing:GraphEditorBugFinder.kt$GraphEditorBugFinder${ it.position.distanceSqToPlayer() }</ID>
     <ID>NoNameShadowing:HoppityCollectionStats.kt$HoppityCollectionStats${ val displayAmount = it.amount.shortFormat() val operationFormat = when (milestoneType) { HoppityEggType.CHOCOLATE_SHOP_MILESTONE -&gt; "spending" HoppityEggType.CHOCOLATE_FACTORY_MILESTONE -&gt; "reaching" else -&gt; "" // Never happens } // List indexing is weird existingLore[replaceIndex - 1] = "§7Obtained by $operationFormat §6$displayAmount" existingLore[replaceIndex] = "§7all-time §6Chocolate." return existingLore }</ID>
     <ID>NoNameShadowing:HotmData.kt$HotmData.Companion${ it.setCurrent(it.getTotal()) }</ID>
-    <ID>NoNameShadowing:LorenzVec.kt$LorenzVec.Companion$pitch</ID>
-    <ID>NoNameShadowing:LorenzVec.kt$LorenzVec.Companion$yaw</ID>
+    <ID>NoNameShadowing:SkyHanniVec3d.kt$LorenzVec.Companion$pitch</ID>
+    <ID>NoNameShadowing:SkyHanniVec3d.kt$LorenzVec.Companion$yaw</ID>
     <ID>NoNameShadowing:Renderable.kt$Renderable.Companion.&lt;no name provided&gt;$posX</ID>
     <ID>NoNameShadowing:Renderable.kt$Renderable.Companion.&lt;no name provided&gt;$posY</ID>
     <ID>NoNameShadowing:Renderable.kt$Renderable.Companion.&lt;no name provided&gt;${ it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }</ID>
@@ -285,7 +285,7 @@
     <ID>TooManyFunctions:ItemResolutionQuery.kt$ItemResolutionQuery</ID>
     <ID>TooManyFunctions:LocationUtils.kt$LocationUtils</ID>
     <ID>TooManyFunctions:LorenzUtils.kt$LorenzUtils</ID>
-    <ID>TooManyFunctions:LorenzVec.kt$LorenzVec</ID>
+    <ID>TooManyFunctions:SkyHanniVec3d.kt$LorenzVec</ID>
     <ID>TooManyFunctions:MobFinder.kt$MobFinder</ID>
     <ID>TooManyFunctions:NumberUtil.kt$NumberUtil</ID>
     <ID>TooManyFunctions:RegexUtils.kt$RegexUtils</ID>

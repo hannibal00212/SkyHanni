@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sendTitle
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereInWorld
@@ -171,7 +171,7 @@ object TotemOfCorruption {
 }
 
 private class Totem(
-    val location: LorenzVec,
+    val location: SkyHanniVec3d,
     val timeRemaining: Duration,
     val ownerName: String,
     val distance: Double = location.distanceToPlayer(),

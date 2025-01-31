@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
@@ -68,7 +68,7 @@ object HoppityNpc {
                 HypixelCommands.warp("hub")
                 EntityMovementData.onNextTeleport(IslandType.HUB) {
                     IslandGraphs.pathFind(
-                        LorenzVec(6.4, 70.0, 7.4),
+                        SkyHanniVec3d(6.4, 70.0, 7.4),
                         "§aHoppity's Shop",
                         condition = { config.hoppityShopReminder },
                     )

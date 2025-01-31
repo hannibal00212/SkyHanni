@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
@@ -34,9 +34,9 @@ object RiftWiltedBerberisHelper {
     private var hasFarmingToolInHand = false
     private var list = listOf<WiltedBerberis>()
 
-    data class WiltedBerberis(var currentParticles: LorenzVec) {
+    data class WiltedBerberis(var currentParticles: SkyHanniVec3d) {
 
-        var previous: LorenzVec? = null
+        var previous: SkyHanniVec3d? = null
         var moving = true
         var y = 0.0
         var lastTime = SimpleTimeMark.now()
@@ -52,13 +52,13 @@ object RiftWiltedBerberisHelper {
         hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftApi.farmingTool
 
         if (Minecraft.getMinecraft().thePlayer.onGround) {
-            val block = LorenzVec.getBlockBelowPlayer().getBlockAt()
+            val block = SkyHanniVec3d.getBlockBelowPlayer().getBlockAt()
             val currentY = LocationUtils.playerLocation().y
             isOnFarmland = block == Blocks.farmland && (currentY % 1 == 0.0)
         }
     }
 
-    private fun nearestBerberis(location: LorenzVec): WiltedBerberis? =
+    private fun nearestBerberis(location: SkyHanniVec3d): WiltedBerberis? =
         list.filter { it.currentParticles.distanceSq(location) < 8 }
             .minByOrNull { it.currentParticles.distanceSq(location) }
 
@@ -149,13 +149,13 @@ object RiftWiltedBerberisHelper {
         event.move(60, "rift.area.dreadfarm.wiltedBerberis.hideparticles", "rift.area.dreadfarm.wiltedBerberis.hideParticles")
     }
 
-    private fun axisAlignedBB(loc: LorenzVec) = loc.add(0.1, -0.1, 0.1).boundingToOffset(0.8, 1.0, 0.8).expandBlock()
+    private fun axisAlignedBB(loc: SkyHanniVec3d) = loc.add(0.1, -0.1, 0.1).boundingToOffset(0.8, 1.0, 0.8).expandBlock()
 
-    private fun LorenzVec.fixLocation(wiltedBerberis: WiltedBerberis): LorenzVec {
+    private fun SkyHanniVec3d.fixLocation(wiltedBerberis: WiltedBerberis): SkyHanniVec3d {
         val x = x - 0.5
         val y = wiltedBerberis.y
         val z = z - 0.5
-        return LorenzVec(x, y, z)
+        return SkyHanniVec3d(x, y, z)
     }
 
     private fun isEnabled() = RiftApi.inRift() && RiftApi.inDreadfarm() && config.enabled

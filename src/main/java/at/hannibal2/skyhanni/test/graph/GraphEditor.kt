@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -68,7 +68,7 @@ object GraphEditor {
         }
 
     private var selectedEdge: GraphingEdge? = null
-    private var ghostPosition: LorenzVec? = null
+    private var ghostPosition: SkyHanniVec3d? = null
 
     private var seeThroughBlocks = true
 
@@ -101,10 +101,10 @@ object GraphEditor {
     private val edgeDijkstraColor = LorenzColor.DARK_BLUE.addOpacity(150)
     private val edgeSelectedColor = LorenzColor.DARK_RED.addOpacity(150)
 
-    private val nodesAlreadyFound = mutableListOf<LorenzVec>()
-    private val nodesToFind: List<LorenzVec>
+    private val nodesAlreadyFound = mutableListOf<SkyHanniVec3d>()
+    private val nodesToFind: List<SkyHanniVec3d>
         get() = IslandGraphs.currentIslandGraph?.nodes?.map { it.position }?.filter { it !in nodesAlreadyFound }.orEmpty()
-    private var currentNodeToFind: LorenzVec? = null
+    private var currentNodeToFind: SkyHanniVec3d? = null
     private var active = false
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
@@ -228,7 +228,7 @@ object GraphEditor {
         calculateNewAllNodeFind()
     }
 
-    private fun calculateNewAllNodeFind(): LorenzVec {
+    private fun calculateNewAllNodeFind(): SkyHanniVec3d {
         val next = GraphUtils.findAllShortestDistancesOnCurrentIsland(
             LocationUtils.playerLocation(),
         ).distances.keys.first { it.position in nodesToFind }.position
@@ -323,10 +323,10 @@ object GraphEditor {
         val pyramidSize =
             lineVec.normalize().times(min(lineVec.length() / 10.0, 1.0)) * (if (edge.direction == EdgeDirection.ONE_TO_TWO) 1.0 else -1.0)
 
-        val lineOffsetVec = LorenzVec(0.5, 0.5, 0.5)
+        val lineOffsetVec = SkyHanniVec3d(0.5, 0.5, 0.5)
 
         fun pyramidDraw(
-            pos: LorenzVec,
+            pos: SkyHanniVec3d,
         ) {
             this.drawPyramid(
                 pos + lineOffsetVec + pyramidSize,
@@ -607,11 +607,11 @@ object GraphEditor {
         KeyboardManager.WasdInputMatrix.s.handleEditClicks(vector.rotateXZ(Math.toRadians(180.0)))
         KeyboardManager.WasdInputMatrix.d.handleEditClicks(vector.rotateXZ(Math.toRadians(270.0)))
 
-        KeyboardManager.WasdInputMatrix.up.handleEditClicks(LorenzVec(0, 1, 0))
-        KeyboardManager.WasdInputMatrix.down.handleEditClicks(LorenzVec(0, -1, 0))
+        KeyboardManager.WasdInputMatrix.up.handleEditClicks(SkyHanniVec3d(0, 1, 0))
+        KeyboardManager.WasdInputMatrix.down.handleEditClicks(SkyHanniVec3d(0, -1, 0))
     }
 
-    private fun KeyBinding.handleEditClicks(vector: LorenzVec) {
+    private fun KeyBinding.handleEditClicks(vector: SkyHanniVec3d) {
         if (this.keyCode.isKeyClicked()) {
             activeNode?.let {
                 it.position = it.position + vector
@@ -789,7 +789,7 @@ object GraphEditor {
         ghostPosition = null
     }
 
-    fun distanceToPlayer(location: LorenzVec): Double {
+    fun distanceToPlayer(location: SkyHanniVec3d): Double {
         val playerPosition = ghostPosition ?: LocationUtils.playerLocation()
         return location.distanceSq(playerPosition)
     }
@@ -798,7 +798,7 @@ object GraphEditor {
 // The node object the graph editor is working with
 class GraphingNode(
     val id: Int,
-    var position: LorenzVec,
+    var position: SkyHanniVec3d,
     var name: String? = null,
     var tags: MutableList<GraphNodeTag> = mutableListOf(),
 ) {

@@ -12,14 +12,14 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import kotlinx.coroutines.launch
 
 @SkyHanniModule
 object AllBurrowsList {
-    private var list = listOf<LorenzVec>()
+    private var list = listOf<SkyHanniVec3d>()
     private val config get() = SkyHanniMod.feature.event.diana.allBurrowsList
     private var burrowLocations
         get() = SkyHanniMod.feature.storage.foundDianaBurrowLocations
@@ -59,9 +59,9 @@ object AllBurrowsList {
 
             var new = 0
             var duplicate = 0
-            val newEntries = mutableListOf<LorenzVec>()
+            val newEntries = mutableListOf<SkyHanniVec3d>()
             for (raw in text.split(";")) {
-                val location = LorenzVec.decodeFromString(raw)
+                val location = SkyHanniVec3d.decodeFromString(raw)
                 if (location !in burrowLocations) {
                     newEntries.add(location)
                     new++

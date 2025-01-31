@@ -84,7 +84,7 @@ object EntityOutlineRenderer {
      * @param vector       the camera position as Vector
      */
     @JvmStatic
-    fun renderEntityOutlines(camera: ICamera, partialTicks: Float, vector: LorenzVec): Boolean {
+    fun renderEntityOutlines(camera: ICamera, partialTicks: Float, vector: SkyHanniVec3d): Boolean {
         val shouldRenderOutlines = shouldRenderEntityOutlines()
 
         if (!(shouldRenderOutlines && !isCacheEmpty() && MinecraftForgeClient.getRenderPass() == 0)) {
@@ -285,7 +285,7 @@ object EntityOutlineRenderer {
      * @param vector the camera position as Vector
      * @return whether the entity should be rendered
      */
-    private fun shouldRender(camera: ICamera, entity: Entity, vector: LorenzVec): Boolean =
+    private fun shouldRender(camera: ICamera, entity: Entity, vector: SkyHanniVec3d): Boolean =
         // Only render the view entity when sleeping or in 3rd person mode
         if (entity === mc.renderViewEntity &&
             !(

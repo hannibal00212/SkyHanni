@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
@@ -33,7 +33,7 @@ object CarnivalZombieShootout {
 
     private val config get() = SkyHanniMod.feature.event.carnival.zombieShootout
 
-    private data class Lamp(var pos: LorenzVec, var time: SimpleTimeMark)
+    private data class Lamp(var pos: SkyHanniVec3d, var time: SimpleTimeMark)
     private data class Updates(var zombie: SimpleTimeMark, var content: SimpleTimeMark)
 
     private val lastUpdate = Updates(SimpleTimeMark.farPast(), SimpleTimeMark.farPast())

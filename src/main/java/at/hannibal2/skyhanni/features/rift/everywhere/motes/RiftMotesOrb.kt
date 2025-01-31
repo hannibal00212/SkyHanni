@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -37,7 +37,7 @@ object RiftMotesOrb {
     private var motesOrbs = emptyList<MotesOrb>()
 
     class MotesOrb(
-        var location: LorenzVec,
+        var location: SkyHanniVec3d,
         var counter: Int = 0,
         var startTime: Long = System.currentTimeMillis(),
         var lastTime: Long = System.currentTimeMillis(),

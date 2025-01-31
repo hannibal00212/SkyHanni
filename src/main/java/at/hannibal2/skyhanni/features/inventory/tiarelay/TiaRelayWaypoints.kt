@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 
@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 object TiaRelayWaypoints {
 
     private val config get() = SkyHanniMod.feature.inventory.helper.tiaRelay
-    private var waypoint: LorenzVec? = null
+    private var waypoint: SkyHanniVec3d? = null
     private var waypointName: String? = null
     private var island = IslandType.NONE
 

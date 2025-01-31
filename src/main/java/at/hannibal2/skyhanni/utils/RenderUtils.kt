@@ -135,7 +135,7 @@ object RenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawColor(
-        location: LorenzVec,
+        location: SkyHanniVec3d,
         color: LorenzColor,
         beacon: Boolean = false,
         alpha: Float = -1f,
@@ -144,7 +144,7 @@ object RenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawColor(
-        location: LorenzVec,
+        location: SkyHanniVec3d,
         color: Color,
         beacon: Boolean = false,
         alpha: Float = -1f,
@@ -192,10 +192,10 @@ object RenderUtils {
         }
 
     fun getViewerPos(partialTicks: Float) =
-        Minecraft.getMinecraft().renderViewEntity?.let { exactLocation(it, partialTicks) } ?: LorenzVec()
+        Minecraft.getMinecraft().renderViewEntity?.let { exactLocation(it, partialTicks) } ?: SkyHanniVec3d()
 
-    fun AxisAlignedBB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
-    fun AxisAlignedBB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector * -n)
+    fun AxisAlignedBB.expandBlock(n: Int = 1) = expand(SkyHanniVec3d.expandVector * n)
+    fun AxisAlignedBB.inflateBlock(n: Int = 1) = expand(SkyHanniVec3d.expandVector * -n)
 
     /**
      * Taken from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
@@ -302,7 +302,7 @@ object RenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawWaypointFilled(
-        location: LorenzVec,
+        location: SkyHanniVec3d,
         color: Color,
         seeThroughBlocks: Boolean = false,
         beacon: Boolean = false,
@@ -345,7 +345,7 @@ object RenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawString(
-        location: LorenzVec,
+        location: SkyHanniVec3d,
         text: String,
         seeThroughBlocks: Boolean = false,
         color: Color? = null,
@@ -433,7 +433,7 @@ object RenderUtils {
      * @author Mojang
      */
     fun drawLabel(
-        pos: LorenzVec,
+        pos: SkyHanniVec3d,
         text: String,
         partialTicks: Float,
         shadow: Boolean = false,
@@ -452,7 +452,7 @@ object RenderUtils {
 
         // 7 – 25
 
-        val translate = LorenzVec(x, y, z)
+        val translate = SkyHanniVec3d(x, y, z)
         val length = translate.length().toFloat()
 
         var finalText = text
@@ -717,7 +717,7 @@ object RenderUtils {
 
     fun SkyHanniRenderWorldEvent.drawCylinderInWorld(
         color: Color,
-        location: LorenzVec,
+        location: SkyHanniVec3d,
         radius: Float,
         height: Float,
     ) {
@@ -725,9 +725,9 @@ object RenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawPyramid(
-        topPoint: LorenzVec,
-        baseCenterPoint: LorenzVec,
-        baseEdgePoint: LorenzVec,
+        topPoint: SkyHanniVec3d,
+        baseCenterPoint: SkyHanniVec3d,
+        baseEdgePoint: SkyHanniVec3d,
         color: Color,
         depth: Boolean = true,
     ) {
@@ -850,7 +850,7 @@ object RenderUtils {
 
     fun SkyHanniRenderWorldEvent.drawSphereInWorld(
         color: Color,
-        location: LorenzVec,
+        location: SkyHanniVec3d,
         radius: Float,
     ) {
         drawSphereInWorld(color, location.x, location.y, location.z, radius)
@@ -922,7 +922,7 @@ object RenderUtils {
 
     fun SkyHanniRenderWorldEvent.drawSphereWireframeInWorld(
         color: Color,
-        location: LorenzVec,
+        location: SkyHanniVec3d,
         radius: Float,
     ) {
         drawSphereWireframeInWorld(color, location.x, location.y, location.z, radius)
@@ -1017,7 +1017,7 @@ object RenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawDynamicText(
-        location: LorenzVec,
+        location: SkyHanniVec3d,
         text: String,
         scaleMultiplier: Double,
         yOff: Float = 0f,
@@ -1062,13 +1062,13 @@ object RenderUtils {
             (y + 20 * distToPlayer / 300 - (renderOffsetY + eyeHeight)) / (distToPlayer / distRender)
         val resultZ = renderOffsetZ + (z + 0.5 - renderOffsetZ) / (distToPlayer / distRender)
 
-        val renderLocation = LorenzVec(resultX, resultY, resultZ)
+        val renderLocation = SkyHanniVec3d(resultX, resultY, resultZ)
 
         render(renderLocation, "§f$text", scale, !ignoreBlocks, true, yOff)
     }
 
     private fun render(
-        location: LorenzVec,
+        location: SkyHanniVec3d,
         text: String,
         scale: Double,
         depthTest: Boolean,
@@ -1121,16 +1121,16 @@ object RenderUtils {
         }
     }
 
-    fun SkyHanniRenderWorldEvent.draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) =
+    fun SkyHanniRenderWorldEvent.draw3DLine(p1: SkyHanniVec3d, p2: SkyHanniVec3d, color: Color, lineWidth: Int, depth: Boolean) =
         LineDrawer.draw3D(partialTicks) {
             draw3DLine(p1, p2, color, lineWidth, depth)
         }
 
     fun SkyHanniRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
 
-    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
+    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): SkyHanniVec3d {
         val player = Minecraft.getMinecraft().thePlayer
-        val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
+        val add = if (player.isSneaking) SkyHanniVec3d(0.0, 1.54, 0.0) else SkyHanniVec3d(0.0, 1.62, 0.0)
         PatcherFixes.onPlayerEyeLine()
         return exactLocation(player) + add
     }
@@ -1141,21 +1141,21 @@ object RenderUtils {
         return entity.entityBoundingBox.offset(offset.x, offset.y, offset.z)
     }
 
-    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec {
-        val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
+    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(player: Entity): SkyHanniVec3d {
+        val add = if (player.isSneaking) SkyHanniVec3d(0.0, 1.54, 0.0) else SkyHanniVec3d(0.0, 1.62, 0.0)
         return exactLocation(player) + add
     }
 
-    fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+    fun SkyHanniRenderWorldEvent.drawLineToEye(location: SkyHanniVec3d, color: Color, lineWidth: Int, depth: Boolean) {
         draw3DLine(exactPlayerEyeLocation(), location, color, lineWidth, depth)
     }
 
-    fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {
+    fun exactLocation(entity: Entity, partialTicks: Float): SkyHanniVec3d {
         if (entity.isDead) return entity.getLorenzVec()
         val x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks
         val y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks
         val z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks
-        return LorenzVec(x, y, z)
+        return SkyHanniVec3d(x, y, z)
     }
 
     fun drawFilledBoundingBox(aabb: AxisAlignedBB, c: Color, alphaMultiplier: Float = 1f) {
@@ -1305,12 +1305,12 @@ object RenderUtils {
         GlStateManager.disableBlend()
     }
 
-    fun WorldRenderer.pos(vec: LorenzVec) = this.pos(vec.x, vec.y, vec.z)
+    fun WorldRenderer.pos(vec: SkyHanniVec3d) = this.pos(vec.x, vec.y, vec.z)
 
     fun draw3DQuad(
-        middlePoint: LorenzVec,
-        sidePoint1: LorenzVec,
-        sidePoint2: LorenzVec,
+        middlePoint: SkyHanniVec3d,
+        sidePoint1: SkyHanniVec3d,
+        sidePoint2: SkyHanniVec3d,
         c: Color,
         partialTicks: Float = 0F,
     ) = QuadDrawer.draw3D(partialTicks) {
@@ -1366,11 +1366,11 @@ object RenderUtils {
         }
     }
 
-    class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator, val inverseView: LorenzVec) {
+    class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator, val inverseView: SkyHanniVec3d) {
 
         val worldRenderer = tessellator.worldRenderer
 
-        fun drawPath(path: List<LorenzVec>, color: Color, lineWidth: Int, depth: Boolean, bezierPoint: Double = 1.0) {
+        fun drawPath(path: List<SkyHanniVec3d>, color: Color, lineWidth: Int, depth: Boolean, bezierPoint: Double = 1.0) {
             if (bezierPoint < 0) {
                 path.zipWithNext().forEach {
                     draw3DLine(it.first, it.second, color, lineWidth, depth)
@@ -1396,7 +1396,7 @@ object RenderUtils {
             }
         }
 
-        fun draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+        fun draw3DLine(p1: SkyHanniVec3d, p2: SkyHanniVec3d, color: Color, lineWidth: Int, depth: Boolean) {
             GL11.glLineWidth(lineWidth.toFloat())
             if (!depth) {
                 GL11.glDisable(GL11.GL_DEPTH_TEST)
@@ -1413,13 +1413,13 @@ object RenderUtils {
             }
         }
 
-        fun draw3DLineFromPlayer(lorenzVec: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) =
-            draw3DLine(inverseView.add(y = Minecraft.getMinecraft().thePlayer.eyeHeight.toDouble()), lorenzVec, color, lineWidth, depth)
+        fun draw3DLineFromPlayer(skyHanniVec3d: SkyHanniVec3d, color: Color, lineWidth: Int, depth: Boolean) =
+            draw3DLine(inverseView.add(y = Minecraft.getMinecraft().thePlayer.eyeHeight.toDouble()), skyHanniVec3d, color, lineWidth, depth)
 
         fun drawBezier2(
-            p1: LorenzVec,
-            p2: LorenzVec,
-            p3: LorenzVec,
+            p1: SkyHanniVec3d,
+            p2: SkyHanniVec3d,
+            p3: SkyHanniVec3d,
             color: Color,
             lineWidth: Int,
             depth: Boolean,
@@ -1494,9 +1494,9 @@ object RenderUtils {
     class QuadDrawer @PublishedApi internal constructor(val tessellator: Tessellator) {
         val worldRenderer = tessellator.worldRenderer
         inline fun draw(
-            middlePoint: LorenzVec,
-            sidePoint1: LorenzVec,
-            sidePoint2: LorenzVec,
+            middlePoint: SkyHanniVec3d,
+            sidePoint1: SkyHanniVec3d,
+            sidePoint2: SkyHanniVec3d,
             c: Color,
         ) {
             GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f)
@@ -1646,8 +1646,8 @@ object RenderUtils {
 
     // TODO nea please merge with 'draw3DLine'
     fun SkyHanniRenderWorldEvent.draw3DLineNea(
-        p1: LorenzVec,
-        p2: LorenzVec,
+        p1: SkyHanniVec3d,
+        p2: SkyHanniVec3d,
         color: Color,
         lineWidth: Int,
         depth: Boolean,

@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -36,7 +36,7 @@ object TrackParticlesCommand {
     private val position get() = SkyHanniMod.feature.dev.debug.trackParticlePosition
 
     private var display: List<Renderable> = emptyList()
-    private var worldParticles: Map<LorenzVec, List<ReceiveParticleEvent>> = emptyMap()
+    private var worldParticles: Map<SkyHanniVec3d, List<ReceiveParticleEvent>> = emptyMap()
 
     // TODO write abstract code for this and TrackSoundsCommand
     private fun command(args: Array<String>) {

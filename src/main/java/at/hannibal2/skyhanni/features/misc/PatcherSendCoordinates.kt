@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
@@ -57,7 +57,7 @@ object PatcherSendCoordinates {
 
                 split.first().toFloat()
             } else end.toFloat()
-            patcherBeacon.add(PatcherBeacon(LorenzVec(x, y, z), description, System.currentTimeMillis() / 1000))
+            patcherBeacon.add(PatcherBeacon(SkyHanniVec3d(x, y, z), description, System.currentTimeMillis() / 1000))
             logger.log("got Patcher coords and username")
         }
     }
@@ -95,7 +95,7 @@ object PatcherSendCoordinates {
         logger.log("Reset everything (world change)")
     }
 
-    data class PatcherBeacon(val location: LorenzVec, val name: String, val time: Long)
+    data class PatcherBeacon(val location: SkyHanniVec3d, val name: String, val time: Long)
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

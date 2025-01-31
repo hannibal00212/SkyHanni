@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
@@ -36,11 +36,11 @@ object PestParticleWaypoint {
 
     private var lastPestTrackerUse = SimpleTimeMark.farPast()
 
-    private var firstParticlePoint: LorenzVec? = null
-    private var secondParticlePoint: LorenzVec? = null
-    private var lastParticlePoint: LorenzVec? = null
-    private var guessPoint: LorenzVec? = null
-    private var locations = listOf<LorenzVec>()
+    private var firstParticlePoint: SkyHanniVec3d? = null
+    private var secondParticlePoint: SkyHanniVec3d? = null
+    private var lastParticlePoint: SkyHanniVec3d? = null
+    private var guessPoint: SkyHanniVec3d? = null
+    private var locations = listOf<SkyHanniVec3d>()
     private var particles = 0
     private var lastParticles = 0
     private var isPointingToPest = false
@@ -79,10 +79,10 @@ object PestParticleWaypoint {
         if (!isEnabled()) return
         if (event.type != EnumParticleTypes.REDSTONE || event.speed != 1f) return
 
-        val darkYellow = LorenzVec(0.0, 0.8, 0.0)
-        val yellow = LorenzVec(0.8, 0.8, 0.0)
-        val redPest = LorenzVec(0.8, 0.4, 0.0)
-        val redPlot = LorenzVec(0.8, 0.0, 0.0)
+        val darkYellow = SkyHanniVec3d(0.0, 0.8, 0.0)
+        val yellow = SkyHanniVec3d(0.8, 0.8, 0.0)
+        val redPest = SkyHanniVec3d(0.8, 0.4, 0.0)
+        val redPlot = SkyHanniVec3d(0.8, 0.0, 0.0)
         isPointingToPest = when (event.offset.roundTo(5)) {
             redPlot -> false
             redPest, yellow, darkYellow -> true
@@ -172,10 +172,10 @@ object PestParticleWaypoint {
         if (PestApi.scoreboardPests == 0) reset()
     }
 
-    private fun calculateWaypoint(): LorenzVec? {
+    private fun calculateWaypoint(): SkyHanniVec3d? {
         val firstParticle = firstParticlePoint ?: return null
         val list = locations.toList()
-        var pos = LorenzVec(0.0, 0.0, 0.0)
+        var pos = SkyHanniVec3d(0.0, 0.0, 0.0)
         for ((i, particle) in list.withIndex()) {
             pos += (particle - firstParticle) / (i.toDouble() + 1.0)
         }

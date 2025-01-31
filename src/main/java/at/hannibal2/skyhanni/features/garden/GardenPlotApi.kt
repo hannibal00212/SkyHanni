@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -89,7 +89,7 @@ object GardenPlotApi {
         return plots.firstOrNull { it.isPlayerInside() }
     }
 
-    class Plot(val id: Int, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
+    class Plot(val id: Int, var inventorySlot: Int, val box: AxisAlignedBB, val middle: SkyHanniVec3d)
 
     class PlotData(
         @Expose
@@ -215,7 +215,7 @@ object GardenPlotApi {
 
     fun Plot.isPlayerInside() = box.isPlayerInside()
 
-    fun closestCenterPlot(location: LorenzVec) = plots.find { it.box.isInside(location) }?.middle
+    fun closestCenterPlot(location: SkyHanniVec3d) = plots.find { it.box.isInside(location) }?.middle
 
     fun Plot.sendTeleportTo() {
         if (isBarn()) HypixelCommands.teleportToPlot("barn")
@@ -239,8 +239,8 @@ object GardenPlotApi {
                 val minY = ((y - 2) * 96 - 48).toDouble()
                 val maxX = ((x - 2) * 96 + 48).toDouble()
                 val maxY = ((y - 2) * 96 + 48).toDouble()
-                val a = LorenzVec(minX, 0.0, minY)
-                val b = LorenzVec(maxX, 256.0, maxY)
+                val a = SkyHanniVec3d(minX, 0.0, minY)
+                val b = SkyHanniVec3d(maxX, 256.0, maxY)
                 val middle = a.interpolate(b, 0.5).copy(y = 10.0)
                 val box = a.axisAlignedTo(b).expand(0.0001, 0.0, 0.0001)
                 list.add(Plot(id, slot, box, middle))
@@ -336,16 +336,16 @@ object GardenPlotApi {
         // Render 4 vertical corners
         for (i in 0..plotSize step plotSize) {
             for (j in 0..plotSize step plotSize) {
-                val start = LorenzVec(chunkMinX + i, minHeight, chunkMinZ + j)
-                val end = LorenzVec(chunkMinX + i, maxHeight, chunkMinZ + j)
+                val start = SkyHanniVec3d(chunkMinX + i, minHeight, chunkMinZ + j)
+                val end = SkyHanniVec3d(chunkMinX + i, maxHeight, chunkMinZ + j)
                 tryDraw3DLine(start, end, cornerColor, 3, true)
             }
         }
 
         // Render vertical on X-Axis
         for (x in 4..<plotSize step 4) {
-            val start = LorenzVec(chunkMinX + x, minHeight, chunkMinZ)
-            val end = LorenzVec(chunkMinX + x, maxHeight, chunkMinZ)
+            val start = SkyHanniVec3d(chunkMinX + x, minHeight, chunkMinZ)
+            val end = SkyHanniVec3d(chunkMinX + x, maxHeight, chunkMinZ)
             // Front lines
             tryDraw3DLine(start, end, lineColor, 2, true)
             // Back lines
@@ -354,8 +354,8 @@ object GardenPlotApi {
 
         // Render vertical on Z-Axis
         for (z in 4..<plotSize step 4) {
-            val start = LorenzVec(chunkMinX, minHeight, chunkMinZ + z)
-            val end = LorenzVec(chunkMinX, maxHeight, chunkMinZ + z)
+            val start = SkyHanniVec3d(chunkMinX, minHeight, chunkMinZ + z)
+            val end = SkyHanniVec3d(chunkMinX, maxHeight, chunkMinZ + z)
             // Left lines
             tryDraw3DLine(start, end, lineColor, 2, true)
             // Right lines
@@ -370,7 +370,7 @@ object GardenPlotApi {
             minHeight..maxHeight step 4
         }
         for (y in iterable) {
-            val start = LorenzVec(chunkMinX, y, chunkMinZ)
+            val start = SkyHanniVec3d(chunkMinX, y, chunkMinZ)
             val isRedLine = y == buildLimit
             val color = if (isRedLine) Color.red else lineColor
             val depth = if (isRedLine) 3 else 2
@@ -386,8 +386,8 @@ object GardenPlotApi {
     }
 
     private fun SkyHanniRenderWorldEvent.tryDraw3DLine(
-        p1: LorenzVec,
-        p2: LorenzVec,
+        p1: SkyHanniVec3d,
+        p2: SkyHanniVec3d,
         color: Color,
         lineWidth: Int,
         depth: Boolean,
@@ -397,7 +397,7 @@ object GardenPlotApi {
         draw3DLine(p1, p2, color, lineWidth, depth)
     }
 
-    private fun isOutOfBorders(location: LorenzVec) = when {
+    private fun isOutOfBorders(location: SkyHanniVec3d) = when {
         location.x > 240 -> true
         location.x < -240 -> true
         location.z > 240 -> true
