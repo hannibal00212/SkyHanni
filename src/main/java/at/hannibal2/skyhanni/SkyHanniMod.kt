@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
@@ -16,7 +15,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
-import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -58,12 +56,8 @@ object SkyHanniMod {
 
         LoadedModules.modules.forEach { loadModule(it) }
 
-        loadModule(CrimsonIsleReputationHelper(this))
-
         SkyHanniEvents.init(modules)
         if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesManager.downloadRepo()
-
-        CommandRegistrationEvent.post()
 
         PreInitFinishedEvent.post()
     }
@@ -76,10 +70,8 @@ object SkyHanniMod {
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
-        repo = RepoManager(ConfigManager.configDirectory)
-        loadModule(repo)
         try {
-            repo.loadRepoInformation()
+            RepoManager.loadRepoInformation()
         } catch (e: Exception) {
             Exception("Error reading repo data", e).printStackTrace()
         }
@@ -124,7 +116,6 @@ object SkyHanniMod {
     lateinit var jacobContestsData: JacobContestsJson
     lateinit var visualWordsData: VisualWordsJson
 
-    lateinit var repo: RepoManager
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")
     fun getLogger(name: String): Logger {

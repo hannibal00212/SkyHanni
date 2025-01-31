@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.rift.everywhere
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ActionBarStatsData
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ActionBarValueUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -131,9 +132,9 @@ object RiftTimer {
         config.timerPosition.renderStrings(display, posLabel = "Rift Timer")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onEntityHealthDisplay(event: EntityHealthDisplayEvent) {
-        if (!RiftApi.inRift() || !config.nametag) return
+        if (!config.nametag) return
         val time = nametagPattern.matchMatcher(event.text) {
             group("time")?.toIntOrNull()
         } ?: return
