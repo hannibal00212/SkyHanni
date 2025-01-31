@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addButton
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -30,6 +29,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableHoverableButton
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -347,42 +347,51 @@ object BestiaryData {
         return text
     }
 
-    // TODO: Avoid ordinal
     private fun MutableList<Renderable>.addButtons() {
-        addButton(
-            prefix = "§7Number Format: ",
-            getName = FormatType.entries[config.numberFormat.ordinal].type,
+        addRenderableHoverableButton<NumberFormatEntry>(
+            label = "Number Format",
+            current = config.numberFormat,
+            getName = { it.displayName },
             onChange = {
-                config.numberFormat = BestiaryConfig.NumberFormatEntry.entries[(config.numberFormat.ordinal + 1) % 2]
+                config.numberFormat = it
                 update()
             },
+            universe = NumberFormatEntry.entries,
         )
 
-        addButton(
-            prefix = "§7Display Type: ",
-            getName = DisplayType.entries[config.displayType.ordinal].type,
+
+        addRenderableHoverableButton<DisplayTypeEntry>(
+            label = "Display Type",
+            current = config.displayType,
+            getName = { it.displayName },
             onChange = {
-                config.displayType = DisplayTypeEntry.entries[(config.displayType.ordinal + 1) % 8]
+                config.displayType = it
                 update()
             },
+            universe = DisplayTypeEntry.entries,
         )
 
-        addButton(
-            prefix = "§7Number Type: ",
-            getName = NumberType.entries[if (config.replaceRoman) 0 else 1].type,
+        // TODO add boolean support
+        addRenderableHoverableButton<NumberType>(
+            label = "Number Type",
+            current = NumberType.entries[if (config.replaceRoman) 0 else 1],
+            getName = { it.type },
             onChange = {
                 config.replaceRoman = !config.replaceRoman
                 update()
             },
+            universe = NumberType.entries,
         )
 
-        addButton(
-            prefix = "§7Hide Maxed: ",
-            getName = HideMaxed.entries[if (config.hideMaxed) 1 else 0].type,
+        addRenderableHoverableButton<HideMaxed>(
+            label = "Hide Maxed",
+            current = HideMaxed.entries[if (config.hideMaxed) 1 else 0],
+            getName = { it.type },
             onChange = {
                 config.hideMaxed = !config.hideMaxed
                 update()
             },
+            universe = HideMaxed.entries,
         )
     }
 
@@ -448,26 +457,21 @@ object BestiaryData {
         return false
     }
 
-    enum class FormatType(val type: String) {
-        SHORT("Short"),
-        LONG("Long")
-    }
-
     enum class NumberType(val type: String) {
         INT("Normal (1, 2, 3)"),
         ROMAN("Roman (I, II, III)")
     }
 
-    enum class DisplayType(val type: String) {
-        GLOBAL_MAX("Global display (to max)"),
-        GLOBAL_TIER("Global display (to next tier)"),
-        LOWEST_TOTAL("Lowest total kills"),
-        HIGHEST_TOTAL("Highest total kills"),
-        LOWEST_NEEDED_MAX("Lowest kills needed to max"),
-        HIGHEST_NEEDED_MAX("Highest kills needed to max"),
-        LOWEST_NEEDED_TIER("Lowest kills needed to next tier"),
-        HIGHEST_NEEDED_TIER("Highest kills needed to next tier"),
-    }
+//     enum class DisplayType(val type: String) {
+//         GLOBAL_MAX("Global display (to max)"),
+//         GLOBAL_TIER("Global display (to next tier)"),
+//         LOWEST_TOTAL("Lowest total kills"),
+//         HIGHEST_TOTAL("Highest total kills"),
+//         LOWEST_NEEDED_MAX("Lowest kills needed to max"),
+//         HIGHEST_NEEDED_MAX("Highest kills needed to max"),
+//         LOWEST_NEEDED_TIER("Lowest kills needed to next tier"),
+//         HIGHEST_NEEDED_TIER("Highest kills needed to next tier"),
+//     }
 
     enum class HideMaxed(val type: String) {
         NO("Show"),

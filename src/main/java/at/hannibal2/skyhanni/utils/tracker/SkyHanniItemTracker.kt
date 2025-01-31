@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchableSelector
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -16,6 +15,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addHoverableButton
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlin.time.Duration.Companion.seconds
@@ -68,15 +68,26 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
     fun addPriceFromButton(lists: MutableList<Searchable>) {
         if (isInventoryOpen()) {
-            lists.addSearchableSelector<ItemPriceSource>(
-                "",
-                getName = { type -> type.sellName },
-                isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
+            lists.addHoverableButton<ItemPriceSource>(
+                label = "Price Source",
+                current = config.priceSource,
+                getName = { it.sellName },
                 onChange = {
-                    config.priceSource = ItemPriceSource.entries[it.ordinal] // todo avoid ordinal
+                    config.priceSource = it
                     update()
                 },
+                universe = ItemPriceSource.entries,
             )
+
+//             lists.addSearchableSelector<ItemPriceSource>(
+//                 "",
+//                 getName = { type -> type.sellName },
+//                 isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
+//                 onChange = {
+//                     config.priceSource = ItemPriceSource.entries[it.ordinal] // todo avoid ordinal
+//                     update()
+//                 },
+//             )
         }
     }
 
