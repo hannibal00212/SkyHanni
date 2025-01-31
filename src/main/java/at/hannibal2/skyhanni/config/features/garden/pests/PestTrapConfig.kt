@@ -20,7 +20,7 @@ class PestTrapConfig {
 
     @ConfigOption(
         name = "Display",
-        desc = "Display the status of pest traps in a GUI element.\nWill take you to Tab Widget Display to enable."
+        desc = "Display the status of pest traps in a GUI element.\nWill take you to Tab Widget Display to enable.",
     )
     @ConfigEditorButton(buttonText = "Go")
     var displayRunnable = Runnable { tabWidgetConfig::display.jumpToEditor() }
@@ -33,8 +33,8 @@ class PestTrapConfig {
     class WarningConfig {
 
         enum class WarningReason(private val displayName: String, val warningString: String) {
-            TRAP_FULL("§cTrap Full§r", "§cFull Trap(s): "),
-            NO_BAIT("§eNo Bait§r", "§eTrap(s) Out of Bait: "),
+            TRAP_FULL("§cTrap Full§r", "§cFull Trap(s):"),
+            NO_BAIT("§eNo Bait§r", "§eTrap(s) Out of Bait:"),
             ;
 
             override fun toString() = displayName

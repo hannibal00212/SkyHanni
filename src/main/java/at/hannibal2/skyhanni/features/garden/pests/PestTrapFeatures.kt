@@ -86,25 +86,26 @@ object PestTrapFeatures {
         lastDataHash = passedData.hashCode()
 
         val warnings = userEnabledWarnings.mapNotNull {
-            generateWarning(it, this.data)?.let { (warning, plot) -> warning to plot }
+            val (warning, plot) = generateWarning(it, this.data) ?: return@mapNotNull null
+            warning to plot
         }
 
         val finalWarning = warnings.joinToString(" §8| ") { it.first }
         val actionPlot = warnings.firstOrNull()?.second
 
-        ChatUtils.chat("Set active warning: $finalWarning")
         activeWarning = finalWarning to actionPlot
     }
 
     private fun getNextWarningMark() = SimpleTimeMark.now() + reminderInterval.get().toInt().seconds
     private fun refreshSound() = soundString.takeIf(String::isNotEmpty)?.let { SoundUtils.createSound(it, 1f) }
-    private fun List<PestTrapData>.joinPlots(): String = this.joinToString("§8, ") { "§a#${it.number}" }
 
     private fun generateWarning(reason: WarningReason, data: List<PestTrapData>): Pair<String, GardenPlotApi.Plot?>? {
         val dataSet = data.getTrapReport(reason).takeIfNotEmpty()?.toList() ?: return null
-        ChatUtils.chat("DataSet: $dataSet (reason: $reason)")
         val plot = GardenPlotApi.getPlotByName(dataSet.firstOrNull()?.plotName.orEmpty())
-        return "${reason.warningString}${dataSet.joinPlots()}" to plot
+        val affectedTrapsFormat = dataSet.joinToString("§8, ") { "§a#${it.number}" }
+        val warningFormat = "${reason.warningString} $affectedTrapsFormat"
+
+        return warningFormat to plot
     }
 
     private fun tryWarnChat(finalWarning: String, actionPlot: GardenPlotApi.Plot?) {

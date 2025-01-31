@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.pestTrapPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
@@ -95,20 +94,21 @@ object PestTrapApi {
     }
 
     private const val BAIT_SLOT = 11
-    private val PEST_SLOTS = 13..15
     private const val RELEASE_ALL_SLOT = 17
     private const val MAX_RELEASED_PESTS = 8
     private const val MAX_PEST_TRAPS = 3
+    private val PEST_SLOTS = 13..15
+    var MAX_PEST_COUNT_PER_TRAP = 3
+        private set
 
     private val patternGroup = RepoPattern.group("garden.pests.trap")
     private val storage get() = GardenApi.storage
     private val processedEntities: TimeLimitedSet<Int> = TimeLimitedSet(10.minutes)
 
-    // Todo: Use this in the future to yell at the user to enable the widget if it's disabled
+    // Todo: Use these to yell at the user to enable the widget if it's disabled
     private val widgetEnabledAndVisible: TimeLimitedCache<TabWidget, Boolean> = baseWidgetStatus()
     private val widgetErrors: MutableMap<TabWidget, Long> = enumMapOf()
 
-    var MAX_PEST_COUNT_PER_TRAP = 3
     private var lastTabHash: Int = 0
     private var lastTitleHash: Int = 0
     private var lastFullHash: Int = 0
@@ -193,6 +193,52 @@ object PestTrapApi {
     private val tabListNoBaitPattern = TabWidget.NO_BAIT.pattern
     // </editor-fold>
 
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onChat(event: SkyHanniChatEvent) {
+        val storage = storage ?: return
+
+        caughtChatPattern.matchMatcher(event.message) {
+            val plotName = groupOrNull("plot") ?: return@matchMatcher
+            val activeTrapNumbers = storage.pestTrapStatus.filter {
+                it.plotName == plotName && !it.isFull && !it.noBait
+            }.takeIfNotEmpty()?.map { it.number }?.toSet() ?: return@matchMatcher
+
+            storage.updatePestTrapStatus { existingData ->
+                existingData.filter { it.number in activeTrapNumbers }.forEach {
+                    it.pestCount++
+                    it.baitCount =
+                        if (it.baitCount == -1) -1
+                        else (it.baitCount - 1).coerceAtLeast(0)
+                }
+            }
+        }
+
+        trapRemovedChatPattern.matchMatcher(event.message) {
+            if (lastClickedIndex == -1 || storage.pestTrapStatus.size <= lastClickedIndex) return@matchMatcher
+            storage.updatePestTrapStatus { existingData ->
+                existingData.removeAt(lastClickedIndex)
+            }
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onTabListUpdate(event: TabListUpdateEvent) {
+        val timeEnteredGarden = timeEnteredGarden ?: return
+        if (timeEnteredGarden.passedSince() < 5.seconds) return
+        val storage = storage ?: return
+        lastTabHash = event.tabList.hashCode().takeIf { it != lastTabHash } ?: return
+
+        for (line in event.tabList) {
+            line.updateDataFromTitle(storage)
+            line.updateDataFromFull(storage)
+            line.updateDataFromNoBait(storage)
+        }
+
+        lastTotalHash = (lastTitleHash + lastFullHash + lastNoBaitHash).takeIf { it != lastTotalHash } ?: return
+
+        PestTrapDataUpdatedEvent(storage.pestTrapStatus).post()
+    }
+
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         timeEnteredGarden = when (event.newIsland) {
@@ -200,6 +246,7 @@ object PestTrapApi {
                 DelayedRun.runDelayed(5.seconds) { releaseCache() }
                 SimpleTimeMark.now()
             }
+
             else -> null
         }
     }
@@ -286,24 +333,9 @@ object PestTrapApi {
         }
     }
 
-    private fun canReleasePest(quantity: Int = 1): Boolean {
-        val existingPests = PestApi.scoreboardPests.takeIf { it < MAX_RELEASED_PESTS } ?: return false
-        val pestsToRelease = min(quantity, MAX_RELEASED_PESTS - existingPests)
-        return pestsToRelease > 0
-    }
-
-    private fun ItemStack.canReleaseAll() =
-        this.getLore().none { noneToReleasePattern.matches(it) }
-
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         initializeStorage()
-    }
-
-    private fun initializeStorage() = storage?.takeIf { it.pestTrapStatus.size < MAX_PEST_TRAPS }?.apply {
-        pestTrapStatus = (1..MAX_PEST_TRAPS).map {
-            pestTrapStatus.getOrNull(it - 1) ?: PestTrapData(it)
-        }.toMutableList()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -313,6 +345,21 @@ object PestTrapApi {
         entityBaitPattern.matchMatcher(entityName) { this.extractBaitType(event.entity) }
         entityFullTrapPattern.matchMatcher(entityName) { markTrapFull(event.entity) }
         processedEntities.add(event.entity.entityId)
+    }
+
+    private fun canReleasePest(quantity: Int = 1): Boolean {
+        val existingPests = PestApi.scoreboardPests.takeIf { it < MAX_RELEASED_PESTS } ?: return false
+        val pestsToRelease = min(quantity, MAX_RELEASED_PESTS - existingPests)
+        return pestsToRelease > 0
+    }
+
+    private fun ItemStack.canReleaseAll() =
+        this.getLore().none { noneToReleasePattern.matches(it) }
+
+    private fun initializeStorage() = storage?.takeIf { it.pestTrapStatus.size < MAX_PEST_TRAPS }?.apply {
+        pestTrapStatus = (1..MAX_PEST_TRAPS).map {
+            pestTrapStatus.getOrNull(it - 1) ?: PestTrapData(it)
+        }.toMutableList()
     }
 
     private fun Matcher.extractTrapType() = when (groupOrNull("type")?.lowercase()) {
@@ -362,54 +409,8 @@ object PestTrapApi {
     }
 
     private fun ProfileSpecificStorage.GardenStorage.updatePestTrapStatus(
-        operation: (MutableList<PestTrapData>) -> Unit
+        operation: (MutableList<PestTrapData>) -> Unit,
     ) = this.apply { operation(pestTrapStatus) }
-
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent) {
-        val storage = storage ?: return
-
-        caughtChatPattern.matchMatcher(event.message) {
-            val plotName = groupOrNull("plot") ?: return@matchMatcher
-            val activeTrapNumbers = storage.pestTrapStatus.filter {
-                it.plotName == plotName && !it.isFull && !it.noBait
-            }.takeIfNotEmpty()?.map { it.number }?.toSet() ?: return@matchMatcher
-
-            storage.updatePestTrapStatus { existingData ->
-                existingData.filter { it.number in activeTrapNumbers }.forEach {
-                    it.pestCount++
-                    it.baitCount =
-                        if (it.baitCount == -1) -1
-                        else (it.baitCount - 1).coerceAtLeast(0)
-                }
-            }
-        }
-
-        trapRemovedChatPattern.matchMatcher(event.message) {
-            if (lastClickedIndex == -1 || storage.pestTrapStatus.size <= lastClickedIndex) return@matchMatcher
-            storage.updatePestTrapStatus { existingData ->
-                existingData.removeAt(lastClickedIndex)
-            }
-        }
-    }
-
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        val timeEnteredGarden = timeEnteredGarden ?: return
-        if (timeEnteredGarden.passedSince() < 5.seconds) return
-        val storage = storage ?: return
-        lastTabHash = event.tabList.hashCode().takeIf { it != lastTabHash } ?: return
-
-        for (line in event.tabList) {
-            line.updateDataFromTitle(storage)
-            line.updateDataFromFull(storage)
-            line.updateDataFromNoBait(storage)
-        }
-
-        lastTotalHash = (lastTitleHash + lastFullHash + lastNoBaitHash).takeIf { it != lastTotalHash } ?: return
-
-        PestTrapDataUpdatedEvent(storage.pestTrapStatus).post()
-    }
 
     private fun String.updateDataFromTitle(
         storage: ProfileSpecificStorage.GardenStorage,
@@ -441,10 +442,9 @@ object PestTrapApi {
         lastFullHash = this@updateDataFromFull.hashCode().takeIf { it != lastFullHash } ?: return@matchMatcher
 
         val fullTraps = this.getTrapIndexSet()
-        ChatUtils.chat("Full traps: $fullTraps")
         storage.updatePestTrapStatus { existingData ->
             if (fullTraps.isNullOrEmpty()) existingData.filter { it.isFull }.forEach { it.affirmNoPests() }
-            else existingData.onEachInIndexSet(fullTraps) { affirmNoPests() }
+            else existingData.onEachInIndexSet(fullTraps) { pestCount = MAX_PEST_COUNT_PER_TRAP }
         }
     }
 
@@ -457,7 +457,7 @@ object PestTrapApi {
         val noBaitTraps = this.getTrapIndexSet()
         storage.updatePestTrapStatus { existingData ->
             if (noBaitTraps.isNullOrEmpty()) existingData.filter { it.noBait }.forEach { it.affirmHasUnknownBait() }
-            else existingData.onEachInIndexSet(noBaitTraps) { affirmHasUnknownBait() }
+            else existingData.onEachInIndexSet(noBaitTraps) { affirmNoBait() }
         }
     }
 
