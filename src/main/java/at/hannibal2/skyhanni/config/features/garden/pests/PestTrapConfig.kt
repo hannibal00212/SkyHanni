@@ -57,7 +57,7 @@ class PestTrapConfig {
         @Expose
         @ConfigOption(name = "Warning Message", desc = "How the warning message should display")
         @ConfigEditorDropdown
-        var warningDisplayType: WarningDisplayType = WarningDisplayType.TITLE
+        var warningDisplayType: Property<WarningDisplayType> = Property.of(WarningDisplayType.TITLE)
 
         @Expose
         @ConfigOption(name = "Warning Sound", desc = "The sound that plays for a warning.\nClear to disable sound.")

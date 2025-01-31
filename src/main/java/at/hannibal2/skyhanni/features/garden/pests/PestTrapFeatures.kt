@@ -33,7 +33,7 @@ private typealias WarningDisplayType = PestTrapConfig.WarningConfig.WarningDispl
 object PestTrapFeatures {
 
     private val config get() = SkyHanniMod.feature.garden.pests.pestTrap
-    private val enabledTypes get(): WarningDisplayType = config.warningConfig.warningDisplayType
+    private val enabledTypes: WarningDisplayType get() = config.warningConfig.warningDisplayType.get()
     private val userEnabledWarnings: List<WarningReason> get() = config.warningConfig.enabledWarnings.get()
     private val chatWarnEnabled: Boolean get() = enabledTypes in listOf(WarningDisplayType.CHAT, WarningDisplayType.BOTH)
     private val titleWarnEnabled: Boolean get() = enabledTypes in listOf(WarningDisplayType.TITLE, WarningDisplayType.BOTH)
@@ -53,6 +53,12 @@ object PestTrapFeatures {
         }
         ConditionalUtils.onToggle(reminderInterval) {
             nextWarningMark = getNextWarningMark()
+        }
+        ConditionalUtils.onToggle(config.warningConfig.enabledWarnings) {
+            handleDataUpdate()
+        }
+        ConditionalUtils.onToggle(config.warningConfig.warningDisplayType) {
+            nextWarningMark = SimpleTimeMark.now() + 5.seconds
         }
     }
 
@@ -92,7 +98,10 @@ object PestTrapFeatures {
     }.hashCode()
 
     private fun handleDataUpdate() {
-        val warnings = userEnabledWarnings.mapNotNull { generateWarning(it, data) }
+        val warnings = userEnabledWarnings.mapNotNull {
+            val (warning, plot: GardenPlotApi.Plot?) = generateWarning(it, data) ?: return@mapNotNull null
+            warning to plot
+        }
 
         val finalWarning = warnings.joinToString(" §8| ") { it.first }
         val actionPlot = warnings.firstOrNull()?.second
@@ -106,7 +115,7 @@ object PestTrapFeatures {
 
     private fun generateWarning(reason: WarningReason, data: List<PestTrapData>): Pair<String, GardenPlotApi.Plot?>? {
         val dataSet = data.getTrapReport(reason).takeIfNotEmpty()?.toList() ?: return null
-        val plot = GardenPlotApi.getPlotByName(dataSet.firstOrNull()?.plotName ?: return null)
+        val plot = GardenPlotApi.getPlotByName(dataSet.firstOrNull()?.plotName ?: "")
         return "${reason.warningString}${dataSet.joinPlots()}" to plot
     }
 
