@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator.CONFIG_VERSION
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator.hasAMove
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils.asIntOrNull
@@ -9,10 +11,23 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 
+/** Used to define a move */
+@Suppress("unused")
+val CONFIG_MOVE_VERSION: Int
+    get() {
+        hasAMove = 1
+        return CONFIG_VERSION
+    }
+
 object ConfigUpdaterMigrator {
 
     val logger = LorenzLogger("ConfigMigration")
-    const val CONFIG_VERSION = 72
+
+    var hasAMove = 0
+
+    private val replacedConfigVersion = "@CONFIG_VERSION@".toInt()
+    val CONFIG_VERSION get() = replacedConfigVersion + hasAMove
+
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null

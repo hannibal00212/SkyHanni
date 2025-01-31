@@ -1,4 +1,8 @@
-import at.skyhanni.sharedvariables.*
+import at.skyhanni.sharedvariables.MinecraftVersion
+import at.skyhanni.sharedvariables.MultiVersionStage
+import at.skyhanni.sharedvariables.ProjectTarget
+import at.skyhanni.sharedvariables.SHVersionInfo
+import at.skyhanni.sharedvariables.versionString
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import moe.nea.shot.ShotParser
@@ -220,7 +224,6 @@ dependencies {
         shadowImpl(libs.hypixelmodapitweaker)
     }
 
-
     // getting clock offset
     shadowImpl("commons-net:commons-net:3.11.1")
 
@@ -395,6 +398,7 @@ preprocess {
 blossom {
     replaceToken("@MOD_VERSION@", version)
     replaceToken("@MC_VERSION@", target.minecraftVersion.versionName)
+    replaceToken("@CONFIG_VERSION@", File("Config_Version").readText().filter { it.isDigit() })
 }
 
 val sourcesJar by tasks.creating(Jar::class) {
