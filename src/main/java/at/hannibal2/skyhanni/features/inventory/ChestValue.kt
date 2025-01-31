@@ -202,9 +202,9 @@ object ChestValue {
             if (internalName.getItemStackOrNull() == null) continue
             val list = mutableListOf<String>()
             var total = if (internalName == NeuInternalName.SKYBLOCK_COIN) {
-                "§8(?<value>.*)".toPattern().matchMatcher(stack.getLore().last()){
+                "§8(?<value>.*)".toPattern().matchMatcher(stack.getLore().last()) {
                     group("value").formatDouble()
-                }?: error("Could not read coin value from trade item")
+                } ?: error("Could not read coin value from trade item")
             } else EstimatedItemValueCalculator.calculate(stack, list).first
 
             val key = "$internalName+$total"

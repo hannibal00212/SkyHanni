@@ -18,6 +18,7 @@ import net.minecraft.item.ItemStack
 @SkyHanniModule
 object TradeValue {
     val config get() = SkyHanniMod.feature.inventory.trade
+
     // other person's trade slots
     val list = (5..8).flatMap { x ->
         (0..3).map { y -> x + 9 * y }
@@ -25,9 +26,11 @@ object TradeValue {
 
     private var prevTotal = 0.0
     private var display = emptyList<Renderable>()
-    //detects trade menu thx NEU
+
+    // Detects trade menu thx NEU
     val inventory = InventoryDetector { name -> name.startsWith("You     ") }
-     init {
+
+    init {
         RenderDisplayHelper(
             inventory,
             condition = { isEnabled() },
@@ -37,7 +40,7 @@ object TradeValue {
     }
 
     private fun isEnabled(): Boolean {
-    return LorenzUtils.inSkyBlock && config.enabled
+        return LorenzUtils.inSkyBlock && config.enabled
     }
 
     @HandleEvent
@@ -48,7 +51,7 @@ object TradeValue {
             return
         }
         var total = 0.0
-        val map = mutableMapOf<Int,ItemStack>()
+        val map = mutableMapOf<Int, ItemStack>()
         // Gets total value of trade
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.slotIndex in list) {
@@ -65,7 +68,8 @@ object TradeValue {
             update(items)
         }
     }
-    //display trade value breakdown
+
+    // Display trade value breakdown
     private fun update(items: Map<String, ChestValue.Item>) {
         display = buildList {
             addToList(items.values, "§eTrade Value")
