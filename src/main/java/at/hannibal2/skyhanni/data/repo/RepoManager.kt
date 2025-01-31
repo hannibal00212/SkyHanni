@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.dev.RepositoryConfig
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -30,44 +31,43 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration.Companion.minutes
 
-class RepoManager(private val configLocation: File) {
+@SkyHanniModule
+object RepoManager {
 
     private val gson get() = ConfigManager.gson
+    private val configLocation = ConfigManager.configDirectory
     val repoLocation: File = File(configLocation, "repo")
     private var error = false
     private var lastRepoUpdate = SimpleTimeMark.now()
     private var repoDownloadFailed = false
 
-    companion object {
+    private val config get() = SkyHanniMod.feature.dev.repo
 
-        private val config get() = SkyHanniMod.feature.dev.repo
+    val successfulConstants = mutableListOf<String>()
+    val unsuccessfulConstants = mutableListOf<String>()
+    var usingBackupRepo = false
 
-        val successfulConstants = mutableListOf<String>()
-        val unsuccessfulConstants = mutableListOf<String>()
-        var usingBackupRepo = false
+    private var lastConstant: String? = null
 
-        private var lastConstant: String? = null
-
-        fun setLastConstant(constant: String) {
-            lastConstant?.let {
-                successfulConstants.add(it)
-            }
-            lastConstant = constant
+    fun setLastConstant(constant: String) {
+        lastConstant?.let {
+            successfulConstants.add(it)
         }
-
-        fun getRepoLocation(): String {
-            return "${config.location.user}/${config.location.name}/${config.location.branch}"
-        }
-
-        private const val DEFAULT_USER = "hannibal002"
-        private const val DEFAULT_NAME = "SkyHanni-REPO"
-        private const val DEFAULT_BRANCH = "main"
-
-        fun RepositoryConfig.RepositoryLocation.hasDefaultSettings() =
-            user.lowercase() == DEFAULT_USER.lowercase() &&
-                name.lowercase() == DEFAULT_NAME.lowercase() &&
-                branch.lowercase() == DEFAULT_BRANCH.lowercase()
+        lastConstant = constant
     }
+
+    fun getRepoLocation(): String {
+        return "${config.location.user}/${config.location.name}/${config.location.branch}"
+    }
+
+    private const val DEFAULT_USER = "hannibal002"
+    private const val DEFAULT_NAME = "SkyHanni-REPO"
+    private const val DEFAULT_BRANCH = "main"
+
+    fun RepositoryConfig.RepositoryLocation.hasDefaultSettings() =
+        user.lowercase() == DEFAULT_USER.lowercase() &&
+            name.lowercase() == DEFAULT_NAME.lowercase() &&
+            branch.lowercase() == DEFAULT_BRANCH.lowercase()
 
     fun loadRepoInformation() {
         atomicShouldManuallyReload.set(true)
@@ -84,6 +84,7 @@ class RepoManager(private val configLocation: File) {
 
     private val atomicShouldManuallyReload = AtomicBoolean(false)// TODO remove the workaround
 
+    @JvmStatic
     fun updateRepo() {
         atomicShouldManuallyReload.set(true)
         checkRepoLocation()
@@ -120,8 +121,7 @@ class RepoManager(private val configLocation: File) {
                     return@supplyAsync false
                 }
 
-                val file = File(configLocation, "repo")
-                if (file.exists() &&
+                if (repoLocation.exists() &&
                     currentDownloadedCommit == latestRepoCommit &&
                     unsuccessfulConstants.isEmpty() &&
                     lastRepoUpdate.passedSince() < 1.minutes
@@ -209,7 +209,7 @@ class RepoManager(private val configLocation: File) {
                 ChatUtils.clickableChat(
                     "Error with the repo detected, try /shupdaterepo to fix it!",
                     onClick = {
-                        SkyHanniMod.repo.updateRepo()
+                        updateRepo()
                     },
                     "§eClick to update the repo!",
                     prefixColor = "§c",

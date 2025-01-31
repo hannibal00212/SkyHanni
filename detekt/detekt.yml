@@ -30,6 +30,8 @@ SkyHanniStyle:
         active: true
     IsInIslandEarlyReturn:
         active: true
+    OnlyOnIslandSpecificity:
+        active: true
 
 style:
     MagicNumber: # I, Linnea Gräf, of sound mind and body, disagree with disabling this rule
@@ -149,3 +151,6 @@ potential-bugs:
         active: false
     StorageNeedsExpose:
         active: true
+    ImmutableTypesWithExpectedInteriorMutabilityInConfig:
+        active: true
+

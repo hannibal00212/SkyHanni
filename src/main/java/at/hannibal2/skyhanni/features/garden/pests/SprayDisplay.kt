@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.currentSpray
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isBarn
@@ -26,9 +25,9 @@ object SprayDisplay {
     private val config get() = PestApi.config.spray
     private var display: String? = null
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
-        if (!GardenApi.inGarden() || !event.isMod(5, 3)) return
+        if (!event.isMod(5, 3)) return
 
         if (config.displayEnabled) {
             display = GardenPlotApi.getCurrentPlot()?.takeIf { !it.isBarn() }?.let { plot ->
@@ -50,9 +49,9 @@ object SprayDisplay {
         sendExpiredPlotsToChat(true)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!GardenApi.inGarden() || !config.displayEnabled) return
+        if (!config.displayEnabled) return
         val display = display ?: return
         config.displayPosition.renderString(display, posLabel = "Active Plot Spray Display")
     }
