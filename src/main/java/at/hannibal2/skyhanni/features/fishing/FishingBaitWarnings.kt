@@ -46,9 +46,9 @@ object FishingBaitWarnings {
         wasUsingBait = true
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBobber(event: FishingBobberInLiquidEvent) {
-        if (!isEnabled()) return
+        if (KuudraApi.inKuudra()) return
         DelayedRun.runDelayed(500.milliseconds) {
             checkBait()
         }
@@ -56,7 +56,7 @@ object FishingBaitWarnings {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityEnterWorld(event: EntityEnterWorldEvent<EntityItem>) {
-        if (!isEnabled() || !FishingApi.isFishing()) return
+        if (KuudraApi.inKuudra() || !FishingApi.isFishing()) return
         if (event.entity.distanceToPlayer() > 10) return
         DelayedRun.runNextTick {
             val isBait = event.entity.entityItem.isBait()
@@ -98,6 +98,4 @@ object FishingBaitWarnings {
         LorenzUtils.sendTitle("§cNo bait is used!", 2.seconds)
         ChatUtils.chat("You're not using any fishing baits!")
     }
-
-    private fun isEnabled() = LorenzUtils.inSkyBlock && !KuudraApi.inKuudra()
 }

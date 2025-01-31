@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -47,6 +49,15 @@ object SkyBlockIslandTest {
             }
         } ?: run {
             event.addIrrelevant("not active.")
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtestisland") {
+            description = "Changes the SkyBlock island SkyHanni thinks you are on"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { onCommand(it) }
         }
     }
 
