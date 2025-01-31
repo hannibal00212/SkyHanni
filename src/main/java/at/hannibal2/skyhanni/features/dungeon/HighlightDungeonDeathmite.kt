@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
@@ -10,9 +11,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 @SkyHanniModule
 object HighlightDungeonDeathmite {
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
-        if (!DungeonApi.inDungeon()) return
         if (!SkyHanniMod.feature.dungeon.highlightDeathmites) return
         if (event.mob.name == "Deathmite") event.mob.highlight(LorenzColor.DARK_RED.toColor().addAlpha(20))
     }

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.dev;
 
+import at.hannibal2.skyhanni.data.repo.RepoManager;
 import at.hannibal2.skyhanni.data.repo.RepoUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
@@ -18,7 +19,7 @@ public class RepositoryConfig {
 
     @ConfigOption(name = "Update Repo Now", desc = "Update your repository to the latest version")
     @ConfigEditorButton(buttonText = "Update")
-    public Runnable updateRepo = RepoUtils::updateRepo;
+    public Runnable updateRepo = RepoManager::updateRepo;
 
     @Expose
     @ConfigOption(name = "Repository Location", desc = "")

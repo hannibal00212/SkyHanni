@@ -59,7 +59,7 @@ object DungeonCleanEnd {
         return true
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         bossDone = false
         chestsSpawned = false

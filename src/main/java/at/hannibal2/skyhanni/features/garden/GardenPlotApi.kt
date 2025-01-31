@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -250,16 +251,15 @@ object GardenPlotApi {
         plots = list
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!GardenApi.inGarden()) return
 
         plotSprayedPattern.matchMatcher(event.message) {
             val sprayName = group("spray")
             val plotName = group("plot")
 
             val plot = getPlotByName(plotName)
-            val spray = SprayType.getByName(sprayName) ?: return
+            val spray = SprayType.getByNameOrNull(sprayName) ?: return
 
             plot?.setSpray(spray, 30.minutes)
         }
@@ -283,9 +283,8 @@ object GardenPlotApi {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!GardenApi.inGarden()) return
         if (event.inventoryName != "Configure Plots") return
 
         for (plot in plots) {
