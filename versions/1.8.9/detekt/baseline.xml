@@ -6,10 +6,10 @@
     <ID>ArrayPrimitive:CropMoneyDisplay.kt$CropMoneyDisplay$arrayOf(npcPrice)</ID>
     <ID>ArrayPrimitive:CropMoneyDisplay.kt$CropMoneyDisplay$arrayOf(sellOffer)</ID>
     <ID>ArrayPrimitive:SkyHanniVec3d.kt$Array&lt;Double&gt;</ID>
-    <ID>ArrayPrimitive:SkyHanniVec3d.kt$LorenzVec$Array&lt;Double&gt;</ID>
-    <ID>ArrayPrimitive:SkyHanniVec3d.kt$LorenzVec$Array&lt;Float&gt;</ID>
-    <ID>ArrayPrimitive:SkyHanniVec3d.kt$LorenzVec$arrayOf(x, y, z)</ID>
-    <ID>ArrayPrimitive:SkyHanniVec3d.kt$LorenzVec$arrayOf(x.toFloat(), y.toFloat(), z.toFloat())</ID>
+    <ID>ArrayPrimitive:SkyHanniVec3d.kt$SkyHanniVec3d$Array&lt;Double&gt;</ID>
+    <ID>ArrayPrimitive:SkyHanniVec3d.kt$SkyHanniVec3d$Array&lt;Float&gt;</ID>
+    <ID>ArrayPrimitive:SkyHanniVec3d.kt$SkyHanniVec3d$arrayOf(x, y, z)</ID>
+    <ID>ArrayPrimitive:SkyHanniVec3d.kt$SkyHanniVec3d$arrayOf(x.toFloat(), y.toFloat(), z.toFloat())</ID>
     <ID>CyclomaticComplexMethod:AdvancedPlayerList.kt$AdvancedPlayerList$fun newSorting(original: List&lt;String&gt;): List&lt;String&gt;</ID>
     <ID>CyclomaticComplexMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun calculateMoneyPerHour(debugList: MutableList&lt;List&lt;Any&gt;&gt;): Map&lt;NeuInternalName, Array&lt;Double&gt;&gt;</ID>
     <ID>CyclomaticComplexMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>
@@ -69,8 +69,8 @@
     <ID>NoNameShadowing:Graph.kt$Graph.Companion${ out.name("Tags") out.beginArray() for (tagName in it) { out.value(tagName) } out.endArray() }</ID>
     <ID>NoNameShadowing:HoppityCollectionStats.kt$HoppityCollectionStats${ val displayAmount = it.amount.shortFormat() val operationFormat = when (milestoneType) { HoppityEggType.CHOCOLATE_SHOP_MILESTONE -&gt; "spending" HoppityEggType.CHOCOLATE_FACTORY_MILESTONE -&gt; "reaching" else -&gt; "" // Never happens } // List indexing is weird existingLore[replaceIndex - 1] = "§7Obtained by $operationFormat §6$displayAmount" existingLore[replaceIndex] = "§7all-time §6Chocolate." return existingLore }</ID>
     <ID>NoNameShadowing:HotmData.kt$HotmData.Companion${ it.setCurrent(it.getTotal()) }</ID>
-    <ID>NoNameShadowing:SkyHanniVec3d.kt$LorenzVec.Companion$pitch</ID>
-    <ID>NoNameShadowing:SkyHanniVec3d.kt$LorenzVec.Companion$yaw</ID>
+    <ID>NoNameShadowing:SkyHanniVec3d.kt$SkyHanniVec3d.Companion$pitch</ID>
+    <ID>NoNameShadowing:SkyHanniVec3d.kt$SkyHanniVec3d.Companion$yaw</ID>
     <ID>NoNameShadowing:Renderable.kt$Renderable.Companion.&lt;no name provided&gt;$posX</ID>
     <ID>NoNameShadowing:Renderable.kt$Renderable.Companion.&lt;no name provided&gt;$posY</ID>
     <ID>NoNameShadowing:Renderable.kt$Renderable.Companion.&lt;no name provided&gt;${ it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }</ID>
@@ -281,7 +281,7 @@
     <ID>TooManyFunctions:ItemResolutionQuery.kt$ItemResolutionQuery</ID>
     <ID>TooManyFunctions:LocationUtils.kt$LocationUtils</ID>
     <ID>TooManyFunctions:LorenzUtils.kt$LorenzUtils</ID>
-    <ID>TooManyFunctions:SkyHanniVec3d.kt$LorenzVec</ID>
+    <ID>TooManyFunctions:SkyHanniVec3d.kt$SkyHanniVec3d</ID>
     <ID>TooManyFunctions:MobFinder.kt$MobFinder</ID>
     <ID>TooManyFunctions:NumberUtil.kt$NumberUtil</ID>
     <ID>TooManyFunctions:RegexUtils.kt$RegexUtils</ID>
@@ -376,7 +376,7 @@
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt$VisitorRewardWarning$visitor.totalReward!!</ID>
     <ID>UnusedParameter:SkyHanniDebugsAndTests.kt$SkyHanniDebugsAndTests$args: Array&lt;String&gt;</ID>
     <ID>UseIsNullOrEmpty:ItemUtils.kt$ItemUtils$name == null || name.isEmpty()</ID>
-    <ID>VarCouldBeVal:HoppityEggLocations.kt$HoppityEggLocations$// TODO add gui/command to show total data/missing islands private var collectedEggStorage: MutableMap&lt;IslandType, MutableSet&lt;LorenzVec&gt;&gt; get() = ChocolateFactoryApi.profileStorage?.collectedEggLocations ?: mutableMapOf() set(value) { ChocolateFactoryApi.profileStorage?.collectedEggLocations = value }</ID>
+    <ID>VarCouldBeVal:HoppityEggLocations.kt$HoppityEggLocations$// TODO add gui/command to show total data/missing islands private var collectedEggStorage: MutableMap&lt;IslandType, MutableSet&lt;SkyHanniVec3d&gt;&gt; get() = ChocolateFactoryApi.profileStorage?.collectedEggLocations ?: mutableMapOf() set(value) { ChocolateFactoryApi.profileStorage?.collectedEggLocations = value }</ID>
     <ID>VarCouldBeVal:IslandAreas.kt$IslandAreas$var suffix = ""</ID>
     <ID>VarCouldBeVal:NeuReforgeJson.kt$NeuReforgeJson$private lateinit var itemTypeField: Pair&lt;String, List&lt;NeuInternalName&gt;&gt;</ID>
     <ID>VarCouldBeVal:RepoPatternGui.kt$RepoPatternGui$private var searchCache = ObservableList(mutableListOf&lt;RepoPatternInfo&gt;())</ID>
