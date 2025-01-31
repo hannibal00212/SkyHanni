@@ -100,7 +100,7 @@ object ArmorDropTracker {
     }
 
     init {
-        tracker.initRenderer(config.pos) { shouldShowDisplay() }
+        tracker.initRenderer({ config.pos }) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {
@@ -119,9 +119,8 @@ object ArmorDropTracker {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!GardenApi.inGarden()) return
         if (!config.enabled) return
 
         checkArmor()

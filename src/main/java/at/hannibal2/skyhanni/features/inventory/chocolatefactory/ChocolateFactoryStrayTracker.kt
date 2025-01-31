@@ -304,7 +304,10 @@ object ChocolateFactoryStrayTracker {
     }
 
     init {
-        tracker.initRenderer(config.strayRabbitTrackerPosition) { isEnabled() }
+        tracker.initRenderer(
+            { config.strayRabbitTrackerPosition },
+            ChocolateFactoryApi.mainInventory,
+        ) { isEnabled() }
     }
 
     @HandleEvent
