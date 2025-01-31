@@ -200,7 +200,14 @@ object ItemUtils {
         return list
     }
 
-    fun ItemStack.getInternalName() = getInternalNameOrNull() ?: NeuInternalName.NONE
+    fun ItemStack.getInternalName() = getInternalNameOrNull() ?: run {
+        val lore = getLore()
+
+        if (lore.getOrNull(0) == "§7Lump-sum amount") {
+            return NeuInternalName.SKYBLOCK_COIN
+        }
+        NeuInternalName.NONE
+    }
 
     fun ItemStack.getInternalNameOrNull(): NeuInternalName? {
         val data = cachedData
