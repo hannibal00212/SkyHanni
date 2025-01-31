@@ -15,12 +15,12 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sendTitle
-import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.SoundUtils.playPlingSound
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
@@ -51,11 +51,11 @@ object TotemOfCorruption {
     )
     private val timeRemainingPattern by patternGroup.pattern(
         "timeremaining",
-        "§7Remaining: §e(?:(?<min>\\d+)m )?(?<sec>\\d+)s"
+        "§7Remaining: §e(?:(?<min>\\d+)m )?(?<sec>\\d+)s",
     )
     private val ownerPattern by patternGroup.pattern(
         "owner",
-        "§7Owner: §e(?<owner>.+)"
+        "§7Owner: §e(?<owner>.+)",
     )
 
     @HandleEvent

@@ -6,5 +6,5 @@ data class MineshaftWaypoint(
     val waypointType: MineshaftWaypointType,
     val location: SkyHanniVec3d,
     var shared: Boolean = false,
-    var isCorpse: Boolean = false
+    var isCorpse: Boolean = false,
 )

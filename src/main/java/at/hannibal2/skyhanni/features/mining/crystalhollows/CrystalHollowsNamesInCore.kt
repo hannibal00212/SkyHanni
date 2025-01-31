@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerSqIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 
 @SkyHanniModule
 object CrystalHollowsNamesInCore {
@@ -20,7 +20,7 @@ object CrystalHollowsNamesInCore {
         SkyHanniVec3d(550, 116, 550) to "§8Precursor Remnants",
         SkyHanniVec3d(552, 116, 474) to "§bMithril Deposits",
         SkyHanniVec3d(477, 116, 476) to "§aJungle",
-        SkyHanniVec3d(474, 116, 554) to "§6Goblin Holdout"
+        SkyHanniVec3d(474, 116, 554) to "§6Goblin Holdout",
     )
 
     private var showWaypoints = false

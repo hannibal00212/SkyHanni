@@ -15,10 +15,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -99,7 +99,11 @@ object CarnivalReminder {
             action = {
                 HypixelCommands.warp("carnival")
                 EntityMovementData.onNextTeleport(IslandType.HUB) {
-                    IslandGraphs.pathFind(SkyHanniVec3d(-89.5, 71.0, -18.7), "§aCarnival Tickets", condition = { config.reminderDailyTickets })
+                    IslandGraphs.pathFind(
+                        SkyHanniVec3d(-89.5, 71.0, -18.7),
+                        "§aCarnival Tickets",
+                        condition = { config.reminderDailyTickets },
+                    )
                 }
             },
         )

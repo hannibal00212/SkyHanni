@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
-import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.GsonBuilder

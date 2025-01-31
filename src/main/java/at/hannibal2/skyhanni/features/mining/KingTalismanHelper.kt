@@ -19,11 +19,11 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
@@ -46,7 +46,7 @@ object KingTalismanHelper {
      */
     private val kingPattern by patternGroup.pattern(
         "king",
-        "§6§lKing (?<name>.*)"
+        "§6§lKing (?<name>.*)",
     )
 
     /**
@@ -54,7 +54,7 @@ object KingTalismanHelper {
      */
     private val talismanPattern by patternGroup.pattern(
         "talisman",
-        "§7You have received a §r§fKing Talisman§r§7!"
+        "§7You have received a §r§fKing Talisman§r§7!",
     )
 
     private var currentOffset: Int? = null

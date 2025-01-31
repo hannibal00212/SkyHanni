@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest
 
-import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 
 class FetchQuest(
     val itemName: String,
@@ -9,5 +9,4 @@ class FetchQuest(
     displayItem: NeuInternalName,
     state: QuestState,
     needAmount: Int,
-) :
-    ProgressQuest(displayItem, location, QuestCategory.FETCH, itemName, state, needAmount)
+) : ProgressQuest(displayItem, location, QuestCategory.FETCH, itemName, state, needAmount)

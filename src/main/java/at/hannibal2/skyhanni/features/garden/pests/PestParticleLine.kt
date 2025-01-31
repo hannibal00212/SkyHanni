@@ -15,11 +15,11 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isAnyOf
-import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLineNea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.seconds
 
@@ -115,7 +115,7 @@ object PestParticleLine {
                 location,
                 color,
                 3,
-                false
+                false,
             )
             val isVeryLast = list == locations.lastOrNull() && next == list.lastOrNull()
             if (isVeryLast) {

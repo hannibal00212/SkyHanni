@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.getCorners
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.RenderUtils.inflateBlock
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import net.minecraft.client.Minecraft
 import net.minecraft.util.AxisAlignedBB
 import java.awt.Color
@@ -77,6 +77,7 @@ object CrystalHollowsWalls {
                 if (!config.nucleus) return
                 drawNucleus(event)
             }
+
             position.x > MIDDLE_X -> {
                 if (position.z > MIDDLE_Z) {
                     drawPrecursor(event)
@@ -84,6 +85,7 @@ object CrystalHollowsWalls {
                     drawMithril((event))
                 }
             }
+
             else -> {
                 if (position.z > MIDDLE_Z) {
                     drawGoblin(event)

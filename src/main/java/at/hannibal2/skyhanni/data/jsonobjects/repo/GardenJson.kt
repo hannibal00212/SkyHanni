@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.data.jsonobjects.repo
 
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 

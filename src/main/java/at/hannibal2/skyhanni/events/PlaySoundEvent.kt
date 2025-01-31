@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 
 class PlaySoundEvent(val soundName: String, val location: SkyHanniVec3d, val pitch: Float, val volume: Float) : CancellableSkyHanniEvent() {
 

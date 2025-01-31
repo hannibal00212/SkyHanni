@@ -17,9 +17,9 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.StringUtils
 
 @SkyHanniModule
@@ -109,7 +109,7 @@ object HoppityEggLocations {
                 loadApiCollectedEggs(collectedEggsApiData)
                 ChatUtils.chat("Updated Hoppity egg location data!")
             },
-            oneTimeClick = true
+            oneTimeClick = true,
         )
     }
 

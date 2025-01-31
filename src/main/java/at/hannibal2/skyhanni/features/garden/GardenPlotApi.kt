@@ -13,10 +13,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.util.AxisAlignedBB
@@ -35,7 +35,7 @@ object GardenPlotApi {
      */
     private val plotNamePattern by patternGroup.pattern(
         "name",
-        "§.Plot §7- §b(?<name>.*)"
+        "§.Plot §7- §b(?<name>.*)",
     )
 
     /**
@@ -43,7 +43,7 @@ object GardenPlotApi {
      */
     private val barnNamePattern by patternGroup.pattern(
         "barnname",
-        "§.(?<name>The Barn)"
+        "§.(?<name>The Barn)",
     )
 
     /**
@@ -51,7 +51,7 @@ object GardenPlotApi {
      */
     private val uncleanedPlotPattern by patternGroup.pattern(
         "uncleaned",
-        "§7Cleanup: .* (?:§.)*Completed"
+        "§7Cleanup: .* (?:§.)*Completed",
     )
 
     /**
@@ -59,7 +59,7 @@ object GardenPlotApi {
      */
     private val unlockPlotChatPattern by patternGroup.pattern(
         "chat.unlock",
-        "§aUnlocked Garden §r§aPlot §r§7- §r§b(?<plot>.*)§r§a!"
+        "§aUnlocked Garden §r§aPlot §r§7- §r§b(?<plot>.*)§r§a!",
     )
 
     /**
@@ -67,11 +67,11 @@ object GardenPlotApi {
      */
     private val cleanPlotChatPattern by patternGroup.pattern(
         "chat.clean",
-        "§aPlot §r§7- §r§b(?<plot>.*) §r§ais now clean!"
+        "§aPlot §r§7- §r§b(?<plot>.*) §r§ais now clean!",
     )
     private val plotSprayedPattern by patternGroup.pattern(
         "spray.target",
-        "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?<plot>.*) §r§7with §r§a(?<spray>.*)§r§7!"
+        "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?<plot>.*) §r§7with §r§a(?<spray>.*)§r§7!",
     )
 
     /**
@@ -80,7 +80,7 @@ object GardenPlotApi {
      */
     private val portableWasherPattern by patternGroup.pattern(
         "spray.cleared.portablewasher",
-        "§9§lSPLASH! §r§6Your §r§[ba]Garden §r§6was cleared of all active §r§aSprayonator §r§6effects!"
+        "§9§lSPLASH! §r§6Your §r§[ba]Garden §r§6was cleared of all active §r§aSprayonator §r§6effects!",
     )
 
     var plots = listOf<Plot>()
