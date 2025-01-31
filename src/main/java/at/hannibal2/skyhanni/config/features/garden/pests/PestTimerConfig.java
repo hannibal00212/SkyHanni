@@ -4,9 +4,16 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.PestTimerTextEntry.defaultList;
 
 public class PestTimerConfig {
 
@@ -29,19 +36,49 @@ public class PestTimerConfig {
 
     @Expose
     @ConfigOption(
-        name = "Pest Spawn Cooldown",
-        desc = "Show the time until pest spawn cooldown is over."
+        name = "Pest Timer Text",
+        desc = "Drag text to change the appearance of the overlay."
     )
-    @ConfigEditorBoolean
-    public boolean pestSpawnCooldown = false;
+    @ConfigEditorDraggableList
+    public List<PestTimerTextEntry> defaultDisplay = new ArrayList<>(defaultList);
+
+    public enum PestTimerTextEntry {
+        PEST_TIMER("§eLast pest spawned: §b8s ago"),
+        PEST_COOLDOWN("§ePest Cooldown: §b1m 8s"),
+        AVERAGE_PEST_SPAWN("§eAverage time to spawn: §b4m 32s")
+        ;
+
+        public static final List<PestTimerTextEntry> defaultList = Arrays.asList(
+            PEST_TIMER,
+            PEST_COOLDOWN
+        );
+
+        private final String displayName;
+
+        PestTimerTextEntry(String displayName) { this.displayName = displayName; }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
+    }
 
     @Expose
     @ConfigOption(
-        name = "Average Pest Spawn Time",
-        desc = "Show the average time between pest spawns."
+        name = "Pest Cooldown Over Warning",
+        desc = "Warn when pest cooldown is over."
     )
     @ConfigEditorBoolean
-    public boolean averagePestSpawnTime = false;
+    @FeatureToggle
+    public boolean pestCooldownOverWarning = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Warn Before Cooldown End",
+        desc = "Trigger the pest cooldown warning x seconds before cooldown ends."
+    )
+    @ConfigEditorSlider(minValue = 0, maxValue = 30, minStep = 1)
+    public float cooldownWarningTime = 0;
 
     @Expose
     @ConfigOption(
