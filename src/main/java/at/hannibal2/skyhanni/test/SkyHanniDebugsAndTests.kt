@@ -275,10 +275,8 @@ object SkyHanniDebugsAndTests {
 
             if (simpleName !in blockedFeatures) {
                 modules.remove(original)
-                val module = javaClass.newInstance()
-                modules.add(module)
-
-                MinecraftForge.EVENT_BUS.register(module)
+                modules.add(javaClass)
+                MinecraftForge.EVENT_BUS.register(javaClass)
                 println("Registered listener $simpleName")
             } else {
                 println("Skipped registering listener $simpleName")
