@@ -273,6 +273,9 @@ class ProfileSpecificStorage {
 
         @Expose
         var boosterCookieExpiryTime: SimpleTimeMark? = null
+
+        @Expose
+        var museumMilestone: Int? = null
     }
 
     @Expose
@@ -497,7 +500,7 @@ class ProfileSpecificStorage {
         var customGoalMilestone: MutableMap<CropType, Int> = enumMapOf()
 
         @Expose
-        var pestProfitTracker: PestProfitTracker.Data = PestProfitTracker.Data()
+        var pestProfitTracker: PestProfitTracker.BucketData = PestProfitTracker.BucketData()
 
         @Expose
         var activeVinyl: VinylType? = null

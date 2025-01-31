@@ -119,9 +119,8 @@ object ArmorDropTracker {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!GardenApi.inGarden()) return
         if (!config.enabled) return
 
         checkArmor()
