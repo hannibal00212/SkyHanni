@@ -15,7 +15,10 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.sendTitle
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -72,10 +75,10 @@ object PestSpawnTimer {
         }
 
         pestCooldownPattern.firstMatcher(event.widget.lines) {
-            val minutes = group("minutes")?.toInt()
-            val seconds = group("seconds")?.toInt()
-            val ready = group("ready") != null
-            val maxPests = group("maxPests") != null
+            val minutes = groupOrNull("minutes")?.formatInt()
+            val seconds = groupOrNull("seconds")?.formatInt()
+            val ready = hasGroup("ready")
+            val maxPests = hasGroup("maxPests")
 
             if (ready) {
                 pestCooldownEndTime = SimpleTimeMark.now() - 1.seconds
@@ -151,7 +154,9 @@ object PestSpawnTimer {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if ((pestCooldownEndTime - config.cooldownWarningTime.toInt().seconds).isInPast() && !hasWarned && config.pestCooldownOverWarning) {
+        if (hasWarned || !config.pestCooldownOverWarning) return
+
+        if ((pestCooldownEndTime - config.cooldownWarningTime.seconds).isInPast()) {
             warn()
         }
     }
@@ -207,11 +212,8 @@ object PestSpawnTimer {
         return formatDisplay(lineMap)
     }
 
-    private fun formatDisplay(lineMap: MutableMap<PestTimerTextEntry, Renderable>): List<Renderable> {
-        val newList = mutableListOf<Renderable>()
-        newList.addAll(config.defaultDisplay.mapNotNull { lineMap[it] })
-
-        return newList
+    private fun formatDisplay(lineMap: Map<PestTimerTextEntry, Renderable>): List<Renderable> {
+        return config.defaultDisplay.mapNotNull { lineMap[it] }
     }
 
     private fun warn() {

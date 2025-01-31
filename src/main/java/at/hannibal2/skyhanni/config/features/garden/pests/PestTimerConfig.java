@@ -86,7 +86,7 @@ public class PestTimerConfig {
         desc = "Amount of seconds to trigger the pest cooldown warning before cooldown ends."
     )
     @ConfigEditorSlider(minValue = 1, maxValue = 30, minStep = 1)
-    public float cooldownWarningTime = 0;
+    public int cooldownWarningTime = 0;
 
     @Expose
     @ConfigOption(
