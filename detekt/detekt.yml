@@ -1,6 +1,12 @@
 config:
     validation: true
 
+CompatRules:
+    McPlayerRule:
+        active: true
+    McWorldRule:
+        active: true
+
 GrammarRules:
     AvoidBritishSpelling:
         active: true

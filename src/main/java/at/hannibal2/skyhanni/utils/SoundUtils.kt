@@ -44,6 +44,7 @@ object SoundUtils {
         }
     }
 
+    @Deprecated("Use McSound.create() instead", ReplaceWith("McSound.create(name, pitch, volume)"))
     fun createSound(name: String, pitch: Float, volume: Float = 50f): ISound {
         val sound: ISound = object : PositionedSound(ResourceLocation(name)) {
             init {
