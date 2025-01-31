@@ -512,7 +512,7 @@ object DamageIndicatorManager {
         entityData.namePrefix = when (entityData.bossType) {
             BossType.SLAYER_BLAZE_1,
             BossType.SLAYER_BLAZE_2,
-                -> {
+            -> {
                 val step = maxHealth / 2
                 calcMaxHealth = step
                 if (health > step) {
@@ -526,7 +526,7 @@ object DamageIndicatorManager {
 
             BossType.SLAYER_BLAZE_3,
             BossType.SLAYER_BLAZE_4,
-                -> {
+            -> {
                 val step = maxHealth / 3
                 calcMaxHealth = step
                 if (health > step * 2) {

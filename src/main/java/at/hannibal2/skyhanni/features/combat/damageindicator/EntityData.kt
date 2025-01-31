@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.combat.damageindicator
 
-import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraft.entity.EntityLivingBase
