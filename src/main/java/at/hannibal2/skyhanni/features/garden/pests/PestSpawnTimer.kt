@@ -132,10 +132,13 @@ object PestSpawnTimer {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (
-            (config.onlyWithVacuum && !PestApi.hasVacuumInHand()) &&
-            (config.onlyWithFarmingTool && !GardenApi.hasFarmingToolInHand())
-        ) return
+
+        if (config.onlyWithVacuum xor config.onlyWithFarmingTool) {
+            if (config.onlyWithFarmingTool && !GardenApi.hasFarmingToolInHand()) return
+            if (config.onlyWithVacuum && !PestApi.hasVacuumInHand()) return
+        } else if (config.onlyWithFarmingTool && config.onlyWithVacuum) {
+            if (!GardenApi.hasFarmingToolInHand() && !PestApi.hasVacuumInHand()) return
+        }
 
         config.position.renderRenderables(drawDisplay(), posLabel = "Pest Spawn Timer")
     }
