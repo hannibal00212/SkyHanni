@@ -126,7 +126,13 @@ data class SkyHanniVec3d(
 
     fun clone(): SkyHanniVec3d = SkyHanniVec3d(x, y, z)
 
+    fun toIntList(): List<Int> = listOf(x.toInt(), y.toInt(), z.toInt())
+    fun toDoubleList(): List<Double> = listOf(x, y, z)
+    fun toFloatList(): List<Float> = listOf(x.toFloat(), y.toFloat(), z.toFloat())
+
+    @Deprecated("Use toDoubleList() instead", ReplaceWith("toDoubleList()"))
     fun toDoubleArray(): Array<Double> = arrayOf(x, y, z)
+    @Deprecated("Use toFloatList() instead", ReplaceWith("toFloatList()"))
     fun toFloatArray(): Array<Float> = arrayOf(x.toFloat(), y.toFloat(), z.toFloat())
 
     fun equalsIgnoreY(other: SkyHanniVec3d) = x == other.x && z == other.z
