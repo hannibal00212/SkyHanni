@@ -94,7 +94,7 @@ object PestTrapApi {
     private val patternGroup = RepoPattern.group("garden.pests.trap")
     private val storage get() = GardenApi.storage
 
-    // Todo: Use this in the future to tell the user to enable the widget if it's disabled
+    // Todo: Use this in the future to yell at the user to enable the widget if it's disabled
     private val widgetEnabledAndVisible: TimeLimitedCache<TabWidget, Boolean> = baseWidgetStatus()
     private val widgetErrors: MutableMap<TabWidget, Long> = enumMapOf()
 
