@@ -158,7 +158,7 @@ internal object RenderableUtils {
             for (entry in universe) {
                 val name = getName(entry)
                 if (entry == current) {
-                    this.add("§b▶ $name")
+                    this.add("§e▶ $name")
                 } else {
                     this.add("§7  $name")
                 }
@@ -170,20 +170,8 @@ internal object RenderableUtils {
 
         return Renderable.line {
             addString("§7$label §a[")
-
-//             Renderable.leftAndRightClickable(
-//                 hoverTips("§b$currentName", tips, false, onClick)
-//             )
-//
-//                 Renderable.leftAndRightClickable(
-//                     hoverTips(),
-//                 onClick,
-//                 bypassChecks = bypassChecks,
-//             )
-//             add(Renderable.clickAndHover())
-
             val clickable = leftAndRightClickable(
-                hoverTips("§b$currentName", tips, bypassChecks = false, onHover = {}),
+                hoverTips("§e$currentName", tips, bypassChecks = false, onHover = {}),
                 onClick,
                 bypassChecks = false,
             )
