@@ -77,7 +77,7 @@ public class PestTimerConfig {
         name = "Warn Before Cooldown End",
         desc = "Amount of seconds to trigger the pest cooldown warning before cooldown ends."
     )
-    @ConfigEditorSlider(minValue = 0, maxValue = 30, minStep = 1)
+    @ConfigEditorSlider(minValue = 1, maxValue = 30, minStep = 1)
     public float cooldownWarningTime = 0;
 
     @Expose
@@ -86,7 +86,7 @@ public class PestTimerConfig {
         desc = "Don't include pest spawn times where the player goes AFK for at least this many seconds."
     )
     @ConfigEditorSlider(minValue = 5, maxValue = 300, minStep = 1)
-    public int averagePestSpawnTimeout = 60;
+    public int averagePestSpawnTimeout = 30;
 
     @Expose
     @ConfigOption(
