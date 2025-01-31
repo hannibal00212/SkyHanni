@@ -15,14 +15,12 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 
 class PestTrapConfig {
 
-    val tabWidgetConfig: TabWidgetConfig get() = SkyHanniMod.feature.gui.tabWidget
-
     @ConfigOption(
         name = "Display",
         desc = "Display the status of pest traps in a GUI element.\nWill take you to Tab Widget Display to enable.",
     )
     @ConfigEditorButton(buttonText = "Go")
-    var displayRunnable = Runnable { tabWidgetConfig::display.jumpToEditor() }
+    var displayRunnable = Runnable { SkyHanniMod.feature.gui.tabWidget::display.jumpToEditor() }
 
     @Expose
     @ConfigOption(name = "Warnings", desc = "")
