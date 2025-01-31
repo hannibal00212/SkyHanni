@@ -624,7 +624,7 @@ object DamageIndicatorManager {
             BossType.SLAYER_ENDERMAN_1,
             BossType.SLAYER_ENDERMAN_2,
             BossType.SLAYER_ENDERMAN_3,
-                -> {
+            -> {
                 val step = maxHealth / 3
                 calcMaxHealth = step
                 if (health > step * 2) {
