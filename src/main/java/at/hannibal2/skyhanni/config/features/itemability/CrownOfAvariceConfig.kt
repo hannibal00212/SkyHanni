@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 
 class CrownOfAvariceConfig {
     @Expose
@@ -41,6 +42,12 @@ class CrownOfAvariceConfig {
     @ConfigOption(name = "Last coins gained", desc = "Shows the amount of scavenger coins gained by last killed mob.")
     @ConfigEditorBoolean
     var coinDiff: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Session Active Timer",
+        desc = "Waits the duration (in seconds) before session statistics are displayed after loading in.")
+    @ConfigEditorSlider(minValue = 0F, maxValue = 10F, minStep = 1F)
+    var sessionActiveTime: Int = 10
 
     @Expose
     @ConfigLink(owner = CrownOfAvariceConfig::class, field = "enable")

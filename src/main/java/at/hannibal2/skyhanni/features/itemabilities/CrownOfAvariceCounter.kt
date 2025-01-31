@@ -39,17 +39,16 @@ object CrownOfAvariceCounter {
     private var display: List<Renderable> = emptyList()
     private val MAX_AVARICE_COINS = 1.billion
     private val MAX_AFK_TIME = 2.minutes
-
     private val isWearingCrown by RecalculatingValue(1.seconds) {
         InventoryUtils.getHelmet()?.getInternalNameOrNull() == internalName
     }
 
-    private var count: Long = 0L
+    private var count: Long? = null
     private var coinsEarned: Long = 0L
-    private var sessionStart = SimpleTimeMark.farPast()
-    private var lastCoinUpdate = SimpleTimeMark.farPast()
-    private val isSessionActive get(): Boolean = sessionStart.passedSince() < 10.seconds
-    private var coinsDifference: Long = 0L
+    private var sessionStart: SimpleTimeMark? = null
+    private var lastCoinUpdate: SimpleTimeMark? = null
+    private val isSessionActive get(): Boolean = sessionStart?.passedSince()?.let { it < config.sessionActiveTime.seconds } ?: false
+    private var coinsDifference: Long? = null
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -72,12 +71,11 @@ object CrownOfAvariceCounter {
         if (item.getInternalNameOrNull() != internalName) return
         val coins = item.getCoinsOfAvarice() ?: return
         if (count == 0L) count = coins
-
-        coinsDifference = coins - count
+        coinsDifference = coins - (count ?: 0)
 
         if (coinsDifference == 0L) return
 
-        if (coinsDifference < 0) {
+        if ((coinsDifference ?: 0) < 0) {
             reset()
             count = coins
             return
@@ -85,7 +83,7 @@ object CrownOfAvariceCounter {
 
         if (isSessionAFK()) reset()
         lastCoinUpdate = SimpleTimeMark.now()
-        coinsEarned += coinsDifference
+        coinsEarned += coinsDifference ?: 0
         count = coins
 
         update()
@@ -94,7 +92,7 @@ object CrownOfAvariceCounter {
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         reset()
-        count = InventoryUtils.getHelmet()?.getCoinsOfAvarice() ?: return
+        count = InventoryUtils.getHelmet()?.getCoinsOfAvarice()
     }
 
     private fun update() {
@@ -104,7 +102,7 @@ object CrownOfAvariceCounter {
     private fun buildList(): List<Renderable> = buildList {
         addLine {
             addItemStack(internalName.getItemStack())
-            addString("§6" + if (config.shortFormat) count.shortFormat() else count.addSeparators())
+            addString("§6" + if (config.shortFormat) count?.shortFormat() else count?.addSeparators())
         }
 
         if (config.perHour) {
@@ -138,16 +136,16 @@ object CrownOfAvariceCounter {
     }
 
     private fun calculateCoinsPerHour(): Double {
-        val timeInHours = sessionStart.passedSince().inPartialHours
+        val timeInHours = sessionStart?.passedSince()?.inPartialHours ?: 0.0
         return if (timeInHours > 0) coinsEarned / timeInHours else 0.0
     }
 
-    private fun isSessionAFK() = lastCoinUpdate.passedSince() > MAX_AFK_TIME
+    private fun isSessionAFK() = lastCoinUpdate?.passedSince()?.let { it > MAX_AFK_TIME } ?: false
 
     private fun calculateTimeUntilMax(): String {
         val coinsPerHour = calculateCoinsPerHour()
         if (coinsPerHour == 0.0) return "Forever..."
-        val timeUntilMax = ((MAX_AVARICE_COINS - count) / coinsPerHour).hours
+        val timeUntilMax = ((MAX_AVARICE_COINS - (count ?: 0)) / coinsPerHour).hours
         return timeUntilMax.format()
     }
 }
