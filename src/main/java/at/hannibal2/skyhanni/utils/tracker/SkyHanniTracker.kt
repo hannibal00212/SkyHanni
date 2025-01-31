@@ -5,13 +5,17 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.RenderData
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchableSelector
 import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -26,6 +30,7 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("TooManyFunctions")
 open class SkyHanniTracker<Data : TrackerData>(
     val name: String,
     private val createNewSession: () -> Data,
@@ -74,6 +79,19 @@ open class SkyHanniTracker<Data : TrackerData>(
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify(mode, modifyFunction)
         update()
+    }
+
+    private fun tryModify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
+        getSharedTracker()?.let {
+            it.tryModify(mode, modifyFunction)
+            update()
+        }
+    }
+
+    fun modifyEachMode(modifyFunction: (Data) -> Unit) {
+        DisplayMode.entries.forEach {
+            tryModify(it, modifyFunction)
+        }
     }
 
     fun renderDisplay(position: Position) {
@@ -203,6 +221,10 @@ open class SkyHanniTracker<Data : TrackerData>(
             get(mode).let(modifyFunction)
         }
 
+        fun tryModify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
+            entries[mode]?.let(modifyFunction)
+        }
+
         fun modify(modifyFunction: (Data) -> Unit) {
             entries.values.forEach(modifyFunction)
         }
@@ -213,6 +235,30 @@ open class SkyHanniTracker<Data : TrackerData>(
             "displayMode" to displayMode,
             "availableModes" to entries.keys,
         )
+    }
+
+    fun handlePossibleRareDrop(internalName: NeuInternalName, amount: Int) {
+        val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
+        if (config.warnings.chat && price >= config.warnings.minimumChat) {
+            ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
+        }
+        if (config.warnings.title && price >= config.warnings.minimumTitle) {
+            LorenzUtils.sendTitle("§a+ $itemName", 5.seconds)
+        }
+    }
+
+    fun addPriceFromButton(lists: MutableList<Searchable>) {
+        if (isInventoryOpen()) {
+            lists.addSearchableSelector<ItemPriceSource>(
+                "",
+                getName = { type -> type.sellName },
+                isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
+                onChange = { entry ->
+                    config.priceSource = entry.let { ItemPriceSource.entries[entry.ordinal] } // todo avoid ordinal
+                    update()
+                },
+            )
+        }
     }
 
     enum class DisplayMode(val displayName: String) {
