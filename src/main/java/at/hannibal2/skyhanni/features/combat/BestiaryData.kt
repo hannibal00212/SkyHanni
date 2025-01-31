@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableHoverableButton
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -348,7 +348,7 @@ object BestiaryData {
     }
 
     private fun MutableList<Renderable>.addButtons() {
-        addRenderableHoverableButton<NumberFormatEntry>(
+        addRenderableButton<NumberFormatEntry>(
             label = "Number Format",
             current = config.numberFormat,
             getName = { it.displayName },
@@ -359,7 +359,7 @@ object BestiaryData {
             universe = NumberFormatEntry.entries,
         )
 
-        addRenderableHoverableButton<DisplayTypeEntry>(
+        addRenderableButton<DisplayTypeEntry>(
             label = "Display Type",
             current = config.displayType,
             getName = { it.displayName },
@@ -371,7 +371,7 @@ object BestiaryData {
         )
 
         // TODO add boolean support
-        addRenderableHoverableButton<NumberType>(
+        addRenderableButton<NumberType>(
             label = "Number Type",
             current = NumberType.entries[if (config.replaceRoman) 0 else 1],
             getName = { it.type },
@@ -382,7 +382,7 @@ object BestiaryData {
             universe = NumberType.entries,
         )
 
-        addRenderableHoverableButton<HideMaxed>(
+        addRenderableButton<HideMaxed>(
             label = "Hide Maxed",
             current = HideMaxed.entries[if (config.hideMaxed) 1 else 0],
             getName = { it.type },

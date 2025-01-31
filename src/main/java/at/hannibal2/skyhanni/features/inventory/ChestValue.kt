@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableHoverableButton
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -148,7 +148,7 @@ object ChestValue {
     // TODO: Avoid Ordinal
     private fun MutableList<Renderable>.addButton() {
 
-        addRenderableHoverableButton<SortingTypeEntry>(
+        addRenderableButton<SortingTypeEntry>(
             label = "Price Sorting",
             current = config.sortingType,
             getName = { it.displayName },
@@ -159,7 +159,7 @@ object ChestValue {
             universe = SortingTypeEntry.entries,
         )
 
-        addRenderableHoverableButton<NumberFormatEntry>(
+        addRenderableButton<NumberFormatEntry>(
             label = "Value Format",
             current = config.formatType,
             getName = { it.displayName },
@@ -171,7 +171,7 @@ object ChestValue {
         )
 
         // TODO boolean support
-        addRenderableHoverableButton<DisplayType>(
+        addRenderableButton<DisplayType>(
             label = "Display Type",
             current = DisplayType.entries[if (config.alignedDisplay) 1 else 0],
             getName = { it.type },

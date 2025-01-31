@@ -98,7 +98,7 @@ internal object RenderableUtils {
         GlStateManager.translate(-1.0, -1.0, 0.0)
     }
 
-    inline fun <T> MutableList<Searchable>.addHoverableButton(
+    inline fun <T> MutableList<Searchable>.addButton(
         label: String,
         current: T,
         crossinline getName: (T) -> String,
@@ -108,8 +108,8 @@ internal object RenderableUtils {
         add(createButtonNew(label, current, getName, onChange, universe))
     }
 
-    // TODO later only use searchable, remove this variant
-    inline fun <T> MutableList<Renderable>.addRenderableHoverableButton(
+    //
+    inline fun <T> MutableList<Renderable>.addRenderableButton(
         label: String,
         current: T,
         crossinline getName: (T) -> String,
