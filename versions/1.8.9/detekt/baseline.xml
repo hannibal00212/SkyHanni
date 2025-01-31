@@ -5,6 +5,10 @@
     <ID>ArrayPrimitive:CropMoneyDisplay.kt$CropMoneyDisplay$Array&lt;Double&gt;</ID>
     <ID>ArrayPrimitive:CropMoneyDisplay.kt$CropMoneyDisplay$arrayOf(npcPrice)</ID>
     <ID>ArrayPrimitive:CropMoneyDisplay.kt$CropMoneyDisplay$arrayOf(sellOffer)</ID>
+    <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$Array&lt;Double&gt;</ID>
+    <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$Array&lt;Float&gt;</ID>
+    <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$arrayOf(x, y, z)</ID>
+    <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$arrayOf(x.toFloat(), y.toFloat(), z.toFloat())</ID>
     <ID>ArrayPrimitive:SkyHanniVec3d.kt$Array&lt;Double&gt;</ID>
     <ID>ArrayPrimitive:SkyHanniVec3d.kt$SkyHanniVec3d$Array&lt;Double&gt;</ID>
     <ID>ArrayPrimitive:SkyHanniVec3d.kt$SkyHanniVec3d$Array&lt;Float&gt;</ID>
@@ -69,6 +73,8 @@
     <ID>NoNameShadowing:Graph.kt$Graph.Companion${ out.name("Tags") out.beginArray() for (tagName in it) { out.value(tagName) } out.endArray() }</ID>
     <ID>NoNameShadowing:HoppityCollectionStats.kt$HoppityCollectionStats${ val displayAmount = it.amount.shortFormat() val operationFormat = when (milestoneType) { HoppityEggType.CHOCOLATE_SHOP_MILESTONE -&gt; "spending" HoppityEggType.CHOCOLATE_FACTORY_MILESTONE -&gt; "reaching" else -&gt; "" // Never happens } // List indexing is weird existingLore[replaceIndex - 1] = "§7Obtained by $operationFormat §6$displayAmount" existingLore[replaceIndex] = "§7all-time §6Chocolate." return existingLore }</ID>
     <ID>NoNameShadowing:HotmData.kt$HotmData.Companion${ it.setCurrent(it.getTotal()) }</ID>
+    <ID>NoNameShadowing:LorenzVec.kt$LorenzVec.Companion$pitch</ID>
+    <ID>NoNameShadowing:LorenzVec.kt$LorenzVec.Companion$yaw</ID>
     <ID>NoNameShadowing:Renderable.kt$Renderable.Companion.&lt;no name provided&gt;$posX</ID>
     <ID>NoNameShadowing:Renderable.kt$Renderable.Companion.&lt;no name provided&gt;$posY</ID>
     <ID>NoNameShadowing:Renderable.kt$Renderable.Companion.&lt;no name provided&gt;${ it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }</ID>
@@ -80,6 +86,7 @@
     <ID>NoNameShadowing:SkyHanniBucketedItemTracker.kt$SkyHanniBucketedItemTracker${ ItemPriceSource.entries[it.ordinal] }</ID>
     <ID>NoNameShadowing:SkyHanniVec3d.kt$SkyHanniVec3d.Companion$pitch</ID>
     <ID>NoNameShadowing:SkyHanniVec3d.kt$SkyHanniVec3d.Companion$yaw</ID>
+    <ID>NoUnusedImports:LorenzVec.kt$at.hannibal2.skyhanni.utils.LorenzVec.kt</ID>
     <ID>RepoPatternRegexTestMissing:AshfangFreezeCooldown.kt$AshfangFreezeCooldown$by RepoPattern.pattern( "ashfang.freeze.cryogenic", "§cAshfang Follower's Cryogenic Blast hit you for .* damage!", )</ID>
     <ID>RepoPatternRegexTestMissing:AuctionsHighlighter.kt$AuctionsHighlighter$by patternGroup.pattern( "auction", "§7(?:Starting bid|Top bid): §6(?&lt;coins&gt;.*) coins" )</ID>
     <ID>RepoPatternRegexTestMissing:AuctionsHighlighter.kt$AuctionsHighlighter$by patternGroup.pattern( "buyitnow", "§7Buy it now: §6(?&lt;coins&gt;.*) coins" )</ID>
@@ -281,6 +288,7 @@
     <ID>TooManyFunctions:ItemResolutionQuery.kt$ItemResolutionQuery</ID>
     <ID>TooManyFunctions:LocationUtils.kt$LocationUtils</ID>
     <ID>TooManyFunctions:LorenzUtils.kt$LorenzUtils</ID>
+    <ID>TooManyFunctions:LorenzVec.kt$LorenzVec</ID>
     <ID>TooManyFunctions:MobFinder.kt$MobFinder</ID>
     <ID>TooManyFunctions:NumberUtil.kt$NumberUtil</ID>
     <ID>TooManyFunctions:RegexUtils.kt$RegexUtils</ID>
