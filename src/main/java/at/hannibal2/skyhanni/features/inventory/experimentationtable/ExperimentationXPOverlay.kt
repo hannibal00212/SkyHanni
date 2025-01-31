@@ -2,10 +2,8 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -16,6 +14,7 @@ import net.minecraft.init.Items
 object ExperimentationXPOverlay {
 
     private val patternGroup = RepoPattern.group("enchanting.experiments")
+
     /**
      * REGEX-TEST: §331k Enchanting Exp
      * REGEX-TEST: §3143k Enchanting Exp
@@ -30,7 +29,7 @@ object ExperimentationXPOverlay {
      */
     private val enchantingXPPattern by patternGroup.pattern(
         "enchantingxp",
-        "§3([\\d.]+)k Enchanting Exp",
+        "§3(?<xp>[\\d.]+)k Enchanting Exp",
     )
 
     @HandleEvent
@@ -39,9 +38,9 @@ object ExperimentationXPOverlay {
         event.stack ?: return
         if (event.stack.item != Items.dye) return
         enchantingXPPattern.matchMatcher(event.stack.displayName) {
-            val text = "${group(1)}k"
+            val text = "${group("xp")}k"
             val stringWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(text)
-            event.drawSlotText(event.x + 2 + stringWidth, event.y + 10, text,.6f)
+            event.drawSlotText(event.x + 2 + stringWidth, event.y + 10, text, .6f)
         }
     }
 
