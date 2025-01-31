@@ -304,9 +304,7 @@ object LorenzUtils {
 
     fun hashAll(vararg objects: Any?): Int {
         var result = 1
-        for (element in objects) {
-            result = 31 * result + element.hashCode()
-        }
+        for (element in objects) result = 31 * result + element.hashCode()
         return result
     }
 }

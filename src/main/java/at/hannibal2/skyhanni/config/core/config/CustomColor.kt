@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.core.config
 
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import java.awt.Color
@@ -30,6 +31,9 @@ class CustomColor {
     fun toColor(): Color = Color(toInt(), true)
 
     val asString get(): String = "$chroma:$alpha:$red:$green:$blue"
+
+    @JvmOverloads
+    constructor(color: LorenzColor, alpha: Int = 255, chroma: Int = 0) : this(color.toColor(), alpha, chroma)
 
     @JvmOverloads
     constructor(color: Color, alpha: Int = color.alpha, chroma: Int = 0) {
@@ -70,7 +74,7 @@ class CustomColor {
         this.chromaSpeed = chromaSpeed(chroma)
     }
 
-    override fun toString(): String = "CustomColor(red=$red, green=$green, blue=$blue, alpha=$alpha, chroma=$chroma)"
+    override fun toString(): String = "CustomColor(chroma=$chroma, alpha=$alpha, red=$red, green=$green, blue=$blue)"
 
     override fun hashCode(): Int = LorenzUtils.hashAll(cachedrgb, chroma)
 
