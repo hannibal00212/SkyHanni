@@ -20,6 +20,7 @@ object AtmosphericFilterDisplay {
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
+        @Suppress("IsInIslandEarlyReturn")
         if (!GardenApi.inGarden() && !config.outsideGarden) return
         display = drawDisplay(SkyblockSeason.currentSeason ?: return)
     }

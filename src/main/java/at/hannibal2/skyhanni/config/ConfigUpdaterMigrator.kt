@@ -12,7 +12,7 @@ import com.google.gson.JsonPrimitive
 object ConfigUpdaterMigrator {
 
     val logger = LorenzLogger("ConfigMigration")
-    const val CONFIG_VERSION = 71
+    const val CONFIG_VERSION = 73
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
@@ -44,6 +44,42 @@ object ConfigUpdaterMigrator {
             move(since, path, path, transform)
         }
 
+        fun add(since: Int, path: String, value: () -> JsonElement) {
+            if (since <= oldVersion) {
+                logger.log("Skipping add of $value to $path ($since <= $oldVersion)")
+                return
+            }
+            if (since > CONFIG_VERSION) {
+                error("Illegally new version $since > $CONFIG_VERSION")
+            }
+            if (since > oldVersion + 1) {
+                logger.log("Skipping add of $value to $path (will be done in another pass)")
+                return
+            }
+            val np = path.split(".")
+            if (np.first().startsWith("#")) {
+                val realPrefixes = dynamicPrefix[np.first()]
+                if (realPrefixes == null) {
+                    logger.log("Could not resolve dynamic prefix $path")
+                    return
+                }
+                for (realPrefix in realPrefixes) {
+                    add(since, "$realPrefix.${path.substringAfter('.')}", value)
+                    return
+                }
+            }
+            val newParentElement = new.at(np.dropLast(1), true)
+            if (newParentElement !is JsonObject) {
+                logger.log(
+                    "Skipping add of $value to $path, since another element already inhabits that path"
+                )
+                return
+            }
+            newParentElement.add(np.last(), value())
+            logger.log("Added element to $path")
+            return
+        }
+
         fun move(since: Int, oldPath: String, newPath: String, transform: (JsonElement) -> JsonElement = { it }) {
             if (since <= oldVersion) {
                 logger.log("Skipping move from $oldPath to $newPath ($since <= $oldVersion)")
@@ -69,7 +105,7 @@ object ConfigUpdaterMigrator {
                     move(
                         since,
                         "$realPrefix.${oldPath.substringAfter('.')}",
-                        "$realPrefix.${newPath.substringAfter('.')}", transform
+                        "$realPrefix.${newPath.substringAfter('.')}", transform,
                     )
                     return
                 }
@@ -83,7 +119,7 @@ object ConfigUpdaterMigrator {
             if (newParentElement !is JsonObject) {
                 logger.log(
                     "Catastrophic: element at path $old could not be relocated to $new, " +
-                        "since another element already inhabits that path"
+                        "since another element already inhabits that path",
                 )
                 return
             }
@@ -140,7 +176,7 @@ object ConfigUpdaterMigrator {
                 JsonObject().also {
                     it.add("lastVersion", JsonPrimitive(i + 1))
                 },
-                i, 0, dynamicPrefix
+                i, 0, dynamicPrefix,
             ).also { it.post() }
             logger.log("Transformations scheduled: ${migration.new}")
             val mergesPerformed = merge(migration.old, migration.new)
