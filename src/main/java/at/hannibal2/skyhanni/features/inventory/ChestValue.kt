@@ -145,9 +145,7 @@ object ChestValue {
         else -> chestItems.values.sortedByDescending { it.total }
     }
 
-    // TODO: Avoid Ordinal
     private fun MutableList<Renderable>.addButton() {
-
         addRenderableButton<SortingTypeEntry>(
             label = "Price Sorting",
             current = config.sortingType,
