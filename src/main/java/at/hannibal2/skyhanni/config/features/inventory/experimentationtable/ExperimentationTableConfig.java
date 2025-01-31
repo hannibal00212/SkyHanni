@@ -47,4 +47,10 @@ public class ExperimentationTableConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean guardianReminder = false;
+
+    @Expose
+    @ConfigOption(name = "Superpairs XP Overlay", desc = "Shows how much XP every pair is worth in superpairs.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean superpairsXPOverlay = true;
 }
