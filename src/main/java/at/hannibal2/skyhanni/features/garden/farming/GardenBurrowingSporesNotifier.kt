@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -10,9 +11,8 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GardenBurrowingSporesNotifier {
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!GardenApi.inGarden()) return
         if (!GardenApi.config.burrowingSporesNotification) return
 
         if (event.message.endsWith("§6§lVERY RARE CROP! §r§f§r§9Burrowing Spores")) {

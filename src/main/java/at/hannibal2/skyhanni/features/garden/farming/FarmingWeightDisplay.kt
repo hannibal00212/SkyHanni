@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -555,7 +557,7 @@ object FarmingWeightDisplay {
         return cropWeight[this] ?: backupCropWeights[this] ?: error("Crop $this not in backupFactors!")
     }
 
-    fun lookUpCommand(it: Array<String>) {
+    private fun lookUpCommand(it: Array<String>) {
         val name = if (it.size == 1) it[0] else LorenzUtils.getPlayerName()
         openWebsite(name, ignoreCooldown = true)
     }
@@ -611,5 +613,14 @@ object FarmingWeightDisplay {
             CropType.COCOA_BEANS to 267_174.04,
             CropType.CACTUS to 177_254.45,
         )
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shfarmingprofile") {
+            description = "Look up the farming profile from yourself or another player on elitebot.dev"
+            category = CommandCategory.USERS_ACTIVE
+            callback { lookUpCommand(it) }
+        }
     }
 }

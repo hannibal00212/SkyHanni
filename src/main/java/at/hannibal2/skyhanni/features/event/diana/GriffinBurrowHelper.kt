@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
@@ -394,7 +396,7 @@ object GriffinBurrowHelper {
 
     private fun isEnabled() = DianaApi.isDoingDiana()
 
-    fun setTestBurrow(strings: Array<String>) {
+    private fun setTestBurrow(strings: Array<String>) {
         if (!IslandType.HUB.isInIsland()) {
             ChatUtils.userError("You can only create test burrows on the hub island!")
             return
@@ -438,5 +440,14 @@ object GriffinBurrowHelper {
         val location = LocationUtils.playerLocation().roundLocation()
         particleBurrows = particleBurrows.editCopy { this[location] = type }
         update()
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtestburrow") {
+            description = "Sets a test burrow waypoint at your location"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { setTestBurrow(it) }
+        }
     }
 }

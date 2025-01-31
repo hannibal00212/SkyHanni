@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotApi.locked
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.uncleared
+import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker.DUNG_ITEM
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -31,6 +32,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -48,6 +50,7 @@ object PestApi {
 
     val config get() = GardenApi.config.pests
     val storage get() = GardenApi.storage
+    private val SPRAYONATOR_ITEM = "SPRAYONATOR".toInternalName()
 
     var scoreboardPests: Int
         get() = storage?.scoreboardPests ?: 0
@@ -55,7 +58,7 @@ object PestApi {
             storage?.scoreboardPests = value
         }
 
-    var lastPestKillTime = SimpleTimeMark.farPast()
+    private var lastPestKillTime = SimpleTimeMark.farPast()
     var lastTimeVacuumHold = SimpleTimeMark.farPast()
 
     // TODO move into repo
@@ -68,8 +71,9 @@ object PestApi {
     )
 
     fun hasVacuumInHand() = InventoryUtils.itemInHandId in vacuumVariants
+    fun hasSprayonatorInHand() = InventoryUtils.itemInHandId == SPRAYONATOR_ITEM
 
-    fun SprayType.getPests() = PestType.entries.filter { it.spray == this }
+    fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }
 
     private val patternGroup = RepoPattern.group("garden.pestsapi")
     private val pestsInScoreboardPattern by patternGroup.pattern(
@@ -199,9 +203,8 @@ object PestApi {
         updatePests()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!GardenApi.inGarden()) return
         if (event.inventoryName != "Configure Plots") return
 
         for (plot in GardenPlotApi.plots) {
@@ -216,9 +219,8 @@ object PestApi {
         updatePests()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (!GardenApi.inGarden()) return
         for (line in event.tabList) {
             infectedPlotsTablistPattern.matchMatcher(line) {
                 val plotList = group("plots").removeColor().split(", ").map { it.toInt() }
@@ -239,17 +241,20 @@ object PestApi {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        if (!GardenApi.inGarden()) return
         if (!firstScoreboardCheck) return
         checkScoreboardLines(event.added)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!GardenApi.inGarden()) return
-        if (pestDeathChatPattern.matches(event.message)) {
+        pestDeathChatPattern.matchMatcher(event.message) {
+            val pest = PestType.getByNameOrNull(group("pest")) ?: return
+            val item = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
+
+            // Field Mice drop 6 separate items, but we only want to count the kill once
+            if (pest == PestType.FIELD_MOUSE && item != DUNG_ITEM) return
             lastPestKillTime = SimpleTimeMark.now()
             removeNearestPest()
             PestKillEvent.post()
@@ -259,9 +264,8 @@ object PestApi {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
-        if (!GardenApi.inGarden()) return
         if (!firstScoreboardCheck && gardenJoinTime.passedSince() > 5.seconds) {
             checkScoreboardLines(ScoreboardData.sidebarLinesFormatted)
             firstScoreboardCheck = true
@@ -277,9 +281,8 @@ object PestApi {
         firstScoreboardCheck = false
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
-        if (!GardenApi.inGarden()) return
         if (event.oldItem !in vacuumVariants) return
         lastTimeVacuumHold = SimpleTimeMark.now()
     }

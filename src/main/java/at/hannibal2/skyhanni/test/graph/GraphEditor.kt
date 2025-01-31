@@ -204,7 +204,7 @@ object GraphEditor {
         if (!isEnabled()) return
         input()
         if (nodes.isEmpty()) return
-        closestNode = nodes.minBy { it.position.distanceSqToPlayer() }
+        closestNode = nodes.minBy { distanceToPlayer(it.position) }
         handleAllNodeFind()
 
     }
@@ -213,7 +213,7 @@ object GraphEditor {
         if (!active) return
 
         if (nodesToFind.isEmpty()) return
-        val closest = nodesToFind.minBy { it.distanceSqToPlayer() }
+        val closest = nodesToFind.minBy { distanceToPlayer(it) }
         if (closest.distanceToPlayer() >= 3) return
         nodesAlreadyFound.add(closest)
 
@@ -272,7 +272,7 @@ object GraphEditor {
             node.position,
             nodeName,
             0.8,
-            ignoreBlocks = seeThroughBlocks || node.position.distanceSqToPlayer() < 100,
+            ignoreBlocks = seeThroughBlocks || distanceToPlayer(node.position) < 100,
             smallestDistanceVew = 12.0,
             ignoreY = true,
             yOff = -15f,
@@ -286,7 +286,7 @@ object GraphEditor {
             node.position,
             tagText,
             0.8,
-            ignoreBlocks = seeThroughBlocks || node.position.distanceSqToPlayer() < 100,
+            ignoreBlocks = seeThroughBlocks || distanceToPlayer(node.position) < 100,
             smallestDistanceVew = 12.0,
             ignoreY = true,
             yOff = 0f,
@@ -496,7 +496,7 @@ object GraphEditor {
                     minimumDistance = distance
                     continue
                 }
-                if (minimumNode == null || minimumNode.position.distanceSqToPlayer() > node.position.distanceSqToPlayer()) {
+                if (minimumNode == null || distanceToPlayer(minimumNode.position) > distanceToPlayer(node.position)) {
                     minimumNode = node
                     minimumDistance = distance
                 }
@@ -632,7 +632,7 @@ object GraphEditor {
 
     private fun addNode() {
         val closestNode = closestNode
-        if (closestNode != null && closestNode.position.distanceSqToPlayer() < 9.0) {
+        if (closestNode != null && distanceToPlayer(closestNode.position) < 9.0) {
             if (closestNode == activeNode) {
                 feedBackInTutorial("Removed node, since you where closer than 3 blocks from a the active node.")
                 nodes.remove(closestNode)
@@ -789,8 +789,9 @@ object GraphEditor {
         ghostPosition = null
     }
 
-    fun LorenzVec.distanceSqToPlayer(): Double {
-        return ghostPosition?.let { distanceSq(it) } ?: distanceSq(LocationUtils.playerLocation())
+    fun distanceToPlayer(location: LorenzVec): Double {
+        val playerPosition = ghostPosition ?: LocationUtils.playerLocation()
+        return location.distanceSq(playerPosition)
     }
 }
 

@@ -27,7 +27,6 @@ enum class MultiVersionStage(val label: String) {
         }
     }
 
-
     companion object {
         lateinit var activeState: MultiVersionStage
         fun initFrom(file: File) {
