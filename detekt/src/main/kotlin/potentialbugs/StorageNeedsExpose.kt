@@ -34,16 +34,19 @@ class StorageNeedsExpose(config: Config): SkyHanniRule(config) {
         if (property.isLocal) return
         // Skip private properties
         if (property.isPrivate()) return
+        // Skip values
+        if (!property.isVar) return
 
         // If the property is not annotated with @Expose, report it
         if (!property.hasAnnotation("Expose")) {
-
             if (property.hasAnnotation("ConfigOption")) {
                 // Valid reasons to not have the @Expose annotation on a config option:
                 //  - Has the ConfigEditorInfoText annotation
                 //  - Has the ConfigEditorButton annotation
+                //  - Has the Transient annotation
                 if(property.hasAnnotation("ConfigEditorInfoText")) return
                 if(property.hasAnnotation("ConfigEditorButton")) return
+                if(property.hasAnnotation("Transient")) return
             }
 
             property.reportIssue("@Expose annotation is missing from property ${property.name}")
