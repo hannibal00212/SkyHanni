@@ -40,6 +40,8 @@ object ItemPriceUtils {
             NeuInternalName.RUBY_CRYSTAL -> return 0.0
             NeuInternalName.SKYBLOCK_COIN -> return 1.0
             NeuInternalName.WISP_POTION -> return 20_000.0
+            NeuInternalName.ENCHANTED_HAY_BLOCK -> return 7_776.0
+            NeuInternalName.TIGHTLY_TIED_HAY_BALE -> return 1_119_744.0
         }
 
         if (priceSource != ItemPriceSource.NPC_SELL) {
@@ -60,7 +62,8 @@ object ItemPriceUtils {
             return 7.0 // NPC price
         }
 
-        return getNpcPriceOrNull() ?: getRawCraftCostOrNull(priceSource, pastRecipes)
+        return getNpcPriceOrNull()
+            ?: getRawCraftCostOrNull(priceSource, pastRecipes).takeUnless { priceSource == ItemPriceSource.NPC_SELL }
     }
 
     fun NeuInternalName.isAuctionHouseItem(): Boolean = getLowestBinOrNull() != null

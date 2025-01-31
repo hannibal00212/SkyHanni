@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
+import at.hannibal2.skyhanni.utils.OSUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
@@ -57,7 +59,7 @@ public class BackgroundConfig {
     @Expose
     @ConfigOption(
         name = "Custom Background Image",
-        desc = "Put that image into a resource pack, using the path \"skyhanni/scoreboard.png\"."
+        desc = "See below on how to add your own custom background."
     )
     @ConfigEditorBoolean
     public boolean useCustomBackgroundImage = false;
@@ -70,11 +72,11 @@ public class BackgroundConfig {
     @ConfigEditorSlider(minValue = 0, maxValue = 100, minStep = 1)
     public int customBackgroundImageOpacity = 100;
 
-    @Expose
     @ConfigOption(
-        name = "Custom Background",
-        desc = "Add an image named \"scoreboard.png\" to your texture pack at \"\\assets\\skyhanni\\scoreboard.png.\" Activate the texture pack in Minecraft, then reload the game."
+        name = "Pack Creator",
+        desc = "Click here to open the background creator. You can use this website to add your own image into as your Scoreboard Background."
     )
-    @ConfigEditorInfoText
-    public String useless;
+    @ConfigEditorButton(buttonText = "Create")
+    public Runnable runnable = () -> OSUtils.openBrowser("https://j10a1n15.github.io/j10a1n15/pages/background.html");
+
 }
