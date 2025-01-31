@@ -1,7 +1,7 @@
 name: Update Config Version
 
 on:
-    pull_request:
+    pull_request_target:
         types:
             - closed  # Only trigger on PR merge
 
