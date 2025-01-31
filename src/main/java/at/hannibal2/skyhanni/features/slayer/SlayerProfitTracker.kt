@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.slayer
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.SlayerApi
@@ -273,5 +275,14 @@ object SlayerProfitTracker {
         }
 
         getTracker()?.resetCommand()
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetslayerprofits") {
+            description = "Resets the total slayer profit for the current slayer type"
+            category = CommandCategory.USERS_RESET
+            callback { resetCommand() }
+        }
     }
 }

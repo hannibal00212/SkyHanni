@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -45,13 +47,13 @@ object AllBurrowsList {
             .take(25).toList()
     }
 
-    fun copyToClipboard() {
+    private fun copyToClipboard() {
         val list = burrowLocations.map { it.printWithAccuracy(0, ":") }
         OSUtils.copyToClipboard(list.joinToString(";"))
         ChatUtils.chat("Saved all ${list.size} burrow locations to clipboard.")
     }
 
-    fun addFromClipboard() {
+    private fun addFromClipboard() {
         SkyHanniMod.coroutineScope.launch {
             val text = OSUtils.readFromClipboard() ?: return@launch
 
@@ -82,6 +84,20 @@ object AllBurrowsList {
 
         for (location in list) {
             event.drawColor(location, LorenzColor.DARK_AQUA)
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shaddfoundburrowlocationsfromclipboard") {
+            description = "Add all ever found burrow locations from clipboard"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { addFromClipboard() }
+        }
+        event.register("shcopyfoundburrowlocations") {
+            description = "Copy all ever found burrow locations to clipboard"
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback { copyToClipboard() }
         }
     }
 

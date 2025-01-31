@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.massconfiguration
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -55,7 +56,7 @@ object DefaultConfigFeatures {
         }
     }
 
-    fun onCommand(args: Array<String>) {
+    private fun onCommand(args: Array<String>) {
         onCommand(
             args.getOrNull(0) ?: "null",
             args.getOrNull(1) ?: "null",
@@ -113,12 +114,21 @@ object DefaultConfigFeatures {
         }
     }
 
-    fun onComplete(strings: Array<String>): List<String> {
+    private fun onComplete(strings: Array<String>): List<String> {
         if (strings.size <= 2)
             return CommandBase.getListOfStringsMatchingLastWord(
                 strings,
                 SkyHanniMod.knownFeaturesData.knownFeatures.keys + listOf("null"),
             )
         return listOf()
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shdefaultoptions") {
+            description = "Select default options"
+            callback { onCommand(it) }
+            autoComplete { onComplete(it) }
+        }
     }
 }

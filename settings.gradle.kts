@@ -5,6 +5,7 @@ pluginManagement {
     includeBuild("sharedVariables")
     repositories {
         mavenCentral()
+        mavenLocal()
         gradlePluginPortal()
         maven("https://oss.sonatype.org/content/repositories/snapshots")
         maven("https://maven.architectury.dev/")

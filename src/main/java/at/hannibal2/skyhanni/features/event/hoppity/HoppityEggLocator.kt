@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -331,7 +333,7 @@ object HoppityEggLocator {
         }
     }
 
-    fun testPathfind(args: Array<String>) {
+    private fun testPathfind(args: Array<String>) {
         val target = args[0].formatInt()
         HoppityEggLocations.apiEggLocations[LorenzUtils.skyBlockIsland]?.let {
             for ((i, location) in it.values.withIndex()) {
@@ -340,6 +342,15 @@ object HoppityEggLocator {
                     return
                 }
             }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtestrabbitpaths") {
+            description = "Tests pathfinding to rabbit eggs. Use a number 0-14."
+            category = CommandCategory.DEVELOPER_TEST
+            callback { testPathfind(it) }
         }
     }
 }
