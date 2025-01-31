@@ -44,8 +44,10 @@ class CrownOfAvariceConfig {
     var coinDiff: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Session Active Timer",
-        desc = "Waits the duration (in seconds) before session statistics are displayed after loading in.")
+    @ConfigOption(
+        name = "Session Active Timer",
+        desc = "Waits the duration (in seconds) before session statistics are displayed after loading in."
+    )
     @ConfigEditorSlider(minValue = 0F, maxValue = 10F, minStep = 1F)
     var sessionActiveTime: Int = 10
 
