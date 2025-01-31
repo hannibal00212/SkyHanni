@@ -93,7 +93,8 @@ object PestTrapFeatures {
 
     private fun generateWarning(reason: WarningReason, data: List<PestTrapData>): Pair<String, GardenPlotApi.Plot?>? {
         val dataSet = data.getTrapReport(reason).takeIfNotEmpty()?.toList() ?: return null
-        return "${reason.warningString}${dataSet.joinPlots()}" to dataSet.firstOrNull()?.plot
+        val plot = GardenPlotApi.getPlotByName(dataSet.firstOrNull()?.plotName ?: return null)
+        return "${reason.warningString}${dataSet.joinPlots()}" to plot
     }
 
     private fun tryWarnChat(finalWarning: String, actionPlot: GardenPlotApi.Plot?) {

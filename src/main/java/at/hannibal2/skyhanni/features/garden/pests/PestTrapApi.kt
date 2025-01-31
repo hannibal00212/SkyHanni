@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataUpdatedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.pestTrapPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
@@ -52,17 +51,15 @@ object PestTrapApi {
         @Expose var name: String? = null,
         @Expose var plotName: String? = null,
         @Expose var location: LorenzVec? = null,
-        @Expose var trapType: PestTrapType? = PestTrapType.PEST_TRAP,
+        @Expose var trapType: PestTrapType = PestTrapType.PEST_TRAP,
         @Expose var pestCount: Int = 0,
-        @Expose var pestType: MutableMap<Int, PestType?> = mutableMapOf(),
+        @Expose var pestType: MutableMap<Int, PestType> = mutableMapOf(),
         @Expose var baitCount: Int = -1,
         @Expose var baitType: SprayType? = null,
     ) {
         val index get() = number - 1
         val isFull get() = pestCount >= MAX_PEST_COUNT_PER_TRAP
         val noBait get() = baitCount == 0
-        val plot get() = plotName?.let { GardenPlotApi.getPlotByName(it) }
-            ?: location?.let { GardenPlotApi.closestPlot(it) }
 
         fun affirmNoPests() {
             pestCount = 0
@@ -126,7 +123,7 @@ object PestTrapApi {
      */
     private val caughtChatPattern by patternGroup.pattern(
         "chat.caught",
-        "(?:§.)+GOTCHA! §7Your traps caught a §.Pest §7in §.Plot (?:§.)+.*(?:§.)+!",
+        "(?:§.)+GOTCHA! §7Your traps caught a §.Pest §7in §.Plot (?:§.)+(?<plot>[^§]*)(?:§.)+!",
     )
 
     /**
@@ -353,7 +350,7 @@ object PestTrapApi {
         val storage = storage ?: return
 
         caughtChatPattern.matchMatcher(event.message) {
-            val plotName = groupOrNull("plot") ?: return
+            val plotName = groupOrNull("plot") ?: return@matchMatcher
             storage.pestTrapStatus.filter {
                 it.plotName == plotName && it.pestCount < MAX_PEST_COUNT_PER_TRAP
             }.onEach {
@@ -365,11 +362,9 @@ object PestTrapApi {
         }
 
         trapRemovedChatPattern.matchMatcher(event.message) {
-            if (lastClickedIndex == -1 || storage.pestTrapStatus.size <= lastClickedIndex) return
-            storage.apply {
-                pestTrapStatus = pestTrapStatus.filterIndexed { index, _ ->
-                    index != lastClickedIndex
-                }.toMutableList()
+            if (lastClickedIndex == -1 || storage.pestTrapStatus.size <= lastClickedIndex) return@matchMatcher
+            storage.pestTrapStatus = storage.pestTrapStatus.toMutableList().apply {
+                removeAt(lastClickedIndex)
             }
         }
     }
