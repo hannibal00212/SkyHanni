@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestTrapConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataUpdatedEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -17,7 +16,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -55,7 +53,7 @@ object PestTrapFeatures {
             nextWarningMark = getNextWarningMark()
         }
         ConditionalUtils.onToggle(config.warningConfig.enabledWarnings) {
-            handleDataUpdate()
+            updateData()
         }
         ConditionalUtils.onToggle(config.warningConfig.warningDisplayType) {
             nextWarningMark = SimpleTimeMark.now() + 5.seconds
@@ -78,34 +76,23 @@ object PestTrapFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPestTrapDataUpdate(event: PestTrapDataUpdatedEvent) {
-        data = event.data.takeIf { it.hash() != lastDataHash } ?: return
-        lastDataHash = data.hash()
-        handleDataUpdate()
+        updateData(event.data)
     }
 
-    @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.GARDEN) return
-        DelayedRun.runDelayed(5.seconds) {
-            data = GardenApi.storage?.pestTrapStatus.orEmpty()
-            lastDataHash = data.hash()
-            handleDataUpdate()
-        }
-    }
+    private fun updateData(passedData: List<PestTrapData>? = GardenApi.storage?.pestTrapStatus) {
+        // Check and update data if hashes are different
+        if (passedData == null || passedData.hashCode() == lastDataHash) return
+        this.data = passedData
+        lastDataHash = passedData.hashCode()
 
-    private fun List<PestTrapData>.hash(): Int = map { data ->
-        data.number to data.pestCount to data.isFull to data.baitCount to data.noBait
-    }.hashCode()
-
-    private fun handleDataUpdate() {
         val warnings = userEnabledWarnings.mapNotNull {
-            val (warning, plot: GardenPlotApi.Plot?) = generateWarning(it, data) ?: return@mapNotNull null
-            warning to plot
+            generateWarning(it, this.data)?.let { (warning, plot) -> warning to plot }
         }
 
         val finalWarning = warnings.joinToString(" §8| ") { it.first }
         val actionPlot = warnings.firstOrNull()?.second
 
+        ChatUtils.chat("Set active warning: $finalWarning")
         activeWarning = finalWarning to actionPlot
     }
 
@@ -115,7 +102,8 @@ object PestTrapFeatures {
 
     private fun generateWarning(reason: WarningReason, data: List<PestTrapData>): Pair<String, GardenPlotApi.Plot?>? {
         val dataSet = data.getTrapReport(reason).takeIfNotEmpty()?.toList() ?: return null
-        val plot = GardenPlotApi.getPlotByName(dataSet.firstOrNull()?.plotName ?: "")
+        ChatUtils.chat("DataSet: $dataSet (reason: $reason)")
+        val plot = GardenPlotApi.getPlotByName(dataSet.firstOrNull()?.plotName.orEmpty())
         return "${reason.warningString}${dataSet.joinPlots()}" to plot
     }
 

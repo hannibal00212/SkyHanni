@@ -9,16 +9,21 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataUpdatedEvent
+import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.pestTrapPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
+import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -27,7 +32,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.common.cache.RemovalCause.EXPIRED
@@ -37,8 +44,10 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C02PacketUseEntity
 import java.util.regex.Matcher
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 private typealias ArmorStandNameChangeEvent = EntityCustomNameUpdateEvent<EntityArmorStand>
@@ -58,7 +67,7 @@ object PestTrapApi {
         @Expose var baitType: SprayType? = null,
     ) {
         val index get() = number - 1
-        val isFull get() = pestCount >= MAX_PEST_COUNT_PER_TRAP
+        val isFull get() = (this.pestCount >= MAX_PEST_COUNT_PER_TRAP)
         val noBait get() = baitCount == 0
 
         fun affirmNoPests() {
@@ -93,6 +102,7 @@ object PestTrapApi {
 
     private val patternGroup = RepoPattern.group("garden.pests.trap")
     private val storage get() = GardenApi.storage
+    private val processedEntities: TimeLimitedSet<Int> = TimeLimitedSet(10.minutes)
 
     // Todo: Use this in the future to yell at the user to enable the widget if it's disabled
     private val widgetEnabledAndVisible: TimeLimitedCache<TabWidget, Boolean> = baseWidgetStatus()
@@ -186,7 +196,10 @@ object PestTrapApi {
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         timeEnteredGarden = when (event.newIsland) {
-            IslandType.GARDEN -> SimpleTimeMark.now()
+            IslandType.GARDEN -> {
+                DelayedRun.runDelayed(5.seconds) { releaseCache() }
+                SimpleTimeMark.now()
+            }
             else -> null
         }
     }
@@ -249,6 +262,11 @@ object PestTrapApi {
         inIndex = -1
     }
 
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onPestUpdate(event: PestUpdateEvent) {
+        releaseCache()
+    }
+
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (inIndex == -1 || !canReleasePest()) return
@@ -261,10 +279,7 @@ object PestTrapApi {
                 if (!stack.canReleaseAll() || !canReleasePest(trap.pestCount)) return
                 val existingPests = PestApi.scoreboardPests.takeIf { it < MAX_RELEASED_PESTS } ?: return
                 val pestsToRelease = min(trap.pestCount, MAX_RELEASED_PESTS - existingPests)
-                @Suppress("UnnecessaryApply")
-                trap.apply {
-                    pestCount -= pestsToRelease
-                }
+                trap.pestCount -= pestsToRelease
             }
 
             else -> return
@@ -292,11 +307,12 @@ object PestTrapApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onEntityChangeName(event: ArmorStandNameChangeEvent) {
-        val entityName = event.entity.name
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
+        val entityName = event.entity.takeIf { !processedEntities.contains(it.entityId) }?.name ?: return
         pestTrapPattern.matchMatcher(entityName) { this.extractPositionNameType(event.entity) }
         entityBaitPattern.matchMatcher(entityName) { this.extractBaitType(event.entity) }
-        entityFullTrapPattern.matchMatcher(entityName) { extractIsFull(event.entity) }
+        entityFullTrapPattern.matchMatcher(entityName) { markTrapFull(event.entity) }
+        processedEntities.add(event.entity.entityId)
     }
 
     private fun Matcher.extractTrapType() = when (groupOrNull("type")?.lowercase()) {
@@ -312,10 +328,12 @@ object PestTrapApi {
         // Provision space for the trap if it doesn't exist
         if (storage.pestTrapStatus.size < number) initializeStorage()
 
-        storage.pestTrapStatus[number - 1].apply {
-            location = entity.getLorenzVec()
-            name = entity.cleanName()
-            trapType = extractTrapType() ?: trapType
+        storage.updatePestTrapStatus { existingData ->
+            existingData[number - 1].apply {
+                location = entity.getLorenzVec()
+                name = entity.cleanName()
+                trapType = extractTrapType() ?: trapType
+            }
         }
     }
 
@@ -326,24 +344,26 @@ object PestTrapApi {
                 entity.getLorenzVec().isBottomToTop(trapLocation)
             } ?: false
         } ?: return
-        val baitString = groupOrNull("bait") ?: run {
-            trap.baitCount = 0
-            return
-        }
+        val baitString = groupOrNull("bait") ?: return trap.affirmNoBait()
         val sprayType = SprayType.getByNameOrNull(baitString) ?: return
         trap.baitType = sprayType
     }
 
-    private fun extractIsFull(entity: EntityArmorStand) {
-        val storage = storage ?: return
-        val trap = storage.pestTrapStatus.firstOrNull { trap ->
-            trap.location?.isBottomToTop(entity.getLorenzVec()) ?: false
-        } ?: return
-        trap.pestCount = MAX_PEST_COUNT_PER_TRAP
+    private fun markTrapFull(entity: EntityArmorStand) = storage?.pestTrapStatus?.firstOrNull { trap ->
+        trap.location?.isBottomToTop(entity.getLorenzVec()) ?: false
+    }?.apply {
+        pestCount = MAX_PEST_COUNT_PER_TRAP
     }
 
-    private fun LorenzVec.isBottomToTop(other: LorenzVec) = (this.y < other.y) &&
-        (this.x == other.x) && (this.z == other.z)
+    private fun LorenzVec.isBottomToTop(other: LorenzVec, epsilon: Double = 1e-2): Boolean {
+        return (this.y < other.y) &&
+            (abs(this.x - other.x) < epsilon) &&
+            (abs(this.z - other.z) < epsilon)
+    }
+
+    private fun ProfileSpecificStorage.GardenStorage.updatePestTrapStatus(
+        operation: (MutableList<PestTrapData>) -> Unit
+    ) = this.apply { operation(pestTrapStatus) }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
@@ -351,20 +371,24 @@ object PestTrapApi {
 
         caughtChatPattern.matchMatcher(event.message) {
             val plotName = groupOrNull("plot") ?: return@matchMatcher
-            storage.pestTrapStatus.filter {
-                it.plotName == plotName && it.pestCount < MAX_PEST_COUNT_PER_TRAP
-            }.onEach {
-                it.pestCount++
-                it.baitCount =
-                    if (it.baitCount == -1) -1
-                    else (it.baitCount - 1).coerceAtLeast(0)
+            val activeTrapNumbers = storage.pestTrapStatus.filter {
+                it.plotName == plotName && !it.isFull && !it.noBait
+            }.takeIfNotEmpty()?.map { it.number }?.toSet() ?: return@matchMatcher
+
+            storage.updatePestTrapStatus { existingData ->
+                existingData.filter { it.number in activeTrapNumbers }.forEach {
+                    it.pestCount++
+                    it.baitCount =
+                        if (it.baitCount == -1) -1
+                        else (it.baitCount - 1).coerceAtLeast(0)
+                }
             }
         }
 
         trapRemovedChatPattern.matchMatcher(event.message) {
             if (lastClickedIndex == -1 || storage.pestTrapStatus.size <= lastClickedIndex) return@matchMatcher
-            storage.pestTrapStatus = storage.pestTrapStatus.toMutableList().apply {
-                removeAt(lastClickedIndex)
+            storage.updatePestTrapStatus { existingData ->
+                existingData.removeAt(lastClickedIndex)
             }
         }
     }
@@ -374,7 +398,7 @@ object PestTrapApi {
         val timeEnteredGarden = timeEnteredGarden ?: return
         if (timeEnteredGarden.passedSince() < 5.seconds) return
         val storage = storage ?: return
-        lastTabHash = event.tabList.sumOf { it.hashCode() }.takeIf { it != lastTabHash } ?: return
+        lastTabHash = event.tabList.hashCode().takeIf { it != lastTabHash } ?: return
 
         for (line in event.tabList) {
             line.updateDataFromTitle(storage)
@@ -394,20 +418,21 @@ object PestTrapApi {
         val thisHash = this@updateDataFromTitle.hashCode().takeIf { it != lastTitleHash } ?: return@matchMatcher
         lastTitleHash = thisHash
 
-        val count = group("count").toIntOrNull() ?: return@matchMatcher
-        val max = group("max").toIntOrNull() ?: return@matchMatcher
+        val count = groupOrNull("count")?.toIntOrNull() ?: return@matchMatcher
+        val max = groupOrNull("max")?.toIntOrNull() ?: return@matchMatcher
 
         MAX_PEST_COUNT_PER_TRAP = max(max, MAX_PEST_COUNT_PER_TRAP)
         val numberToTrack = min(count, MAX_PEST_COUNT_PER_TRAP)
 
-        storage.pestTrapStatus = storage.pestTrapStatus.take(numberToTrack).toMutableList()
+        storage.updatePestTrapStatus { existingData ->
+            existingData.filter { it.number <= numberToTrack }
+        }
     }
 
-    private val trapGroups = listOf("one", "two", "three")
-    private fun Matcher.getTrapIndexSet(): Set<Int>? = trapGroups.map {
-        val trapNumber = groupOrNull(it)?.toIntOrNull() ?: return@map null
-        trapNumber - 1
-    }.takeIf { it.any { group -> group != null } }?.filterNotNull()?.toSet()
+    private fun Matcher.getTrapIndexSet(): Set<Int>? =
+        groupOrNull("traps")?.removeColor()?.replace("#", "")?.split(", ")?.mapNotNull {
+            it.toIntOrNull()
+        }?.takeIfNotEmpty()?.toSet()
 
     private fun String.updateDataFromFull(
         storage: ProfileSpecificStorage.GardenStorage,
@@ -415,10 +440,11 @@ object PestTrapApi {
         widgetEnabledAndVisible[TabWidget.FULL_TRAPS] = true
         lastFullHash = this@updateDataFromFull.hashCode().takeIf { it != lastFullHash } ?: return@matchMatcher
 
-        val fullTraps = getTrapIndexSet()
-        storage.pestTrapStatus.let { data ->
-            if (fullTraps.isNullOrEmpty()) data.filter { it.isFull }.forEach { it.affirmNoPests() }
-            else data.onEachInIndexSet(fullTraps) { pestCount = MAX_PEST_COUNT_PER_TRAP }
+        val fullTraps = this.getTrapIndexSet()
+        ChatUtils.chat("Full traps: $fullTraps")
+        storage.updatePestTrapStatus { existingData ->
+            if (fullTraps.isNullOrEmpty()) existingData.filter { it.isFull }.forEach { it.affirmNoPests() }
+            else existingData.onEachInIndexSet(fullTraps) { affirmNoPests() }
         }
     }
 
@@ -428,10 +454,10 @@ object PestTrapApi {
         widgetEnabledAndVisible[TabWidget.NO_BAIT] = true
         lastNoBaitHash = this@updateDataFromNoBait.hashCode().takeIf { it != lastNoBaitHash } ?: return@matchMatcher
 
-        val noBaitTraps = getTrapIndexSet()
-        storage.pestTrapStatus.let { data ->
-            if (noBaitTraps.isNullOrEmpty()) data.filter { it.noBait }.forEach { it.affirmHasUnknownBait() }
-            else data.onEachInIndexSet(noBaitTraps) { affirmNoBait() }
+        val noBaitTraps = this.getTrapIndexSet()
+        storage.updatePestTrapStatus { existingData ->
+            if (noBaitTraps.isNullOrEmpty()) existingData.filter { it.noBait }.forEach { it.affirmHasUnknownBait() }
+            else existingData.onEachInIndexSet(noBaitTraps) { affirmHasUnknownBait() }
         }
     }
 
