@@ -52,9 +52,9 @@ object VoltHighlighter {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!RiftApi.inRift() || !(config.voltRange || config.voltMoodMeter)) return
+        if (!(config.voltRange || config.voltMoodMeter)) return
         for (entity in getEntities<EntityLivingBase>()) {
             val state = getVoltState(entity)
             if (state == VoltState.NO_VOLT) continue
