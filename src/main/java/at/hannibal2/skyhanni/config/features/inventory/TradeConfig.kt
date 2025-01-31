@@ -9,7 +9,10 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class TradeConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Creates a trade value overlay")
+    @ConfigOption(
+        name = "Enabled",
+        desc = "Displays an overlay showing the total combined value of the items being offered by the other party",
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = false
