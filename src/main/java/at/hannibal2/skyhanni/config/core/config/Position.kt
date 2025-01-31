@@ -213,7 +213,7 @@ class Position @JvmOverloads constructor(
 
     fun setLink(configLink: ConfigLink) {
         try {
-            linkField = configLink.owner.java.getField(configLink.field)
+            linkField = configLink.owner.java.getDeclaredField(configLink.field)
         } catch (e: NoSuchFieldException) {
             ErrorManager.logErrorWithData(
                 FieldNotFoundException(configLink.field, configLink.owner.java),

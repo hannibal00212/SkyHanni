@@ -96,7 +96,6 @@ internal object RenderableUtils {
         GlStateManager.translate(-1.0, -1.0, 0.0)
     }
 
-    // TODO move to RenderableUtils
     inline fun MutableList<Searchable>.addButton(
         prefix: String,
         getName: String,
