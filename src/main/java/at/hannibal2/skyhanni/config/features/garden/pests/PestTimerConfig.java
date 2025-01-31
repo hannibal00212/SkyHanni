@@ -28,6 +28,14 @@ public class PestTimerConfig {
 
     @Expose
     @ConfigOption(
+        name = "Only With Farming Tool",
+        desc = "Only show the display when holding a farming tool in hand."
+    )
+    @ConfigEditorBoolean
+    public boolean onlyWithFarmingTool = true;
+
+    @Expose
+    @ConfigOption(
         name = "Only With Vacuum",
         desc = "Only show the time while holding a vacuum in the hand."
     )

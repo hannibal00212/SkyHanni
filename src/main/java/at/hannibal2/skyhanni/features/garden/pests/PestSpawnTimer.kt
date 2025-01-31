@@ -129,7 +129,7 @@ object PestSpawnTimer {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (config.onlyWithVacuum && !PestApi.hasVacuumInHand()) return
+        if ((config.onlyWithVacuum && !PestApi.hasVacuumInHand()) && (config.onlyWithFarmingTool && !GardenApi.hasFarmingToolInHand())) return
 
         config.position.renderRenderables(drawDisplay(), posLabel = "Pest Spawn Timer")
     }
@@ -161,13 +161,13 @@ object PestSpawnTimer {
     private fun shouldSetCooldown(tabCooldownEnd: SimpleTimeMark, minutes: Int?, seconds: Int?): Boolean {
 
         // tablist can have up to 6 seconds of delay, besides this, there is no scenario where tablist will overestimate cooldown
-        if (tabCooldownEnd > ((pestCooldownEndTime ?: SimpleTimeMark.now()) + 6.seconds)) return true
+        if (tabCooldownEnd > ((pestCooldownEndTime) + 6.seconds)) return true
 
         // tablist sometimes rounds down to nearest min
-        if ((tabCooldownEnd + 1.minutes) < (pestCooldownEndTime ?: SimpleTimeMark.now()) && seconds == null) return true
+        if ((tabCooldownEnd + 1.minutes) < (pestCooldownEndTime) && seconds == null) return true
 
         // tablist shouldn't underestimate if it is displaying seconds
-        if ((tabCooldownEnd + 1.seconds) < (pestCooldownEndTime ?: SimpleTimeMark.now()) && seconds != null) return true
+        if ((tabCooldownEnd + 1.seconds) < (pestCooldownEndTime) && seconds != null) return true
 
         return false
     }
