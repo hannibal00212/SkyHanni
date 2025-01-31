@@ -359,7 +359,6 @@ object BestiaryData {
             universe = NumberFormatEntry.entries,
         )
 
-
         addRenderableHoverableButton<DisplayTypeEntry>(
             label = "Display Type",
             current = config.displayType,

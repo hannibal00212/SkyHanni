@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addButton
 import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -31,6 +30,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableHoverableButton
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -147,31 +147,39 @@ object ChestValue {
 
     // TODO: Avoid Ordinal
     private fun MutableList<Renderable>.addButton() {
-        addButton(
-            prefix = "§7Sorted By: ",
-            getName = SortType.entries[config.sortingType.ordinal].longName,
+
+        addRenderableHoverableButton<SortingTypeEntry>(
+            label = "Price Sorting",
+            current = config.sortingType,
+            getName = { it.displayName },
             onChange = {
-                config.sortingType = SortingTypeEntry.entries[(config.sortingType.ordinal + 1) % 2]
+                config.sortingType = it
                 update()
             },
+            universe = SortingTypeEntry.entries,
         )
 
-        addButton(
-            prefix = "§7Value format: ",
-            getName = FormatType.entries[config.formatType.ordinal].type,
+        addRenderableHoverableButton<NumberFormatEntry>(
+            label = "Value Format",
+            current = config.formatType,
+            getName = { it.displayName },
             onChange = {
-                config.formatType = NumberFormatEntry.entries[(config.formatType.ordinal + 1) % 2]
+                config.formatType = it
                 update()
             },
+            universe = NumberFormatEntry.entries,
         )
 
-        addButton(
-            prefix = "§7Display Type: ",
-            getName = DisplayType.entries[if (config.alignedDisplay) 1 else 0].type,
+        // TODO boolean support
+        addRenderableHoverableButton<DisplayType>(
+            label = "Display Type",
+            current = DisplayType.entries[if (config.alignedDisplay) 1 else 0],
+            getName = { it.type },
             onChange = {
                 config.alignedDisplay = !config.alignedDisplay
                 update()
             },
+            universe = DisplayType.entries,
         )
     }
 
@@ -219,16 +227,6 @@ object ChestValue {
             NumberFormatEntry.LONG -> this.addSeparators()
             else -> "0"
         }
-    }
-
-    enum class SortType(val shortName: String, val longName: String) {
-        PRICE_DESC("Price D", "Price Descending"),
-        PRICE_ASC("Price A", "Price Ascending"),
-    }
-
-    enum class FormatType(val type: String) {
-        SHORT("Formatted"),
-        LONG("Unformatted"),
     }
 
     enum class DisplayType(val type: String) {
