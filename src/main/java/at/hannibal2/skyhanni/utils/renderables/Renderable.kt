@@ -784,6 +784,47 @@ interface Renderable {
             }
         }
 
+        fun progressBarMultipleColors(
+            percent: Double,
+            colorRanges: List<ColorUtils.ColorRange>,
+            width: Int = 182,
+            height: Int = 5,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = width
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            private val progress = (percent * width).toInt()
+
+            override fun render(posX: Int, posY: Int) {
+                Gui.drawRect(posX, posY, posX + width, posY + height, 0xFF43464B.toInt())
+                Gui.drawRect(posX + 1, posY + 1, posX + width - 1, posY + height - 1, Color.GRAY.darker(0.2).rgb)
+
+                var currentWidth = 1
+                for (range in colorRanges) {
+                    if (range.isChroma) ChromaShaderManager.begin(ChromaType.STANDARD)
+
+                    val rangeStart = (range.startPercent * (width - 1)).toInt()
+                    val rangeEnd = (range.endPercent * (width - 1)).toInt()
+                    if (currentWidth >= progress) break
+
+                    val drawStart = maxOf(currentWidth, rangeStart)
+                    val drawEnd = minOf(rangeEnd, progress)
+
+                    if (drawStart < drawEnd) {
+                        Gui.drawRect(posX + drawStart, posY + 1, posX + drawEnd, posY + height - 1, range.color.rgb)
+                    }
+                    currentWidth = drawEnd
+
+                    if (range.isChroma) ChromaShaderManager.end()
+                }
+            }
+        }
+
+
         // TODO use this to render current boosted crop in next jacob contest crops
         fun Renderable.renderBounds(color: Color = LorenzColor.GREEN.toColor().addAlpha(100)) = object : Renderable {
             override val width = this@renderBounds.width

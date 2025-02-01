@@ -54,4 +54,11 @@ object ColorUtils {
     fun Color.addAlpha(alpha: Int): Color = Color(red, green, blue, alpha)
 
     fun getColorFromHex(hex: String): Int = runCatching { Color(Integer.decode(hex)) }.getOrNull()?.rgb ?: 0
+
+    data class ColorRange(
+        val startPercent: Double,
+        val endPercent: Double,
+        val color: Color,
+        val isChroma: Boolean = false,
+    )
 }
