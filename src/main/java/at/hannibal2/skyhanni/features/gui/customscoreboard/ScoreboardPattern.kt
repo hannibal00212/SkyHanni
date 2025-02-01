@@ -643,7 +643,7 @@ object ScoreboardPattern {
         "anniversary",
         "(?:§d\\d+(?:st|nd|rd|th) Anniversary|§bCentury Raffle)§f (?:\\d|:)+",
     )
-    /
+
     /**
      * REGEX-TEST: §bCentury Raffle§f 124:00:00
      * To fix custom scoreboard erroring every second
