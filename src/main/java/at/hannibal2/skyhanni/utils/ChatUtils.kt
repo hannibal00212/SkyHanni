@@ -1,11 +1,16 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.ChatManager.deleteChatLine
+import at.hannibal2.skyhanni.data.ChatManager.editChatLine
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.chat.Text.command
@@ -16,6 +21,7 @@ import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.chat.Text.url
 import at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.ChatLine
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.IChatComponent
@@ -257,6 +263,42 @@ object ChatUtils {
         chat(Text.join(components).prefix(msgPrefix))
     }
 
+    private val chatGui get() = Minecraft.getMinecraft().ingameGUI.chatGUI
+
+    var chatLines: MutableList<ChatLine>
+        get() = (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni
+        set(value) {
+            (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni = value
+        }
+
+    var drawnChatLines: MutableList<ChatLine>
+        get() = (chatGui as AccessorMixinGuiNewChat).drawnChatLines_skyhanni
+        set(value) {
+            (chatGui as AccessorMixinGuiNewChat).drawnChatLines_skyhanni = value
+        }
+
+    /** Edits the first message in chat that matches the given [predicate] to the new [component]. */
+    fun editFirstMessage(
+        component: (IChatComponent) -> IChatComponent,
+        reason: String,
+        predicate: (ChatLine) -> Boolean
+    ) {
+        chatLines.editChatLine(component, predicate, reason)
+        chatGui.refreshChat()
+    }
+
+    /**
+     * Deletes a maximum of [amount] messages in chat that match the given [predicate].
+     */
+    fun deleteMessage(
+        reason: String,
+        amount: Int = 1,
+        predicate: (ChatLine) -> Boolean
+    ) {
+        chatLines.deleteChatLine(amount, reason, predicate)
+        chatGui.refreshChat()
+    }
+
     private var lastMessageSent = SimpleTimeMark.farPast()
     private val sendQueue: Queue<String> = LinkedList()
     private val messageDelay = 300.milliseconds
@@ -329,5 +371,9 @@ object ChatUtils {
             replaceSameMessage = true,
         )
     }
+
+    val ChatLine.message get() = chatComponent.formattedText.stripHypixelMessage()
+
+    fun ChatLine.passedSinceSent() = (Minecraft.getMinecraft().ingameGUI.updateCounter - updatedCounter).ticks
 
 }

@@ -30,7 +30,7 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
         result.actionReason?.let { fontRenderer().getStringWidth(it) } ?: 0
 
     private val historySize =
-        history.sumOf { splitLine(it.message).size * 10 + if (it.modified != null) splitLine(it.modified).size * 10 else 0 }
+        history.sumOf { splitLine(it.message).size * 10 + (it.modified?.let { mod -> splitLine(mod).size * 10 } ?: 0) }
 
     override fun drawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
         super.drawScreen(originalMouseX, originalMouseY, partialTicks)
@@ -55,14 +55,14 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
                 msg.message,
                 ChatManager.ActionKind.maxLength + reasonMaxLength + 10,
             )
-            if (msg.modified != null) {
+            msg.modified?.let {
                 drawString(
                     fontRenderer(),
                     "§e§lNEW TEXT",
-                    0, 0, -1,
+                    0, size * 10, -1,
                 )
                 size += drawMultiLineText(
-                    msg.modified,
+                    it,
                     ChatManager.ActionKind.maxLength + reasonMaxLength + 10,
                 )
             }

@@ -509,7 +509,13 @@ object StringUtils {
 
     fun IChatComponent.contains(string: String): Boolean = formattedText.contains(string)
 
-    fun String.width(): Int = Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
+    fun String.width(): Int {
+        return Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
+    }
+
+    private val vowels = "aeiouAEIOU".toSet()
+
+    fun Char.isVowel(): Boolean = this in vowels
 
     fun String.lastColorCode(): String? = minecraftColorCodesPattern.findAll(this).lastOrNull()
 

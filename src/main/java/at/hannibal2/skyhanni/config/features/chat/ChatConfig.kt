@@ -34,6 +34,11 @@ class ChatConfig {
     var soundResponse: ChatSoundResponseConfig = ChatSoundResponseConfig()
 
     @Expose
+    @ConfigOption(name = "Rare Drop Messages", desc = "")
+    @Accordion
+    var rareDropMessages: RareDropMessagesConfig = RareDropMessagesConfig()
+
+    @Expose
     @ConfigOption(name = "Dungeon Filters", desc = "Hide specific message types in Dungeons.")
     @ConfigEditorDraggableList
     var dungeonFilteredMessageTypes: MutableList<DungeonMessageTypes> = mutableListOf()
