@@ -73,7 +73,7 @@ public class PestTimerConfig {
 
     @Expose
     @ConfigOption(
-        name = "Pest Cooldown Over Warning",
+        name = "Pest Cooldown Warning",
         desc = "Warn when pest cooldown is over."
     )
     @ConfigEditorBoolean
@@ -90,8 +90,8 @@ public class PestTimerConfig {
 
     @Expose
     @ConfigOption(
-        name = "Average Pest Spawn Time AFK Timeout",
-        desc = "Don't include pest spawn times where the player goes AFK for at least this many seconds."
+        name = "AFK Timeout",
+        desc = "Don't include spawn time in average spawn time display when the player goes AFK for at least this many seconds"
     )
     @ConfigEditorSlider(minValue = 5, maxValue = 300, minStep = 1)
     public int averagePestSpawnTimeout = 30;
@@ -99,7 +99,7 @@ public class PestTimerConfig {
     @Expose
     @ConfigOption(
         name = "Pest Spawn Time Chat Message",
-        desc = "When a pest spawns, send the time it took to spawn it."
+        desc = "When a pest spawns, send the time it took to spawn it in chat."
     )
     @ConfigEditorBoolean
     public boolean pestSpawnChatMessage = false;
