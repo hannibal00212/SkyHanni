@@ -121,7 +121,7 @@ enum class ElectionCandidate(
 
     companion object {
 
-        fun getMayorFromName(name: String): ElectionCandidate? = entries.firstOrNull { it.mayorName == name }
+        fun getMayorFromName(name: String): ElectionCandidate? = entries.firstOrNull { it.mayorName == name || it.name == name }
 
         fun getMayorFromPerk(perk: Perk): ElectionCandidate? = entries.firstOrNull { it.perks.contains(perk) }
 

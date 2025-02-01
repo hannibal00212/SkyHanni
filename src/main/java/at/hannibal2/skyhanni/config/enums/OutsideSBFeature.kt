@@ -20,6 +20,7 @@ enum class OutsideSBFeature(private val displayName: String) {
     HIGHLIGHT_PARTY_MEMBERS("Highlight Party Members"),
     MOVEMENT_SPEED("Movement Speed"),
     CUSTOM_SCOREBOARD("Custom Scoreboard (only on Hypixel)"),
+    MAYOR_OVERLAY("Mayor Overlay"),
     MINING_EVENT_DISPLAY("Mining Event Display"),
     ;
 
