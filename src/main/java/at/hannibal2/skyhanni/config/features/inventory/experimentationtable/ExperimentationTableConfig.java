@@ -34,7 +34,7 @@ public class ExperimentationTableConfig {
     @ConfigOption(name = "Superpairs Clicks Alert", desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean superpairsClicksAlert = false;
+    public boolean superpairsClicksAlert = true;
 
     @Expose
     @ConfigOption(name = "ULTRA-RARE Book Alert", desc = "Send a chat message, title and sound when you find an ULTRA-RARE book.")
@@ -47,4 +47,10 @@ public class ExperimentationTableConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean guardianReminder = false;
+
+    @Expose
+    @ConfigOption(name = "Superpairs XP Overlay", desc = "Shows how much XP every pair is worth in superpairs.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean superpairsXPOverlay = true;
 }
