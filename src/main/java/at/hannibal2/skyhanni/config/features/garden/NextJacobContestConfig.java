@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.features.garden.CropType;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
@@ -36,6 +37,16 @@ public class NextJacobContestConfig {
     @ConfigOption(name = "Fetch Contests", desc = "Automatically fetch Contests from elitebot.dev for the current year if they're uploaded already.")
     @ConfigEditorBoolean
     public boolean fetchAutomatically = true;
+
+    @Expose
+    @ConfigOption(name = "Alternative Boosted Highlight", desc = "Highlight the current boosted crop with an highlight in addition to the enchant glint.")
+    @ConfigEditorBoolean
+    public boolean differentBoostedHighlight = false;
+
+    @Expose
+    @ConfigOption(name = "Alternative Boosted Highlight Color", desc = "Set the color of the highlight for the current boosted crop.")
+    @ConfigEditorColour
+    public String differentBoostedHighlightColor = "0:80:0:255:0";
 
     @Expose
     @ConfigOption(name = "Share Contests", desc = "Share the list of upcoming Contests to elitebot.dev for everyone else to then fetch automatically.")
