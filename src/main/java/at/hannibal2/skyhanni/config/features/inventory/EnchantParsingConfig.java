@@ -91,4 +91,9 @@ public class EnchantParsingConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public Property<Boolean> hideEnchantDescriptions = Property.of(false);
+
+    @Expose
+    @ConfigOption(name = "Stacking Enchant Progress", desc = "Shows the stacking enchant progress at the bottom of the lore.")
+    @ConfigEditorBoolean
+    public boolean stackingEnchantProgress = true;
 }
