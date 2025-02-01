@@ -105,6 +105,18 @@ formatting:
         maxLineLength: 140
     Wrapping:
         maxLineLength: 140
+    allowExplicitReturnType:
+        active: true
+        includePublic: true
+        includePrivate: false
+        includeProtected: false
+        includeInternal: false
+    VarCouldBeVal: #
+        active: true
+        ignoreInConstructors: false # Set to true if you want to skip constructor parameters.
+        ignoreInLambdaParameters: false # Set to true if you want to skip lambda parameters.
+        ignoreInAnonymousObjects: false # Set to true if you want to skip anonymous object members.
+
 
 complexity:
     CyclomaticComplexMethod: # default threshold of 15, caught almost every complex method
