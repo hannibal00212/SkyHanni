@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
+import at.hannibal2.skyhanni.features.garden.pests.PesthunterProfit
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPrice
@@ -182,7 +183,8 @@ object GardenApi {
         ChocolateShopPrice.inInventory ||
         ChocolateFactoryApi.inChocolateFactory ||
         ChocolateFactoryApi.chocolateFactoryPaused ||
-        HoppityCollectionStats.inInventory
+        HoppityCollectionStats.inInventory ||
+        PesthunterProfit.isInInventory()
 
     fun resetCropSpeed() {
         storage?.cropsPerSecond?.clear()

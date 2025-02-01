@@ -40,4 +40,9 @@ public class PestsConfig {
     @Accordion
     @Expose
     public StereoHarmonyConfig stereoHarmony = new StereoHarmonyConfig();
+
+    @ConfigOption(name = "Pesthunter Profit Display", desc = "")
+    @Accordion
+    @Expose
+    public PesthunterShopConfig pesthunterShop = new PesthunterShopConfig();
 }
