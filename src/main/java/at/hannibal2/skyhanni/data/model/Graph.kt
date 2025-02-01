@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.GsonBuilder
@@ -78,7 +78,7 @@ value class Graph(
                 while (reader.hasNext()) {
                     val id = reader.nextName().toInt()
                     reader.beginObject()
-                    var position: LorenzVec? = null
+                    var position: SkyHanniVec3d? = null
                     var name: String? = null
                     var tags = emptyList<String>()
                     val neighbors = mutableListOf<Pair<Int, Double>>()
@@ -90,7 +90,7 @@ value class Graph(
                         when (reader.nextName()) {
                             "Position" -> {
                                 position = reader.nextString().split(":").let { parts ->
-                                    LorenzVec(parts[0].toDouble(), parts[1].toDouble(), parts[2].toDouble())
+                                    SkyHanniVec3d(parts[0].toDouble(), parts[1].toDouble(), parts[2].toDouble())
                                 }
                             }
 
@@ -145,7 +145,7 @@ value class Graph(
 }
 
 // The node object that gets parsed from/to json
-class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null, val tagNames: List<String> = emptyList()) {
+class GraphNode(val id: Int, val position: SkyHanniVec3d, val name: String? = null, val tagNames: List<String> = emptyList()) {
 
     val tags: List<GraphNodeTag> by lazy {
         tagNames.mapNotNull { GraphNodeTag.byId(it) }

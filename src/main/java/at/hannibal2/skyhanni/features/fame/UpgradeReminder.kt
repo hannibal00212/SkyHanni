@@ -17,12 +17,12 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
@@ -200,7 +200,7 @@ object UpgradeReminder {
                     HypixelCommands.warp("hub")
                     EntityMovementData.onNextTeleport(IslandType.HUB) {
                         IslandGraphs.pathFind(
-                            LorenzVec(-2.6, 73.0, -101.6),
+                            SkyHanniVec3d(-2.6, 73.0, -101.6),
                             "§eCommunity Shop",
                             condition = { config.accountUpgradeReminder },
                         )

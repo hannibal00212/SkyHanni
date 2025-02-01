@@ -5,11 +5,15 @@
     <ID>ArrayPrimitive:CropMoneyDisplay.kt$CropMoneyDisplay$Array&lt;Double&gt;</ID>
     <ID>ArrayPrimitive:CropMoneyDisplay.kt$CropMoneyDisplay$arrayOf(npcPrice)</ID>
     <ID>ArrayPrimitive:CropMoneyDisplay.kt$CropMoneyDisplay$arrayOf(sellOffer)</ID>
-    <ID>ArrayPrimitive:LorenzVec.kt$Array&lt;Double&gt;</ID>
     <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$Array&lt;Double&gt;</ID>
     <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$Array&lt;Float&gt;</ID>
     <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$arrayOf(x, y, z)</ID>
     <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$arrayOf(x.toFloat(), y.toFloat(), z.toFloat())</ID>
+    <ID>ArrayPrimitive:SkyHanniVec3d.kt$Array&lt;Double&gt;</ID>
+    <ID>ArrayPrimitive:SkyHanniVec3d.kt$SkyHanniVec3d$Array&lt;Double&gt;</ID>
+    <ID>ArrayPrimitive:SkyHanniVec3d.kt$SkyHanniVec3d$Array&lt;Float&gt;</ID>
+    <ID>ArrayPrimitive:SkyHanniVec3d.kt$SkyHanniVec3d$arrayOf(x, y, z)</ID>
+    <ID>ArrayPrimitive:SkyHanniVec3d.kt$SkyHanniVec3d$arrayOf(x.toFloat(), y.toFloat(), z.toFloat())</ID>
     <ID>CyclomaticComplexMethod:AdvancedPlayerList.kt$AdvancedPlayerList$fun newSorting(original: List&lt;String&gt;): List&lt;String&gt;</ID>
     <ID>CyclomaticComplexMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun calculateMoneyPerHour(debugList: MutableList&lt;List&lt;Any&gt;&gt;): Map&lt;NeuInternalName, Array&lt;Double&gt;&gt;</ID>
     <ID>CyclomaticComplexMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>
@@ -80,6 +84,9 @@
     <ID>NoNameShadowing:RepoPatternManager.kt$RepoPatternManager${ it == '.' }</ID>
     <ID>NoNameShadowing:Shimmy.kt$Shimmy.Companion$source</ID>
     <ID>NoNameShadowing:SkyHanniBucketedItemTracker.kt$SkyHanniBucketedItemTracker${ ItemPriceSource.entries[it.ordinal] }</ID>
+    <ID>NoNameShadowing:SkyHanniVec3d.kt$SkyHanniVec3d.Companion$pitch</ID>
+    <ID>NoNameShadowing:SkyHanniVec3d.kt$SkyHanniVec3d.Companion$yaw</ID>
+    <ID>NoUnusedImports:LorenzVec.kt$at.hannibal2.skyhanni.utils.LorenzVec.kt</ID>
     <ID>RepoPatternRegexTestMissing:AshfangFreezeCooldown.kt$AshfangFreezeCooldown$by RepoPattern.pattern( "ashfang.freeze.cryogenic", "§cAshfang Follower's Cryogenic Blast hit you for .* damage!", )</ID>
     <ID>RepoPatternRegexTestMissing:AuctionsHighlighter.kt$AuctionsHighlighter$by patternGroup.pattern( "auction", "§7(?:Starting bid|Top bid): §6(?&lt;coins&gt;.*) coins" )</ID>
     <ID>RepoPatternRegexTestMissing:AuctionsHighlighter.kt$AuctionsHighlighter$by patternGroup.pattern( "buyitnow", "§7Buy it now: §6(?&lt;coins&gt;.*) coins" )</ID>
@@ -146,7 +153,7 @@
     <ID>RepoPatternRegexTestMissing:GardenLevelDisplay.kt$GardenLevelDisplay$by patternGroup.pattern( "inventory.levelprogress", "§7Progress to Level (?&lt;currentLevel&gt;[^:]*).*", )</ID>
     <ID>RepoPatternRegexTestMissing:GardenLevelDisplay.kt$GardenLevelDisplay$by patternGroup.pattern( "inventory.nextxp", ".* §e(?&lt;nextLevelExp&gt;.*)§6/.*", )</ID>
     <ID>RepoPatternRegexTestMissing:GardenLevelDisplay.kt$GardenLevelDisplay$by patternGroup.pattern( "inventory.overflow", ".*§r §6(?&lt;overflow&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTestMissing:GardenPlotApi.kt$GardenPlotApi$by patternGroup.pattern( "spray.target", "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?&lt;plot&gt;.*) §r§7with §r§a(?&lt;spray&gt;.*)§r§7!" )</ID>
+    <ID>RepoPatternRegexTestMissing:GardenPlotApi.kt$GardenPlotApi$by patternGroup.pattern( "spray.target", "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?&lt;plot&gt;.*) §r§7with §r§a(?&lt;spray&gt;.*)§r§7!", )</ID>
     <ID>RepoPatternRegexTestMissing:GlacitePowderFeatures.kt$GlacitePowderFeatures$by patternGroup.pattern( "glacitepowder", "Glacite Powder x(?&lt;amount&gt;.*)" )</ID>
     <ID>RepoPatternRegexTestMissing:HighlightPlaceableNpcs.kt$HighlightPlaceableNpcs$by patternGroup.pattern( "location", "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]", )</ID>
     <ID>RepoPatternRegexTestMissing:HotmData.kt$HotmData.Companion$by patternGroup.pattern( "mayhem", "§b§lMAYHEM! §r§7(?&lt;perk&gt;.*)", )</ID>
@@ -216,8 +223,8 @@
     <ID>RepoPatternRegexTestMissing:TestCopyBestiaryValues.kt$TestCopyBestiaryValues$by RepoPattern.pattern( "test.bestiary.type", "\\[Lv(?&lt;lvl&gt;.*)] (?&lt;text&gt;.*)" )</ID>
     <ID>RepoPatternRegexTestMissing:TestCopyRngMeterValues.kt$TestCopyRngMeterValues$by patternGroup.pattern( "dungeon", "§7Dungeon Score: §d.*§5/§d(?&lt;xp&gt;.*)" )</ID>
     <ID>RepoPatternRegexTestMissing:TestCopyRngMeterValues.kt$TestCopyRngMeterValues$by patternGroup.pattern( "slayer", "§7Slayer XP: §d.*§5/§d(?&lt;xp&gt;.*)" )</ID>
-    <ID>RepoPatternRegexTestMissing:TotemOfCorruption.kt$TotemOfCorruption$by patternGroup.pattern( "owner", "§7Owner: §e(?&lt;owner&gt;.+)" )</ID>
-    <ID>RepoPatternRegexTestMissing:TotemOfCorruption.kt$TotemOfCorruption$by patternGroup.pattern( "timeremaining", "§7Remaining: §e(?:(?&lt;min&gt;\\d+)m )?(?&lt;sec&gt;\\d+)s" )</ID>
+    <ID>RepoPatternRegexTestMissing:TotemOfCorruption.kt$TotemOfCorruption$by patternGroup.pattern( "owner", "§7Owner: §e(?&lt;owner&gt;.+)", )</ID>
+    <ID>RepoPatternRegexTestMissing:TotemOfCorruption.kt$TotemOfCorruption$by patternGroup.pattern( "timeremaining", "§7Remaining: §e(?:(?&lt;min&gt;\\d+)m )?(?&lt;sec&gt;\\d+)s", )</ID>
     <ID>RepoPatternRegexTestMissing:TrophyFishMessages.kt$TrophyFishMessages$by RepoPattern.pattern( "fishing.trophy.trophyfish", "§6§lTROPHY FISH! §r§bYou caught an? §r(?&lt;displayName&gt;§[0-9a-f](?:§k)?[\\w -]+) §r(?&lt;displayRarity&gt;§[0-9a-f]§l\\w+)§r§b\\." )</ID>
     <ID>RepoPatternRegexTestMissing:TunnelsMaps.kt$TunnelsMaps$by RepoPattern.pattern( "mining.commisson.collector", "§9(?&lt;what&gt;\\w+(?: \\w+)?) Collector", )</ID>
     <ID>RepoPatternRegexTestMissing:TunnelsMaps.kt$TunnelsMaps$by RepoPattern.pattern( "mining.commisson.collector.invalid", "Glacite|Scrap", )</ID>
@@ -287,6 +294,7 @@
     <ID>TooManyFunctions:RegexUtils.kt$RegexUtils</ID>
     <ID>TooManyFunctions:RenderUtils.kt$RenderUtils</ID>
     <ID>TooManyFunctions:SkyBlockItemModifierUtils.kt$SkyBlockItemModifierUtils</ID>
+    <ID>TooManyFunctions:SkyHanniVec3d.kt$SkyHanniVec3d</ID>
     <ID>TooManyFunctions:StringUtils.kt$StringUtils</ID>
     <ID>UnsafeCallOnNullableType:BucketedItemTrackerData.kt$BucketedItemTrackerData$it.value[internalName]?.hidden!!</ID>
     <ID>UnsafeCallOnNullableType:ChatHoverEvent.kt$ChatHoverEvent$component.chatStyle.chatHoverEvent!!</ID>
@@ -376,7 +384,7 @@
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt$VisitorRewardWarning$visitor.totalReward!!</ID>
     <ID>UnusedParameter:SkyHanniDebugsAndTests.kt$SkyHanniDebugsAndTests$args: Array&lt;String&gt;</ID>
     <ID>UseIsNullOrEmpty:ItemUtils.kt$ItemUtils$name == null || name.isEmpty()</ID>
-    <ID>VarCouldBeVal:HoppityEggLocations.kt$HoppityEggLocations$// TODO add gui/command to show total data/missing islands private var collectedEggStorage: MutableMap&lt;IslandType, MutableSet&lt;LorenzVec&gt;&gt; get() = ChocolateFactoryApi.profileStorage?.collectedEggLocations ?: mutableMapOf() set(value) { ChocolateFactoryApi.profileStorage?.collectedEggLocations = value }</ID>
+    <ID>VarCouldBeVal:HoppityEggLocations.kt$HoppityEggLocations$// TODO add gui/command to show total data/missing islands private var collectedEggStorage: MutableMap&lt;IslandType, MutableSet&lt;SkyHanniVec3d&gt;&gt; get() = ChocolateFactoryApi.profileStorage?.collectedEggLocations ?: mutableMapOf() set(value) { ChocolateFactoryApi.profileStorage?.collectedEggLocations = value }</ID>
     <ID>VarCouldBeVal:IslandAreas.kt$IslandAreas$var suffix = ""</ID>
     <ID>VarCouldBeVal:NeuReforgeJson.kt$NeuReforgeJson$private lateinit var itemTypeField: Pair&lt;String, List&lt;NeuInternalName&gt;&gt;</ID>
     <ID>VarCouldBeVal:RepoPatternGui.kt$RepoPatternGui$private var searchCache = ObservableList(mutableListOf&lt;RepoPatternInfo&gt;())</ID>

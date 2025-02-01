@@ -43,7 +43,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -58,6 +57,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.DragNDrop
 import at.hannibal2.skyhanni.utils.renderables.Droppable
@@ -102,7 +102,7 @@ object SkyHanniDebugsAndTests {
         LorenzDebug.log(text)
     }
 
-    private var testLocation: LorenzVec? = null
+    private var testLocation: SkyHanniVec3d? = null
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
@@ -125,7 +125,7 @@ object SkyHanniDebugsAndTests {
         val x = args[0].toDouble()
         val y = args[1].toDouble()
         val z = args[2].toDouble()
-        val location = LorenzVec(x, y, z)
+        val location = SkyHanniVec3d(x, y, z)
         testLocation = location
         if (args.getOrNull(3) == "pathfind") {
             IslandGraphs.pathFind(location, "/shtestwaypoint", condition = { true })
@@ -336,7 +336,7 @@ object SkyHanniDebugsAndTests {
     private fun formatLocation(x: Double, y: Double, z: Double, parameter: String?): Pair<String, String> = when (parameter) {
         "json" -> "$x:$y:$z" to "json"
         "pathfind" -> "`/shtestwaypoint $x $y $z pathfind`" to "pathfind"
-        else -> "LorenzVec($x, $y, $z)" to "LorenzVec"
+        else -> "SkyHanniVec3d($x, $y, $z)" to "SkyHanniVec3d"
     }
 
     fun debugVersion() {

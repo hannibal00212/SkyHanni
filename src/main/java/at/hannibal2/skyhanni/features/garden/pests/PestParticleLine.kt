@@ -15,11 +15,11 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isAnyOf
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLineNea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.seconds
 
@@ -28,7 +28,7 @@ import kotlin.time.Duration.Companion.seconds
 object PestParticleLine {
     private val config get() = SkyHanniMod.feature.garden.pests.pestWaypoint
 
-    class ParticleLocation(val location: LorenzVec, val spawnTime: SimpleTimeMark)
+    class ParticleLocation(val location: SkyHanniVec3d, val spawnTime: SimpleTimeMark)
 
     private var lastPestTrackerUse = SimpleTimeMark.farPast()
     private val locations = mutableListOf<MutableList<ParticleLocation>>()
@@ -62,7 +62,7 @@ object PestParticleLine {
         }
     }
 
-    private fun getCurrentList(location: LorenzVec): MutableList<ParticleLocation> {
+    private fun getCurrentList(location: SkyHanniVec3d): MutableList<ParticleLocation> {
         locations.lastOrNull()?.let {
             val distance = it.last().location.distance(location)
             if (distance < 4) {
@@ -115,7 +115,7 @@ object PestParticleLine {
                 location,
                 color,
                 3,
-                false
+                false,
             )
             val isVeryLast = list == locations.lastOrNull() && next == list.lastOrNull()
             if (isVeryLast) {

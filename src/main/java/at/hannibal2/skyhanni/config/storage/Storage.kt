@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.storage
 
 import at.hannibal2.skyhanni.features.misc.reminders.Reminder
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 import java.util.*
@@ -38,7 +38,7 @@ class Storage {
     var trackerDisplayModes: MutableMap<String, SkyHanniTracker.DisplayMode> = mutableMapOf()
 
     @Expose
-    var foundDianaBurrowLocations: List<LorenzVec> = emptyList()
+    var foundDianaBurrowLocations: List<SkyHanniVec3d> = emptyList()
 
     @Expose
     var players: MutableMap<UUID, PlayerSpecificStorage> = mutableMapOf()

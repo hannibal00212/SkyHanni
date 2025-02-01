@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import net.minecraft.entity.item.EntityArmorStand
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -17,11 +17,11 @@ import kotlin.time.Duration.Companion.seconds
 object IsFishingDetection {
 
     var isFishing = false
-    private var lastRodCastLocation: LorenzVec? = null
+    private var lastRodCastLocation: SkyHanniVec3d? = null
     private var lastRodCastTime = SimpleTimeMark.farPast()
     private var lastInAreaTime = SimpleTimeMark.farPast()
 
-    private var lastSeaCreatureKillArea: LorenzVec? = null
+    private var lastSeaCreatureKillArea: SkyHanniVec3d? = null
     private var lastSeaCreatureKillAreaTime = SimpleTimeMark.farPast()
 
     @HandleEvent

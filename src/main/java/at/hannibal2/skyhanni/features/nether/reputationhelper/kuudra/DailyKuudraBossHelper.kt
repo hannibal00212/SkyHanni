@@ -15,10 +15,10 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 
@@ -27,7 +27,7 @@ object DailyKuudraBossHelper {
 
     val kuudraTiers = mutableListOf<KuudraTier>()
 
-    private var kuudraLocation: LorenzVec? = null
+    private var kuudraLocation: SkyHanniVec3d? = null
     private var allKuudraDone = true
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper

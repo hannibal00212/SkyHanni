@@ -15,9 +15,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -97,7 +97,7 @@ object ChocolateFactoryBlockOpen {
                     action = {
                         HypixelCommands.warp("hub")
                         EntityMovementData.onNextTeleport(IslandType.HUB) {
-                            IslandGraphs.pathFind(LorenzVec(-32.5, 71.0, -76.5), "§aBazaar", condition = { true })
+                            IslandGraphs.pathFind(SkyHanniVec3d(-32.5, 71.0, -76.5), "§aBazaar", condition = { true })
                         }
                     },
                 )

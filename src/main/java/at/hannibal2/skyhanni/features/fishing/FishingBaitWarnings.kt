@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -30,7 +30,7 @@ object FishingBaitWarnings {
     private data class Bait(
         private val entity: EntityItem,
         val name: String = entity.entityItem.name,
-        val location: LorenzVec = entity.getLorenzVec(),
+        val location: SkyHanniVec3d = entity.getLorenzVec(),
     ) {
         fun distanceTo(bobber: EntityFishHook) = location.distance(bobber.getLorenzVec())
     }

@@ -17,7 +17,7 @@ import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
 class ParkourHelper(
-    val locations: List<LorenzVec>,
+    val locations: List<SkyHanniVec3d>,
     private val shortCuts: List<ParkourShortCut>,
     val platformSize: Double = 1.0,
     val detectionRange: Double = 1.0,
@@ -130,9 +130,9 @@ class ParkourHelper(
         }
     }
 
-    private fun LorenzVec.offsetCenter() = add(platformSize / 2, 1.0, platformSize / 2)
+    private fun SkyHanniVec3d.offsetCenter() = add(platformSize / 2, 1.0, platformSize / 2)
 
-    private fun getInProgressPair(): Pair<IndexedValue<LorenzVec>, IndexedValue<LorenzVec>>? {
+    private fun getInProgressPair(): Pair<IndexedValue<SkyHanniVec3d>, IndexedValue<SkyHanniVec3d>>? {
         if (current < 0 || current + lookAhead >= locations.size) return null
         val currentPosition = locations[current].offsetCenter()
         val nextPosition = locations[current + 1].offsetCenter()
@@ -149,7 +149,7 @@ class ParkourHelper(
         )
     }
 
-    private fun axisAlignedBB(loc: LorenzVec) = loc.boundingToOffset(platformSize, 1.0, platformSize).expandBlock()
+    private fun axisAlignedBB(loc: SkyHanniVec3d) = loc.boundingToOffset(platformSize, 1.0, platformSize).expandBlock()
 
     private fun colorForIndex(index: Int) = if (rainbowColor) {
         RenderUtils.chromaColor(4.seconds, offset = -index / 12f, brightness = 0.7f)

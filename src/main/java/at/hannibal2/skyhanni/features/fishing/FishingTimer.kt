@@ -20,10 +20,10 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
@@ -37,7 +37,7 @@ import kotlin.time.Duration.Companion.seconds
 object FishingTimer {
 
     private val config get() = SkyHanniMod.feature.fishing.barnTimer
-    private val barnLocation = LorenzVec(108, 89, -252)
+    private val barnLocation = SkyHanniVec3d(108, 89, -252)
     private val mobDespawnTime = mutableMapOf<Mob, SimpleTimeMark>()
 
     private var lastSeaCreatureFished = SimpleTimeMark.farPast()
@@ -45,7 +45,7 @@ object FishingTimer {
     private var lastNameFished: String? = null
 
     private var babyMagmaSlugsToFind = 0
-    private var lastMagmaSlugLocation: LorenzVec? = null
+    private var lastMagmaSlugLocation: SkyHanniVec3d? = null
     private var lastMagmaSlugTime = SimpleTimeMark.farPast()
     private var recentBabyMagmaSlugs = TimeLimitedSet<Mob>(2.seconds)
 

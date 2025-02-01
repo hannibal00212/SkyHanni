@@ -14,12 +14,12 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawCylinderInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import net.minecraft.entity.item.EntityArmorStand
 
@@ -81,7 +81,7 @@ object AshfangHighlights {
         gravityOrbs.clear()
     }
 
-    private fun SkyHanniRenderWorldEvent.drawBlendedColorString(location: LorenzVec, text: String) {
+    private fun SkyHanniRenderWorldEvent.drawBlendedColorString(location: SkyHanniVec3d, text: String) {
         val distance = location.distanceToPlayer()
         if (distance < MAX_DISTANCE) {
             val colorCode = getColorCode(distance)

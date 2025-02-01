@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest
 
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 
 class DojoQuest(
     val dojoName: String,
-    location: LorenzVec?,
+    location: SkyHanniVec3d?,
     displayItem: NeuInternalName,
     dojoRankGoal: String,
     state: QuestState,
@@ -17,5 +17,5 @@ class DojoQuest(
         QuestCategory.DOJO,
         "$dojoName Rank $dojoRankGoal",
         state,
-        "$dojoName §7(§e" + LorenzUtils.getPointsForDojoRank(dojoRankGoal) + " points§7)"
+        "$dojoName §7(§e" + LorenzUtils.getPointsForDojoRank(dojoRankGoal) + " points§7)",
     )

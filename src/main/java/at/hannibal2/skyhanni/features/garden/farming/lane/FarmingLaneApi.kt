@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -58,12 +58,12 @@ object FarmingLaneApi {
         )
     }
 
-    fun FarmingDirection.getValue(location: LorenzVec): Double = when (this) {
+    fun FarmingDirection.getValue(location: SkyHanniVec3d): Double = when (this) {
         FarmingDirection.NORTH_SOUTH -> location.z
         FarmingDirection.EAST_WEST -> location.x
     }
 
-    fun FarmingDirection.setValue(location: LorenzVec, value: Double): LorenzVec = when (this) {
+    fun FarmingDirection.setValue(location: SkyHanniVec3d, value: Double): SkyHanniVec3d = when (this) {
         FarmingDirection.NORTH_SOUTH -> location.copy(z = value)
         FarmingDirection.EAST_WEST -> location.copy(x = value)
     }

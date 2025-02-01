@@ -24,11 +24,11 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.chat.Text.onClick
@@ -103,7 +103,7 @@ object IslandGraphs {
     private var pathfindClosestNode: GraphNode? = null
     var closestNode: GraphNode? = null
 
-    private var currentTarget: LorenzVec? = null
+    private var currentTarget: SkyHanniVec3d? = null
     private var currentTargetNode: GraphNode? = null
     private var label = ""
     private var lastDistance = 0.0
@@ -403,7 +403,7 @@ object IslandGraphs {
      * @param condition The pathfinding stops when the condition is no longer valid.
      */
     fun pathFind(
-        location: LorenzVec,
+        location: SkyHanniVec3d,
         label: String,
         color: Color = LorenzColor.WHITE.toColor(),
         onFound: () -> Unit = {},
@@ -416,7 +416,7 @@ object IslandGraphs {
     }
 
     private fun pathFind0(
-        location: LorenzVec,
+        location: SkyHanniVec3d,
         label: String,
         color: Color = LorenzColor.WHITE.toColor(),
         onFound: () -> Unit = {},
@@ -496,7 +496,7 @@ object IslandGraphs {
     // TODO move into new utils class
     private fun cutByMaxDistance(nodes: List<GraphNode>, maxDistance: Double): List<GraphNode> {
         var index = nodes.size * 10
-        val locations = mutableListOf<LorenzVec>()
+        val locations = mutableListOf<SkyHanniVec3d>()
         var first = true
         for (node in nodes) {
             if (first) {

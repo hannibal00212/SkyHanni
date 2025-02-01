@@ -11,13 +11,13 @@ object BlockUtils {
 
     private val world get() = Minecraft.getMinecraft().theWorld
 
-    fun LorenzVec.getBlockAt(): Block = getBlockStateAt().block
+    fun SkyHanniVec3d.getBlockAt(): Block = getBlockStateAt().block
 
-    fun LorenzVec.getBlockStateAt(): IBlockState = world.getBlockState(toBlockPos())
+    fun SkyHanniVec3d.getBlockStateAt(): IBlockState = world.getBlockState(toBlockPos())
 
-    fun LorenzVec.isInLoadedChunk(): Boolean = world.isBlockLoaded(toBlockPos(), false)
+    fun SkyHanniVec3d.isInLoadedChunk(): Boolean = world.isBlockLoaded(toBlockPos(), false)
 
-    fun getTextureFromSkull(position: LorenzVec?): String? {
+    fun getTextureFromSkull(position: SkyHanniVec3d?): String? {
         val entity = world.getTileEntity(position?.toBlockPos()) as? TileEntitySkull ?: return null
         return entity.serializeNBT().getCompoundTag("Owner").getSkullTexture()
     }
@@ -27,7 +27,7 @@ object BlockUtils {
         return getValue(property) == 0
     }
 
-    fun rayTrace(start: LorenzVec, direction: LorenzVec, distance: Double = 50.0): LorenzVec? {
+    fun rayTrace(start: SkyHanniVec3d, direction: SkyHanniVec3d, distance: Double = 50.0): SkyHanniVec3d? {
         val target = start + direction.normalize() * distance
         val result = world.rayTraceBlocks(start.toVec3(), target.toVec3())
 

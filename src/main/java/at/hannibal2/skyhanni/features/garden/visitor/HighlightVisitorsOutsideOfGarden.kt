@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
@@ -85,7 +85,7 @@ object HighlightVisitorsOutsideOfGarden {
             null -> false
         }
 
-    private fun isVisitorNearby(location: LorenzVec) =
+    private fun isVisitorNearby(location: SkyHanniVec3d) =
         EntityUtils.getEntitiesNearby<EntityLivingBase>(location, 2.0).any { isVisitor(it) }
 
     @HandleEvent(onlyOnSkyblock = true)

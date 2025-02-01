@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 
@@ -21,7 +21,7 @@ import net.minecraft.item.ItemStack
 object CarrolynHelper {
     private val config get() = GardenApi.config
 
-    private val carrolynLocation = LorenzVec(0.5, 103.1, -803.7)
+    private val carrolynLocation = SkyHanniVec3d(0.5, 103.1, -803.7)
 
     private val patternGroup = RepoPattern.group("garden.carrolyn")
 

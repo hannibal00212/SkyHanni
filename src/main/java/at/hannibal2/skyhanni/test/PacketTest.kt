@@ -9,10 +9,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.compat.getLocation
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -189,26 +189,26 @@ object PacketTest {
         }.let { println(it) }
     }
 
-    private fun getDistance(location: LorenzVec?): Double {
+    private fun getDistance(location: SkyHanniVec3d?): Double {
         return location?.distanceToPlayer()?.roundTo(1) ?: 0.0
     }
 
-    private fun getLocation(packet: Packet<*>, entity: Entity?): LorenzVec? {
+    private fun getLocation(packet: Packet<*>, entity: Entity?): SkyHanniVec3d? {
         if (packet is S2APacketParticles) {
-            return LorenzVec(packet.xCoordinate, packet.yCoordinate, packet.zCoordinate)
+            return SkyHanniVec3d(packet.xCoordinate, packet.yCoordinate, packet.zCoordinate)
         }
         if (packet is S0EPacketSpawnObject) {
-            return LorenzVec(packet.x, packet.y, packet.z)
+            return SkyHanniVec3d(packet.x, packet.y, packet.z)
         }
         if (packet is S0CPacketSpawnPlayer) {
-            return LorenzVec(packet.x, packet.y, packet.z)
+            return SkyHanniVec3d(packet.x, packet.y, packet.z)
         }
         if (packet is C03PacketPlayer) {
             return packet.getLocation()
         }
 
         if (packet is S0FPacketSpawnMob) {
-            return LorenzVec(packet.x, packet.y, packet.z)
+            return SkyHanniVec3d(packet.x, packet.y, packet.z)
         }
         if (packet is S28PacketEffect) {
             return packet.soundPos.toLorenzVec()

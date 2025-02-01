@@ -24,9 +24,9 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -188,10 +188,10 @@ object CrimsonIsleReputationHelper {
         update()
     }
 
-    fun readLocationData(locations: List<Double>): LorenzVec? {
+    fun readLocationData(locations: List<Double>): SkyHanniVec3d? {
         if (locations.isEmpty()) return null
         val (x, y, z) = locations
-        return LorenzVec(x, y, z).add(-1, 0, -1)
+        return SkyHanniVec3d(x, y, z).add(-1, 0, -1)
     }
 
     fun showLocations() = when (config.showLocation) {

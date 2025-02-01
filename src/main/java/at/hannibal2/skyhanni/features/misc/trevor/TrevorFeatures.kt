@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -36,6 +35,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
@@ -260,7 +260,7 @@ object TrevorFeatures {
         } else {
             inBetweenQuests = true
         }
-        if (TrevorSolver.mobCoordinates != LorenzVec(0.0, 0.0, 0.0) && active) {
+        if (TrevorSolver.mobCoordinates != SkyHanniVec3d(0.0, 0.0, 0.0) && active) {
             TrevorSolver.mobLocation = previousLocation
         }
         questActive = active
@@ -289,7 +289,7 @@ object TrevorFeatures {
             var location = TrevorSolver.mobLocation.coordinates
             if (TrevorSolver.mobLocation == TrapperMobArea.NONE) return
             if (TrevorSolver.averageHeight != 0.0) {
-                location = LorenzVec(location.x, TrevorSolver.averageHeight, location.z)
+                location = SkyHanniVec3d(location.x, TrevorSolver.averageHeight, location.z)
             }
             if (TrevorSolver.mobLocation == TrapperMobArea.FOUND) {
                 val displayName = TrevorSolver.currentMob?.mobName ?: "Mob Location"

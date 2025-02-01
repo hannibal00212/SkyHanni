@@ -54,11 +54,11 @@ object HolographicEntities {
      */
     class HolographicEntity<T : EntityLivingBase> internal constructor(
         val entity: T,
-        var position: LorenzVec,
+        var position: SkyHanniVec3d,
         var yaw: Float,
     ) {
         var isChild: Boolean = false
-        var lastPosition: LorenzVec = position
+        var lastPosition: SkyHanniVec3d = position
         var lastYaw: Float = yaw
         val createdAt = SimpleTimeMark.now()
 
@@ -67,7 +67,7 @@ object HolographicEntities {
         /**
          * Should be called exactly once per tick or never over the lifetime of this [HolographicEntity].
          */
-        fun moveTo(position: LorenzVec, yaw: Float, isTeleport: Boolean = false) {
+        fun moveTo(position: SkyHanniVec3d, yaw: Float, isTeleport: Boolean = false) {
             if (isTeleport) {
                 this.lastYaw = yaw
                 this.lastPosition = position
@@ -79,7 +79,7 @@ object HolographicEntities {
             this.yaw = yaw
         }
 
-        fun interpolatedPosition(partialTicks: Float): LorenzVec {
+        fun interpolatedPosition(partialTicks: Float): SkyHanniVec3d {
             return lastPosition.slope(position, partialTicks.toDouble())
         }
 
@@ -98,7 +98,7 @@ object HolographicEntities {
     class HolographicBase<T : EntityLivingBase> internal constructor(
         private val entity: T
     ) {
-        fun instance(position: LorenzVec, yaw: Float): HolographicEntity<T> {
+        fun instance(position: SkyHanniVec3d, yaw: Float): HolographicEntity<T> {
             return HolographicEntity(entity, position, yaw)
         }
     }

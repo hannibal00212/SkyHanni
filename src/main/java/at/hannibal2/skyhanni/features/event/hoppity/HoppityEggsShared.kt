@@ -7,10 +7,10 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
 @SkyHanniModule
@@ -24,7 +24,7 @@ object HoppityEggsShared {
      */
     private val sharedEggPattern by ChocolateFactoryApi.patternGroup.pattern(
         "egg.shared",
-        ".*\\[SkyHanni] (?<meal>\\w+) Chocolate Egg located at x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+)(?: \\((?<note>.*)\\))?"
+        ".*\\[SkyHanni] (?<meal>\\w+) Chocolate Egg located at x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+)(?: \\((?<note>.*)\\))?",
     )
 
     @HandleEvent
@@ -33,7 +33,7 @@ object HoppityEggsShared {
 
         sharedEggPattern.matchMatcher(event.message.removeColor()) {
             val (x, y, z) = listOf(group("x"), group("y"), group("z")).map { it.formatInt() }
-            val eggLocation = LorenzVec(x, y, z)
+            val eggLocation = SkyHanniVec3d(x, y, z)
 
             val meal = getEggType(event)
             val note = groupOrNull("note")
@@ -47,7 +47,7 @@ object HoppityEggsShared {
         }
     }
 
-    fun shareNearbyEggLocation(playerLocation: LorenzVec, meal: HoppityEggType, note: String) {
+    fun shareNearbyEggLocation(playerLocation: SkyHanniVec3d, meal: HoppityEggType, note: String) {
         if (!isEnabled()) return
         val islandEggsLocations = HoppityEggLocations.islandLocations
         val closestEgg = islandEggsLocations.minByOrNull { it.distance(playerLocation) } ?: return

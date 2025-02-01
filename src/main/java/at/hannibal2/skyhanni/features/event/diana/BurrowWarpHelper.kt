@@ -12,9 +12,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.seconds
 
@@ -93,7 +93,7 @@ object BurrowWarpHelper {
         event.addData(list)
     }
 
-    fun shouldUseWarps(target: LorenzVec, debug: MutableList<String>? = null) {
+    fun shouldUseWarps(target: SkyHanniVec3d, debug: MutableList<String>? = null) {
         debug?.add("target: ${target.printWithAccuracy(1)}")
         val playerLocation = LocationUtils.playerLocation()
         debug?.add("playerLocation: ${playerLocation.printWithAccuracy(1)}")
@@ -111,7 +111,7 @@ object BurrowWarpHelper {
         currentWarp = if (setWarpPoint) warpPoint else null
     }
 
-    private fun getNearestWarpPoint(location: LorenzVec) =
+    private fun getNearestWarpPoint(location: SkyHanniVec3d) =
         WarpPoint.entries.filter { it.unlocked && !it.ignored() }.map { it to it.distance(location) }
             .sorted().first().first
 
@@ -122,21 +122,21 @@ object BurrowWarpHelper {
 
     enum class WarpPoint(
         val displayName: String,
-        val location: LorenzVec,
+        val location: SkyHanniVec3d,
         private val extraBlocks: Int,
         val ignored: () -> Boolean = { false },
         var unlocked: Boolean = true,
     ) {
 
-        HUB("Hub", LorenzVec(-3, 70, -70), 2),
-        CASTLE("Castle", LorenzVec(-250, 130, 45), 10),
-        CRYPT("Crypt", LorenzVec(-190, 74, -88), 15, { config.ignoredWarps.crypt }),
-        DA("Dark Auction", LorenzVec(91, 74, 173), 2),
-        MUSEUM("Museum", LorenzVec(-75, 76, 81), 2),
-        WIZARD("Wizard", LorenzVec(42.5, 122.0, 69.0), 5, { config.ignoredWarps.wizard }),
-        STONKS("Stonks", LorenzVec(-52.5, 70.0, -49.5), 5, { config.ignoredWarps.stonks }),
+        HUB("Hub", SkyHanniVec3d(-3, 70, -70), 2),
+        CASTLE("Castle", SkyHanniVec3d(-250, 130, 45), 10),
+        CRYPT("Crypt", SkyHanniVec3d(-190, 74, -88), 15, { config.ignoredWarps.crypt }),
+        DA("Dark Auction", SkyHanniVec3d(91, 74, 173), 2),
+        MUSEUM("Museum", SkyHanniVec3d(-75, 76, 81), 2),
+        WIZARD("Wizard", SkyHanniVec3d(42.5, 122.0, 69.0), 5, { config.ignoredWarps.wizard }),
+        STONKS("Stonks", SkyHanniVec3d(-52.5, 70.0, -49.5), 5, { config.ignoredWarps.stonks }),
         ;
 
-        fun distance(other: LorenzVec): Double = other.distance(location) + extraBlocks
+        fun distance(other: SkyHanniVec3d): Double = other.distance(location) + extraBlocks
     }
 }

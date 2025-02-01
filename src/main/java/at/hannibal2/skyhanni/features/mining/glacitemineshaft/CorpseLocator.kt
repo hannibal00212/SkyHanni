@@ -17,9 +17,9 @@ import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -40,7 +40,7 @@ object CorpseLocator {
         "x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+)(?:.+)?",
     )
 
-    private val sharedWaypoints: MutableList<LorenzVec> = mutableListOf()
+    private val sharedWaypoints: MutableList<SkyHanniVec3d> = mutableListOf()
 
     private fun findCorpse() {
         EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()
@@ -117,7 +117,7 @@ object CorpseLocator {
 
         mineshaftCoordsPattern.matchMatcher(message) {
             val (x, y, z) = listOf(group("x"), group("y"), group("z")).map { it.formatInt() }
-            val location = LorenzVec(x, y, z)
+            val location = SkyHanniVec3d(x, y, z)
 
             // Return if someone had already sent a location nearby
             if (sharedWaypoints.any { it.distance(location) <= 5 }) return

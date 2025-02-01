@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.data.jsonobjects.repo
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
@@ -22,7 +22,7 @@ data class GardenJson(
 data class GardenVisitor(
     @Expose @SerializedName("rarity") private val _rarity: LorenzRarity,
     @Expose @SerializedName("new_rarity") private val _newRarity: LorenzRarity?,
-    @Expose val position: LorenzVec?,
+    @Expose val position: SkyHanniVec3d?,
     @Expose var skinOrType: String?,
     @Expose val mode: String,
     @Expose @SerializedName("need_items") val needItems: List<String>,

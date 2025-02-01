@@ -19,6 +19,7 @@ import kotlin.math.round
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+@Deprecated("Use SkyHanniVec3d instead")
 data class LorenzVec(
     val x: Double,
     val y: Double,
@@ -228,25 +229,3 @@ data class LorenzVec(
         val expandVector = LorenzVec(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
     }
 }
-
-fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
-
-fun Entity.getLorenzVec(): LorenzVec = LorenzVec(posX, posY, posZ)
-fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(prevPosX, prevPosY, prevPosZ)
-fun Entity.getMotionLorenzVec(): LorenzVec = LorenzVec(motionX, motionY, motionZ)
-
-fun Vec3.toLorenzVec(): LorenzVec = LorenzVec(xCoord, yCoord, zCoord)
-
-fun Rotations.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
-
-fun S2APacketParticles.toLorenzVec() = LorenzVec(xCoordinate, yCoordinate, zCoordinate)
-
-fun Array<Double>.toLorenzVec(): LorenzVec {
-    return LorenzVec(this[0], this[1], this[2])
-}
-
-fun RenderUtils.translate(vec: LorenzVec) = GlStateManager.translate(vec.x, vec.y, vec.z)
-
-fun AxisAlignedBB.expand(vec: LorenzVec): AxisAlignedBB = expand(vec.x, vec.y, vec.z)
-
-fun AxisAlignedBB.expand(amount: Double): AxisAlignedBB = expand(amount, amount, amount)

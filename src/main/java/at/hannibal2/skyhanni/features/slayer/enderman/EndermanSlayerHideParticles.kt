@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.util.EnumParticleTypes
@@ -17,7 +17,7 @@ import net.minecraft.util.EnumParticleTypes
 @SkyHanniModule
 object EndermanSlayerHideParticles {
 
-    private var endermanLocations = listOf<LorenzVec>()
+    private var endermanLocations = listOf<SkyHanniVec3d>()
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
@@ -46,7 +46,7 @@ object EndermanSlayerHideParticles {
         }
     }
 
-    private fun LorenzVec.distanceToNearestEnderman() = endermanLocations.minOfOrNull { it.distanceSq(this) }
+    private fun SkyHanniVec3d.distanceToNearestEnderman() = endermanLocations.minOfOrNull { it.distanceSq(this) }
 
     fun isEnabled() = IslandType.THE_END.isInIsland() && SkyHanniMod.feature.slayer.endermen.hideParticles
 

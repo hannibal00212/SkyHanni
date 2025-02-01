@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
@@ -22,9 +22,9 @@ object FarmingLaneCreator {
     val config get() = FarmingLaneApi.config
 
     var detection = false
-    private var start: LorenzVec? = null
-    private var lastLocation: LorenzVec? = null
-    private var potentialEnd: LorenzVec? = null
+    private var start: SkyHanniVec3d? = null
+    private var lastLocation: SkyHanniVec3d? = null
+    private var potentialEnd: SkyHanniVec3d? = null
     private var crop: CropType? = null
     private var maxDistance = 0.0
 
@@ -76,7 +76,7 @@ object FarmingLaneCreator {
         }
     }
 
-    private fun saveLane(a: LorenzVec, b: LorenzVec, crop: CropType) {
+    private fun saveLane(a: SkyHanniVec3d, b: SkyHanniVec3d, crop: CropType) {
         val lane = createLane(a, b)
         val lanes = FarmingLaneApi.lanes ?: return
         lanes[crop] = lane
@@ -85,7 +85,7 @@ object FarmingLaneCreator {
         reset()
     }
 
-    private fun createLane(a: LorenzVec, b: LorenzVec): FarmingLane {
+    private fun createLane(a: SkyHanniVec3d, b: SkyHanniVec3d): FarmingLane {
         val diffX = a.x - b.x
         val diffZ = a.z - b.z
         val direction =

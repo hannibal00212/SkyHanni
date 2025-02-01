@@ -9,18 +9,18 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerSqIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 
 @SkyHanniModule
 object CrystalHollowsNamesInCore {
 
     private val config get() = SkyHanniMod.feature.mining
     private val coreLocations = mapOf(
-        LorenzVec(550, 116, 550) to "§8Precursor Remnants",
-        LorenzVec(552, 116, 474) to "§bMithril Deposits",
-        LorenzVec(477, 116, 476) to "§aJungle",
-        LorenzVec(474, 116, 554) to "§6Goblin Holdout"
+        SkyHanniVec3d(550, 116, 550) to "§8Precursor Remnants",
+        SkyHanniVec3d(552, 116, 474) to "§bMithril Deposits",
+        SkyHanniVec3d(477, 116, 476) to "§aJungle",
+        SkyHanniVec3d(474, 116, 554) to "§6Goblin Holdout",
     )
 
     private var showWaypoints = false
@@ -30,7 +30,7 @@ object CrystalHollowsNamesInCore {
         if (!isEnabled()) return
 
         if (event.isMod(10)) {
-            val center = LorenzVec(514.3, 106.0, 514.3)
+            val center = SkyHanniVec3d(514.3, 106.0, 514.3)
             showWaypoints = center.distanceToPlayerSqIgnoreY() < 1100 && LocationUtils.playerLocation().y > 65
         }
     }

@@ -24,12 +24,12 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.netty.util.internal.ConcurrentSet
@@ -100,16 +100,16 @@ object MiningApi {
     }
 
     // normal mining
-    private val recentClickedBlocks = ConcurrentSet<Pair<LorenzVec, SimpleTimeMark>>()
-    private val surroundingMinedBlocks = ConcurrentLinkedQueue<Pair<MinedBlock, LorenzVec>>()
+    private val recentClickedBlocks = ConcurrentSet<Pair<SkyHanniVec3d, SimpleTimeMark>>()
+    private val surroundingMinedBlocks = ConcurrentLinkedQueue<Pair<MinedBlock, SkyHanniVec3d>>()
 
-    private var lastClickedPos: LorenzVec? = null
+    private var lastClickedPos: SkyHanniVec3d? = null
     private var lastClicked = SimpleTimeMark.farPast()
     private var ignoreInit = false
 
     private var lastInitSound = SimpleTimeMark.farPast()
 
-    private var initBlockPos: LorenzVec? = null
+    private var initBlockPos: SkyHanniVec3d? = null
     private var waitingForInitSound = true
 
     private var waitingForEffMinerSound = false
@@ -118,8 +118,8 @@ object MiningApi {
     // pickobulus
     private var lastPickobulusUse = SimpleTimeMark.farPast()
     private var lastPickobulusExplosion = SimpleTimeMark.farPast()
-    private var pickobulusExplosionPos: LorenzVec? = null
-    private val pickobulusMinedBlocks = ConcurrentLinkedQueue<Pair<LorenzVec, OreBlock>>()
+    private var pickobulusExplosionPos: SkyHanniVec3d? = null
+    private val pickobulusMinedBlocks = ConcurrentLinkedQueue<Pair<SkyHanniVec3d, OreBlock>>()
 
     private val pickobulusActive get() = lastPickobulusUse.passedSince() < 2.seconds
 

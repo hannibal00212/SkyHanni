@@ -9,5 +9,5 @@ class KuudraQuest(val kuudraTier: KuudraTier, state: QuestState) :
         QuestCategory.KUUDRA,
         "Kill Kuudra ${kuudraTier.name} Tier",
         state,
-        displayName = kuudraTier.getDisplayName()
+        displayName = kuudraTier.getDisplayName(),
     )

@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
@@ -24,7 +24,7 @@ object TrevorSolver {
     private var maxHeight: Double = 0.0
     private var minHeight: Double = 0.0
     private var foundID = -1
-    var mobCoordinates = LorenzVec(0.0, 0.0, 0.0)
+    var mobCoordinates = SkyHanniVec3d(0.0, 0.0, 0.0)
     var mobLocation = TrapperMobArea.NONE
     var averageHeight = (minHeight + maxHeight) / 2
 
@@ -84,7 +84,7 @@ object TrevorSolver {
             }
         }
         if (foundID != -1) {
-            mobCoordinates = LorenzVec(0.0, 0.0, 0.0)
+            mobCoordinates = SkyHanniVec3d(0.0, 0.0, 0.0)
             foundID = -1
         }
     }
@@ -97,6 +97,6 @@ object TrevorSolver {
         minHeight = 0.0
         averageHeight = (minHeight + maxHeight) / 2
         foundID = -1
-        mobCoordinates = LorenzVec(0.0, 0.0, 0.0)
+        mobCoordinates = SkyHanniVec3d(0.0, 0.0, 0.0)
     }
 }

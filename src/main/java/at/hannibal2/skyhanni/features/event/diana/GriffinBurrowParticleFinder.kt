@@ -14,8 +14,8 @@ import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
@@ -28,12 +28,12 @@ object GriffinBurrowParticleFinder {
 
     private val config get() = SkyHanniMod.feature.event.diana
 
-    private val recentlyDugParticleBurrows = TimeLimitedSet<LorenzVec>(1.minutes)
-    private val burrows = mutableMapOf<LorenzVec, Burrow>()
-    private var lastDugParticleBurrow: LorenzVec? = null
+    private val recentlyDugParticleBurrows = TimeLimitedSet<SkyHanniVec3d>(1.minutes)
+    private val burrows = mutableMapOf<SkyHanniVec3d, Burrow>()
+    private var lastDugParticleBurrow: SkyHanniVec3d? = null
 
     // This exists to detect the unlucky timing when the user opens a burrow before it gets fully detected
-    private var fakeBurrow: LorenzVec? = null
+    private var fakeBurrow: SkyHanniVec3d? = null
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
@@ -168,7 +168,7 @@ object GriffinBurrowParticleFinder {
         }
     }
 
-    private fun tryDig(location: LorenzVec, ignoreFound: Boolean = false): Boolean {
+    private fun tryDig(location: SkyHanniVec3d, ignoreFound: Boolean = false): Boolean {
         val burrow = burrows[location] ?: return false
         if (!burrow.found && !ignoreFound) return false
         burrows.remove(location)
@@ -206,7 +206,7 @@ object GriffinBurrowParticleFinder {
     }
 
     class Burrow(
-        var location: LorenzVec,
+        var location: SkyHanniVec3d,
         var hasFootstep: Boolean = false,
         var hasEnchant: Boolean = false,
         var type: Int = -1,

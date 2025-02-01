@@ -13,15 +13,15 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 
 @SkyHanniModule
 object OdgerWaypoint {
 
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing
-    private val odgerLocation = LorenzVec(-373, 207, -808)
+    private val odgerLocation = SkyHanniVec3d(-373, 207, -808)
 
     private var trophyFishInInventory = false
 

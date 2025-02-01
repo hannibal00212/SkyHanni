@@ -387,7 +387,7 @@ object Commands {
             callback { SkyHanniDebugsAndTests.copyItemInternalName() }
         }
         event.register("shcopylocation") {
-            description = "Copies the player location as LorenzVec format to the clipboard"
+            description = "Copies the player location as SkyHanniVec3d format to the clipboard"
             category = CommandCategory.DEVELOPER_DEBUG
             callback { SkyHanniDebugsAndTests.copyLocation(it) }
         }

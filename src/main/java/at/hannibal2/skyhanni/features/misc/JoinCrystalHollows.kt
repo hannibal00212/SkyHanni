@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 
 @SkyHanniModule
 object JoinCrystalHollows {
@@ -32,16 +32,21 @@ object JoinCrystalHollows {
                     "Click here to warp to Dwarven Mines!",
                     onClick = {
                         HypixelCommands.warp("mines")
-                    }, "§eClick to run /warp mines!"
+                    },
+                    "§eClick to run /warp mines!",
                 )
             } else {
                 ChatUtils.chat("Buy a §2Crystal Hollows Pass §efrom §5Gwendolyn")
             }
         }
         if (message == "§e[NPC] §5Gwendolyn§f: §rGreat! Now hop on into the Minecart and I'll get you on your way!" && inTime()) {
-            ChatUtils.clickableChat("Click here to warp to Crystal Hollows!", onClick = {
-                HypixelCommands.warp("ch")
-            }, "§eClick to run /warp ch!")
+            ChatUtils.clickableChat(
+                "Click here to warp to Crystal Hollows!",
+                onClick = {
+                    HypixelCommands.warp("ch")
+                },
+                "§eClick to run /warp ch!",
+            )
         }
     }
 
@@ -62,7 +67,7 @@ object JoinCrystalHollows {
         if (!isEnabled()) return
 
         if (inTime()) {
-            val location = LorenzVec(88, 198, -99)
+            val location = SkyHanniVec3d(88, 198, -99)
             event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor())
             event.drawDynamicText(location, "§eBuy Crystal Hollows Pass", 1.3)
         }

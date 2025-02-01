@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import com.google.gson.annotations.Expose
 
 data class RiftWoodenButtonsJson(
@@ -8,6 +8,6 @@ data class RiftWoodenButtonsJson(
 )
 
 data class ButtonSpots(
-    @Expose val position: LorenzVec,
-    @Expose val buttons: List<LorenzVec>
+    @Expose val position: SkyHanniVec3d,
+    @Expose val buttons: List<SkyHanniVec3d>
 )

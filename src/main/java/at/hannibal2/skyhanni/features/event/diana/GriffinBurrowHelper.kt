@@ -31,12 +31,12 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
@@ -61,13 +61,13 @@ object GriffinBurrowHelper {
         Blocks.spruce_fence,
     )
 
-    var targetLocation: LorenzVec? = null
-    private var guessLocation: LorenzVec? = null
-    private var particleBurrows = mapOf<LorenzVec, BurrowType>()
+    var targetLocation: SkyHanniVec3d? = null
+    private var guessLocation: SkyHanniVec3d? = null
+    private var particleBurrows = mapOf<SkyHanniVec3d, BurrowType>()
     var lastTitleSentTime = SimpleTimeMark.farPast()
     private var shouldFocusOnInquis = false
 
-    private var testList = listOf<LorenzVec>()
+    private var testList = listOf<SkyHanniVec3d>()
     private var testGriffinSpots = false
 
     @HandleEvent
@@ -105,7 +105,7 @@ object GriffinBurrowHelper {
     private fun loadTestGriffinSpots() {
         if (!testGriffinSpots) return
         val center = LocationUtils.playerLocation().toBlockPos().toLorenzVec()
-        val list = mutableListOf<LorenzVec>()
+        val list = mutableListOf<SkyHanniVec3d>()
         for (x in -5 until 5) {
             for (z in -5 until 5) {
                 list.add(findBlock(center.add(x, 0, z)))
@@ -119,7 +119,7 @@ object GriffinBurrowHelper {
             checkRemoveGuess()
         }
 
-        val locations = mutableListOf<LorenzVec>()
+        val locations = mutableListOf<SkyHanniVec3d>()
 
         if (config.inquisitorSharing.enabled) {
             for (waypoint in InquisitorWaypointShare.waypoints) {
@@ -219,7 +219,7 @@ object GriffinBurrowHelper {
         resetAllData()
     }
 
-    private fun findBlock(point: LorenzVec): LorenzVec {
+    private fun findBlock(point: SkyHanniVec3d): SkyHanniVec3d {
         if (!point.isInLoadedChunk()) {
             return point.copy(y = LocationUtils.playerLocation().y)
         }
@@ -230,7 +230,7 @@ object GriffinBurrowHelper {
         return findBlockBelowAir(point)
     }
 
-    private fun findGround(point: LorenzVec): LorenzVec? {
+    private fun findGround(point: SkyHanniVec3d): SkyHanniVec3d? {
         fun isValidGround(y: Double): Boolean {
             val isGround = point.copy(y = y).getBlockAt() == Blocks.grass
             val isValidBlockAbove = point.copy(y = y + 1).getBlockAt() in allowedBlocksAboveGround
@@ -248,7 +248,7 @@ object GriffinBurrowHelper {
         return point.copy(y = gY)
     }
 
-    private fun findBlockBelowAir(point: LorenzVec): LorenzVec {
+    private fun findBlockBelowAir(point: SkyHanniVec3d): SkyHanniVec3d {
         val start = 65.0
         var gY = start
         while (point.copy(y = gY).getBlockAt() != Blocks.air) {

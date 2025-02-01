@@ -293,11 +293,11 @@ object LorenzUtils {
     }
 
     // TODO move into location utils
-    fun AxisAlignedBB.getCorners(y: Double): List<LorenzVec> {
-        val cornerOne = LorenzVec(minX, y, minZ)
-        val cornerTwo = LorenzVec(minX, y, maxZ)
-        val cornerThree = LorenzVec(maxX, y, maxZ)
-        val cornerFour = LorenzVec(maxX, y, minZ)
+    fun AxisAlignedBB.getCorners(y: Double): List<SkyHanniVec3d> {
+        val cornerOne = SkyHanniVec3d(minX, y, minZ)
+        val cornerTwo = SkyHanniVec3d(minX, y, maxZ)
+        val cornerThree = SkyHanniVec3d(maxX, y, maxZ)
+        val cornerFour = SkyHanniVec3d(maxX, y, minZ)
 
         return listOf(cornerOne, cornerTwo, cornerThree, cornerFour)
     }

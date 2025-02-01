@@ -17,10 +17,10 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -223,23 +223,23 @@ object CrimsonMinibossRespawnTimer {
     ) {
         BLADESOUL(
             "Bladesoul",
-            LorenzVec(-330, 80, -486).axisAlignedTo(LorenzVec(-257, 107, -545)),
+            SkyHanniVec3d(-330, 80, -486).axisAlignedTo(SkyHanniVec3d(-257, 107, -545)),
         ),
         MAGE_OUTLAW(
             "Mage Outlaw",
-            LorenzVec(-200, 98, -843).axisAlignedTo(LorenzVec(-162, 116, -878)),
+            SkyHanniVec3d(-200, 98, -843).axisAlignedTo(SkyHanniVec3d(-162, 116, -878)),
         ),
         BARBARIAN_DUKE_X(
             "Barbarian Duke X",
-            LorenzVec(-550, 101, -890).axisAlignedTo(LorenzVec(-522, 131, -918)),
+            SkyHanniVec3d(-550, 101, -890).axisAlignedTo(SkyHanniVec3d(-522, 131, -918)),
         ),
         ASHFANG(
             "Ashfang",
-            LorenzVec(-462, 155, -1035).axisAlignedTo(LorenzVec(-507, 131, -955)),
+            SkyHanniVec3d(-462, 155, -1035).axisAlignedTo(SkyHanniVec3d(-507, 131, -955)),
         ),
         MAGMA_BOSS(
             "Magma Boss",
-            LorenzVec(-318, 59, -751).axisAlignedTo(LorenzVec(-442, 90, -851)),
+            SkyHanniVec3d(-318, 59, -751).axisAlignedTo(SkyHanniVec3d(-442, 90, -851)),
         ),
         ;
 

@@ -35,7 +35,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -47,6 +46,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -63,8 +63,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object MinionFeatures {
 
     private val config get() = SkyHanniMod.feature.misc.minions
-    private var lastClickedEntity: LorenzVec? = null
-    private var newMinion: LorenzVec? = null
+    private var lastClickedEntity: SkyHanniVec3d? = null
+    private var newMinion: SkyHanniVec3d? = null
     private var newMinionName: String? = null
     private var lastMinionOpened = 0L
 
@@ -103,12 +103,12 @@ object MinionFeatures {
         "^§aCollect All$",
     )
 
-    var lastMinion: LorenzVec? = null
-    private var lastStorage: LorenzVec? = null
+    var lastMinion: SkyHanniVec3d? = null
+    private var lastStorage: SkyHanniVec3d? = null
     var minionInventoryOpen = false
     var minionStorageInventoryOpen = false
 
-    private var minions: Map<LorenzVec, ProfileSpecificStorage.MinionConfig>?
+    private var minions: Map<SkyHanniVec3d, ProfileSpecificStorage.MinionConfig>?
         get() {
             return ProfileStorageData.profileSpecific?.minions
         }
@@ -229,7 +229,7 @@ object MinionFeatures {
         if (!IslandType.PRIVATE_ISLAND.isInIsland()) return
         val minions = minions ?: return
 
-        val removedEntities = mutableListOf<LorenzVec>()
+        val removedEntities = mutableListOf<SkyHanniVec3d>()
         for (location in minions.keys) {
             if (location.distanceToPlayer() > 30) continue
             val entitiesNearby = EntityUtils.getEntities<EntityArmorStand>().map { it.distanceTo(location) }

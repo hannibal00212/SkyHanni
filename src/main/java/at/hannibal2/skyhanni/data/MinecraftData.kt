@@ -14,8 +14,8 @@ import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S2APacketParticles
@@ -34,7 +34,7 @@ object MinecraftData {
             is S29PacketSoundEffect -> {
                 if (PlaySoundEvent(
                         packet.soundName,
-                        LorenzVec(packet.x, packet.y, packet.z),
+                        SkyHanniVec3d(packet.x, packet.y, packet.z),
                         packet.pitch,
                         packet.volume,
                     ).post()
@@ -46,10 +46,10 @@ object MinecraftData {
             is S2APacketParticles -> {
                 if (ReceiveParticleEvent(
                         packet.particleType,
-                        LorenzVec(packet.xCoordinate, packet.yCoordinate, packet.zCoordinate),
+                        SkyHanniVec3d(packet.xCoordinate, packet.yCoordinate, packet.zCoordinate),
                         packet.particleCount,
                         packet.particleSpeed,
-                        LorenzVec(packet.xOffset, packet.yOffset, packet.zOffset),
+                        SkyHanniVec3d(packet.xOffset, packet.yOffset, packet.zOffset),
                         packet.isLongDistance,
                         packet.particleArgs,
                     ).post()

@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.util.EnumParticleTypes
 import kotlin.math.abs
@@ -29,14 +29,14 @@ object SoopyGuessBurrow {
     private var hasDinged = false
     private var lastDingPitch = 0f
     private var firstPitch = 0f
-    private var lastParticlePoint: LorenzVec? = null
-    private var lastParticlePoint2: LorenzVec? = null
-    private var firstParticlePoint: LorenzVec? = null
-    private var particlePoint: LorenzVec? = null
-    private var guessPoint: LorenzVec? = null
+    private var lastParticlePoint: SkyHanniVec3d? = null
+    private var lastParticlePoint2: SkyHanniVec3d? = null
+    private var firstParticlePoint: SkyHanniVec3d? = null
+    private var particlePoint: SkyHanniVec3d? = null
+    private var guessPoint: SkyHanniVec3d? = null
 
-    private var lastSoundPoint: LorenzVec? = null
-    private val locations = mutableListOf<LorenzVec>()
+    private var lastSoundPoint: SkyHanniVec3d? = null
+    private val locations = mutableListOf<SkyHanniVec3d>()
 
     private val dingSlope = mutableListOf<Float>()
 
@@ -123,12 +123,12 @@ object SoopyGuessBurrow {
     }
 
     @Suppress("MaxLineLength")
-    private fun solveEquationThing(x: LorenzVec, y: LorenzVec): LorenzVec {
+    private fun solveEquationThing(x: SkyHanniVec3d, y: SkyHanniVec3d): SkyHanniVec3d {
         val a =
             (-y.x * x.y * x.x - y.y * x.y * x.z + y.y * x.y * x.x + x.y * x.z * y.z + x.x * x.z * y.x - x.x * x.z * y.z) / (x.y * y.x - x.y * y.z + x.x * y.z - y.x * x.z + y.y * x.z - y.y * x.x)
         val b = (y.x - y.y) * (x.x + a) * (x.y + a) / (x.y - x.x)
         val c = y.x - b / (x.x + a)
-        return LorenzVec(a, b, c)
+        return SkyHanniVec3d(a, b, c)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -162,16 +162,16 @@ object SoopyGuessBurrow {
                     }
 
                     val (a, b, c) = solveEquationThing(
-                        LorenzVec(slopeThing.size - 5, slopeThing.size - 3, slopeThing.size - 1),
-                        LorenzVec(
+                        SkyHanniVec3d(slopeThing.size - 5, slopeThing.size - 3, slopeThing.size - 1),
+                        SkyHanniVec3d(
                             slopeThing[slopeThing.size - 5],
                             slopeThing[slopeThing.size - 3],
                             slopeThing[slopeThing.size - 1],
                         ),
                     )
 
-                    val pr1 = mutableListOf<LorenzVec>()
-                    val pr2 = mutableListOf<LorenzVec>()
+                    val pr1 = mutableListOf<SkyHanniVec3d>()
+                    val pr2 = mutableListOf<SkyHanniVec3d>()
 
                     val start = slopeThing.size - 1
                     val lastPos = locations[start].toDoubleArray()
@@ -229,9 +229,9 @@ object SoopyGuessBurrow {
                         val d2 = ((p2.x - it.x).times(2 + (p2.z - it.z))).pow(2)
 
                         val finalLocation = if (d1 < d2) {
-                            LorenzVec(floor(p1.x), 255.0, floor(p1.z))
+                            SkyHanniVec3d(floor(p1.x), 255.0, floor(p1.z))
                         } else {
-                            LorenzVec(floor(p2.x), 255.0, floor(p2.z))
+                            SkyHanniVec3d(floor(p2.x), 255.0, floor(p2.z))
                         }
                         BurrowGuessEvent(finalLocation).post()
                     }
@@ -263,7 +263,7 @@ object SoopyGuessBurrow {
 
         lastParticlePoint?.let {
             guessPoint =
-                LorenzVec(
+                SkyHanniVec3d(
                     it.x + changes[0] * distance!!,
                     it.y + changes[1] * distance!!,
                     it.z + changes[2] * distance!!,

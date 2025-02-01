@@ -15,12 +15,12 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import net.minecraft.block.BlockChest
 import net.minecraft.client.Minecraft
 import net.minecraft.item.Item
@@ -43,7 +43,7 @@ object MinionXP {
 
     data class XPInfo(val type: SkillType, val amount: Double)
 
-    private data class MinionStorage(val position: LorenzVec, val xpList: EnumMap<SkillType, Double>) {
+    private data class MinionStorage(val position: SkyHanniVec3d, val xpList: EnumMap<SkillType, Double>) {
         val timestamp: SimpleTimeMark = SimpleTimeMark.now()
     }
 
@@ -73,7 +73,7 @@ object MinionXP {
     }
 
     private fun getStorageXPAndUpdateTotal(
-        minionPosition: LorenzVec,
+        minionPosition: SkyHanniVec3d,
         xpTotal: EnumMap<SkillType, Double>,
     ): Boolean {
         if (!getHasStorage(minionPosition)) return false
@@ -131,10 +131,10 @@ object MinionXP {
     private fun collectMessage(type: SkillType, amount: Double) =
         "§7Collect to get: §b${amount.addSeparators()} §e${type.displayName} XP"
 
-    private fun getHasStorage(minionPosition: LorenzVec): Boolean {
+    private fun getHasStorage(minionPosition: SkyHanniVec3d): Boolean {
         val positionsToCheck = listOf(
-            LorenzVec(1, 0, 0), LorenzVec(0, 0, 1),
-            LorenzVec(-1, 0, 0), LorenzVec(0, 0, -1),
+            SkyHanniVec3d(1, 0, 0), SkyHanniVec3d(0, 0, 1),
+            SkyHanniVec3d(-1, 0, 0), SkyHanniVec3d(0, 0, -1),
         )
 
         return positionsToCheck.any { position ->

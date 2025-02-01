@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
+import at.hannibal2.skyhanni.utils.SkyHanniVec3d
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.EnumParticleTypes
@@ -22,9 +22,9 @@ import net.minecraft.util.EnumParticleTypes
 object GeyserFishing {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.geyserOptions
 
-    private val geyserOffset = LorenzVec(0.1f, 0.6f, 0.1f)
+    private val geyserOffset = SkyHanniVec3d(0.1f, 0.6f, 0.1f)
 
-    private var geyser: LorenzVec? = null
+    private var geyser: SkyHanniVec3d? = null
     private var geyserBox: AxisAlignedBB? = null
 
     @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true)
