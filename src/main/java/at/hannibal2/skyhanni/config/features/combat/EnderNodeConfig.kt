@@ -33,7 +33,7 @@ class EnderNodeConfig {
     @Expose
     @ConfigOption(name = "Text Format", desc = "Drag text to change the appearance of the overlay.")
     @ConfigEditorDraggableList
-    var textFormat: Property<List<EnderNodeDisplayEntry>> = Property.of(
+    var textFormat: Property<MutableList<EnderNodeDisplayEntry>> = Property.of(
         mutableListOf(
             EnderNodeDisplayEntry.TITLE,
             EnderNodeDisplayEntry.NODES_MINED,
