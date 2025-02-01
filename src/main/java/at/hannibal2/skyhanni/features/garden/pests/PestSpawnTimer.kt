@@ -157,7 +157,7 @@ object PestSpawnTimer {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (hasWarned || !config.pestCooldownOverWarning) return
+        if (hasWarned || !config.pestCooldownOverWarning || pestSpawned) return
 
         if ((pestCooldownEndTime - config.cooldownWarningTime.seconds).isInPast()) {
             warn()
