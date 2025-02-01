@@ -7,6 +7,9 @@ import net.minecraft.util.IChatComponent
 
 object GuiChatHook {
 
+    @JvmStatic
+    lateinit var currentComponent: IChatComponent
+
     lateinit var replacement: ChatComponentText
 
     fun replaceEntireComponent(title: String, chatStyle: ChatStyle) {

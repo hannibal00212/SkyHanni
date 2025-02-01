@@ -34,6 +34,11 @@ class ChatConfig {
     var soundResponse: ChatSoundResponseConfig = ChatSoundResponseConfig()
 
     @Expose
+    @ConfigOption(name = "Rare Drop Messages", desc = "")
+    @Accordion
+    var rareDropMessages: RareDropMessagesConfig = RareDropMessagesConfig()
+
+    @Expose
     @ConfigOption(name = "Dungeon Filters", desc = "Hide specific message types in Dungeons.")
     @ConfigEditorDraggableList
     var dungeonFilteredMessageTypes: MutableList<DungeonMessageTypes> = mutableListOf()
@@ -54,6 +59,16 @@ class ChatConfig {
 
         override fun toString() = displayName
     }
+
+    @Expose
+    @ConfigOption(
+        name = "Copy Chat",
+        desc = "Right click a chat message to copy it. Holding Shift will copy the\n" +
+            "message with Shwords applied, and holding Ctrl will copy only one line.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var copyChat: Boolean = false
 
     @Expose
     @ConfigOption(name = "Dungeon Boss Messages", desc = "Hide messages from the Watcher and bosses in Dungeons.")

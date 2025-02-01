@@ -3,9 +3,10 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ChatUtils.message
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.util.IChatComponent
 
@@ -31,7 +32,7 @@ object WatchdogHider {
             }
 
             ANNOUNCEMENT_LINE -> {
-                ChatManager.retractMessage(startLineComponent, "watchdog")
+                ChatUtils.deleteMessage("watchdog") { it.message == START_LINE }
                 startLineComponent = null
                 inWatchdog = true
             }
