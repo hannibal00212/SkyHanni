@@ -2,9 +2,12 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.CollectionUtils.putAt
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.hoverTips
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.leftAndRightClickable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import java.awt.Color
@@ -96,6 +99,114 @@ internal object RenderableUtils {
         GlStateManager.translate(-1.0, -1.0, 0.0)
     }
 
+    inline fun <T> MutableList<Searchable>.addNullableButton(
+        label: String,
+        current: T,
+        crossinline onChange: (T?) -> Unit,
+        universe: List<T>,
+        nullLabel: String,
+    ) {
+        val map = universe.associateWithTo(LinkedHashMap<T?, String>()) { it.toString() }
+        map.putAt(0, null, nullLabel)
+
+        val currentName = map[current] ?: error("unknown entry in map")
+        addButton(
+            label = label,
+            current = currentName,
+            getName = { it },
+            onChange = { new ->
+                onChange(
+                    map.filter { it.value == new }.keys.firstOrNull() ?: error("")
+                )
+            },
+            universe = map.values.toList(),
+        )
+    }
+
+    inline fun <T> MutableList<Searchable>.addButton(
+        label: String,
+        current: T,
+        crossinline getName: (T) -> String,
+        crossinline onChange: (T) -> Unit,
+        universe: List<T>,
+    ) {
+        add(createButtonNew(label, current, getName, onChange, universe))
+    }
+
+    //
+    inline fun <T> MutableList<Renderable>.addRenderableButton(
+        label: String,
+        current: T,
+        crossinline getName: (T) -> String,
+        crossinline onChange: (T) -> Unit,
+        universe: List<T>,
+    ) {
+        add(createButtonNew(label, current, getName, onChange, universe).renderable)
+    }
+
+    fun <T> List<T>.circle(current: T): T {
+        val index = indexOf(current)
+        val newIndex = (index + 1) % size // Increment index and wrap around
+        return get(newIndex)
+    }
+
+    fun <T> List<T>.circleBackwards(current: T): T {
+        val index = indexOf(current)
+        val newIndex = ((index - 1 + size)) % size // Increment index and wrap around
+        return get(newIndex)
+    }
+
+    inline fun <T> createButtonNew(
+        label: String,
+        current: T,
+        crossinline getName: (T) -> String,
+        crossinline onChange: (T) -> Unit,
+        universe: List<T>,
+    ): Searchable {
+        val onClick: (Renderable.Companion.Direction) -> Unit = { d ->
+            if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) > 150) { // funny thing happen if I don't do that
+                val next = if (d == Renderable.Companion.Direction.LEFT) {
+                    universe.circle(current)
+                } else {
+                    universe.circleBackwards(current)
+                }
+                onChange(next)
+                SoundUtils.playClickSound()
+                ChatUtils.lastButtonClicked = System.currentTimeMillis()
+            }
+        }
+
+        val currentName = getName(current)
+        val tips = buildList {
+            add("§a$label")
+            add(" ")
+            for (entry in universe) {
+                val name = getName(entry)
+                if (entry == current) {
+                    this.add("§e▶ $name")
+                } else {
+                    this.add("§7  $name")
+                }
+            }
+            add(" ")
+            add("§bRight-click to go backwards!")
+            add("§eClick to switch $label!")
+        }
+
+        return Renderable.line {
+            addString("§7$label §a[")
+            val clickable = leftAndRightClickable(
+                hoverTips("§e$currentName", tips, bypassChecks = false, onHover = {}),
+                onClick,
+                bypassChecks = false,
+            )
+            add(leftAndRightClickable(clickable, onClick = onClick))
+
+            addString("§a]")
+        }.toSearchable()
+    }
+
+    @Deprecated("do not use", ReplaceWith(""))
     inline fun MutableList<Searchable>.addButton(
         prefix: String,
         getName: String,

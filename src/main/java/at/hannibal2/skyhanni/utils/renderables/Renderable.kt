@@ -119,7 +119,6 @@ interface Renderable {
                     highlightsOnHoverSlots = highlightsOnHoverSlots,
                 ),
                 onClick,
-                0,
                 bypassChecks,
                 condition,
             )
@@ -156,7 +155,22 @@ interface Renderable {
         fun clickable(
             render: Renderable,
             onClick: () -> Unit,
-            button: Int = 0,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+        ) = leftAndRightClickable(
+            render,
+            onClick = { if (it == Direction.LEFT) onClick() },
+            bypassChecks, condition,
+        )
+
+        enum class Direction {
+            LEFT,
+            RIGHT,
+        }
+
+        fun leftAndRightClickable(
+            render: Renderable,
+            onClick: (Direction) -> Unit,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
         ) = object : Renderable {
@@ -166,8 +180,13 @@ interface Renderable {
             override val verticalAlign = render.verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks) && (button - 100).isKeyClicked()) {
-                    onClick()
+                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                    if ((-100).isKeyClicked()) {
+                        onClick(Direction.LEFT)
+                    }
+                    if ((-99).isKeyClicked()) {
+                        onClick(Direction.RIGHT)
+                    }
                 }
                 render.render(posX, posY)
             }

@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addNullableButton
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 
 @Suppress("SpreadOperator")
@@ -78,18 +78,21 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
     fun addBucketSelector(
         lists: MutableList<Searchable>,
         data: BucketedData,
-        sourceStringPrefix: String,
+        sourceLabel: String,
         nullBucketLabel: String = "All",
     ) {
         if (isInventoryOpen()) {
-            lists.addButton(
-                prefix = "§7$sourceStringPrefix: ",
-                getName = data.selectedBucket?.toString() ?: nullBucketLabel,
-                onChange = {
-                    // We need to make sure the selected bucket syncs with the shared tracker
-                    val newBucket: E? = data.selectNextSequentialBucket()
-                    modifyEachMode { it.selectedBucket = newBucket }
+            lists.addNullableButton(
+                label = sourceLabel,
+                current = data.selectedBucket,
+                onChange = { new ->
+                    modifyEachMode {
+                        it.selectedBucket = new
+                    }
+                    update()
                 },
+                universe = data.selectableBuckets,
+                nullLabel = nullBucketLabel,
             )
         }
     }

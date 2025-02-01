@@ -139,6 +139,7 @@ object SeaCreatureTracker {
         }
 
         if (tracker.isInventoryOpen()) {
+            // TODO change
             addButton(
                 prefix = "§7Category: ",
                 getName = currentCategory.allLettersFirstUppercase() + " §7(" + amounts[currentCategory] + ")",

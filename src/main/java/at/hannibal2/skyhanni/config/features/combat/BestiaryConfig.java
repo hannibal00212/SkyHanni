@@ -25,7 +25,7 @@ public class BestiaryConfig {
         SHORT("Short", 0),
         LONG("Long", 1);
 
-        private final String displayName;
+        public final String displayName;
         private final int legacyId;
 
         NumberFormatEntry(String displayName, int legacyId) {
@@ -64,7 +64,7 @@ public class BestiaryConfig {
         LOWEST_NEXT("Lowest kills needed to next tier", 6),
         HIGHEST_NEXT("Highest kills needed to next tier", 7);
 
-        private final String displayName;
+        public final String displayName;
         private final int legacyId;
 
         DisplayTypeEntry(String displayName, int legacyId) {

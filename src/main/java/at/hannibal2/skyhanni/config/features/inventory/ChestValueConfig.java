@@ -62,7 +62,7 @@ public class ChestValueConfig {
         DESCENDING("Descending", 0),
         ASCENDING("Ascending", 1),
         ;
-        private final String displayName;
+        public final String displayName;
         private final int legacyId;
 
         SortingTypeEntry(String displayName, int legacyId) {
@@ -95,7 +95,7 @@ public class ChestValueConfig {
         SHORT("Short", 0),
         LONG("Long", 1);
 
-        private final String displayName;
+        public final String displayName;
         private final int legacyId;
 
         NumberFormatEntry(String displayName, int legacyId) {

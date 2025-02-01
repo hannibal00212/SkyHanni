@@ -10,9 +10,7 @@ import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addButton
 import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSelector
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -28,6 +26,7 @@ import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.buildSearchableTable
 
@@ -192,50 +191,51 @@ object SackDisplay {
     }
 
     private fun MutableList<Renderable>.drawOptions(totalPrice: Long) {
-        val name = SortType.entries[config.sortingType.ordinal].longName // todo avoid ordinal
-        addString("§7Sorted By: §c$name")
-
-        addSelector<SortType>(
-            " ",
-            getName = { type -> type.shortName },
-            isCurrent = { it.ordinal == config.sortingType.ordinal }, // todo avoid ordinal
+        addRenderableButton<SortingTypeEntry>(
+            label = "Sorted By",
+            current = config.sortingType,
+            getName = { it.displayName },
             onChange = {
-                config.sortingType = SortingTypeEntry.entries[it.ordinal] // todo avoid ordinals
+                config.sortingType = it
                 update(false)
             },
+            universe = SortingTypeEntry.entries,
         )
 
-        addButton(
-            prefix = "§7Number format: ",
-            getName = NumberFormat.entries[config.numberFormat.ordinal].displayName, // todo avoid ordinal
+        addRenderableButton<NumberFormatEntry>(
+            label = "Number Format",
+            current = config.numberFormat,
+            getName = { it.displayName },
             onChange = {
-                // todo avoid ordinal
-                config.numberFormat =
-                    NumberFormatEntry.entries[(config.numberFormat.ordinal + 1) % 3]
+                config.numberFormat = it
                 update(false)
             },
+            universe = NumberFormatEntry.entries,
         )
 
         if (config.showPrice) {
-            addSelector<ItemPriceSource>(
-                " ",
-                getName = { type -> type.sellName },
-                isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
+            addRenderableButton<ItemPriceSource>(
+                label = "Price Source",
+                current = config.priceSource,
+                getName = { it.sellName },
                 onChange = {
-                    config.priceSource = ItemPriceSource.entries[it.ordinal] // todo avoid ordinal
+                    config.priceSource = it
                     update(false)
                 },
+                universe = ItemPriceSource.entries,
             )
-            addButton(
-                prefix = "§7Price Format: ",
-                getName = PriceFormat.entries[config.priceFormat.ordinal].displayName, // todo avoid ordinal
+
+            addRenderableButton<PriceFormatEntry>(
+                label = "Price Source",
+                current = config.priceFormat,
+                getName = { it.displayName },
                 onChange = {
-                    // todo avoid ordinal
-                    config.priceFormat =
-                        PriceFormatEntry.entries[(config.priceFormat.ordinal + 1) % 2]
+                    config.priceFormat = it
                     update(false)
                 },
+                universe = PriceFormatEntry.entries,
             )
+
             addString("§eTotal price: §6${format(totalPrice)}")
         }
     }
@@ -311,21 +311,7 @@ object SackDisplay {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
-    // TODO: one mod wide enum for sorttype, priceformat, etc instead of one per feature (e.g. ChestValue)
-    enum class SortType(val shortName: String, val longName: String) {
-        STORED_DESC("Stored D", "Stored Descending"),
-        STORED_ASC("Stored A", "Stored Ascending"),
-        PRICE_DESC("Price D", "Price Descending"),
-        PRICE_ASC("Price A", "Price Ascending"),
-    }
-
     enum class PriceFormat(val displayName: String) {
-        FORMATTED("Formatted"),
-        UNFORMATTED("Unformatted"),
-    }
-
-    enum class NumberFormat(val displayName: String) {
-        DEFAULT("Default"),
         FORMATTED("Formatted"),
         UNFORMATTED("Unformatted"),
     }
