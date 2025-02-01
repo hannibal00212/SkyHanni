@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.features.rift.area.colosseum.ColosseumConfig
 import at.hannibal2.skyhanni.config.features.rift.area.dreadfarm.DreadfarmConfig;
 import at.hannibal2.skyhanni.config.features.rift.area.livingcave.LivingCaveConfig;
 import at.hannibal2.skyhanni.config.features.rift.area.mirrorverse.MirrorVerseConfig;
+import at.hannibal2.skyhanni.config.features.rift.area.mountaintop.MountaintopConfig;
 import at.hannibal2.skyhanni.config.features.rift.area.stillgorechateau.StillgoreChateauConfig;
 import at.hannibal2.skyhanni.config.features.rift.area.westvillage.WestVillageConfig;
 import at.hannibal2.skyhanni.config.features.rift.area.wyldwoods.WyldWoodsConfig;
@@ -53,8 +54,8 @@ public class RiftAreasConfig {
     @Accordion
     public StillgoreChateauConfig stillgoreChateau = new StillgoreChateauConfig();
 
-//        @Expose
-//        @ConfigOption(name = "Mountaintop", desc = "")
-//        @Accordion
-//        public MountaintopConfig mountaintop = new MountaintopConfig();
+    @Expose
+    @ConfigOption(name = "Mountaintop", desc = "")
+    @Accordion
+    public MountaintopConfig mountaintop = new MountaintopConfig();
 }
