@@ -452,6 +452,10 @@ object CollectionUtils {
         return list
     }
 
+    fun <T> Collection<T>.distribute(subs: Int = 2): List<List<T>> {
+        return this.split(ceil(this.size.toDouble() / subs.toDouble()).toInt())
+    }
+
     inline fun <K, V, R : Any> Map<K, V>.mapKeysNotNull(transform: (Map.Entry<K, V>) -> R?): Map<R, V> {
         val destination = LinkedHashMap<R, V>()
         for (element in this) {

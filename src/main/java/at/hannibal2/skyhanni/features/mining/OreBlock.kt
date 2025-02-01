@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.mining
 
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.MiningApi.currentAreaOreBlocks
 import at.hannibal2.skyhanni.data.MiningApi.inCrimsonIsle
 import at.hannibal2.skyhanni.data.MiningApi.inCrystalHollows
@@ -22,97 +23,126 @@ import net.minecraft.block.BlockStoneSlabNew
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
+import kotlin.math.ceil
+import kotlin.math.round
+
+enum class OreCategory {
+    BLOCK,
+    ORE,
+    DWARVEN_METAL,
+    GEMSTONE,
+}
 
 enum class OreBlock(
     val checkBlock: (IBlockState) -> Boolean,
     val checkArea: () -> Boolean,
+    val category: OreCategory,
     val hasInitSound: Boolean = true,
 ) {
     // MITHRIL
-    LOW_TIER_MITHRIL(::isLowTierMithril, { inDwarvenMines || inGlacite }),
-    MID_TIER_MITHRIL(Blocks.prismarine, { inDwarvenMines || inCrystalHollows || inGlacite }),
-    HIGH_TIER_MITHRIL(::isHighTierMithril, { inDwarvenMines || inCrystalHollows || inGlacite }),
+    LOW_TIER_MITHRIL(::isLowTierMithril, { inDwarvenMines || inGlacite }, OreCategory.DWARVEN_METAL),
+    MID_TIER_MITHRIL(Blocks.prismarine, { inDwarvenMines || inCrystalHollows || inGlacite }, OreCategory.DWARVEN_METAL),
+    HIGH_TIER_MITHRIL(::isHighTierMithril, { inDwarvenMines || inCrystalHollows || inGlacite }, OreCategory.DWARVEN_METAL),
 
     // TITANIUM
-    TITANIUM(::isTitanium, { inDwarvenMines || inGlacite }),
+    TITANIUM(::isTitanium, { inDwarvenMines || inGlacite }, OreCategory.DWARVEN_METAL),
 
     // VANILLA ORES
-    STONE(::isStone, { inDwarvenMines }),
-    COBBLESTONE(Blocks.cobblestone, { inDwarvenMines }),
-    COAL_ORE(Blocks.coal_ore, { inDwarvenMines || inCrystalHollows }),
-    IRON_ORE(Blocks.iron_ore, { inDwarvenMines || inCrystalHollows }),
-    GOLD_ORE(Blocks.gold_ore, { inDwarvenMines || inCrystalHollows }),
-    LAPIS_ORE(Blocks.lapis_ore, { inDwarvenMines || inCrystalHollows }),
+    STONE(::isStone, { inDwarvenMines }, OreCategory.BLOCK),
+    COBBLESTONE(Blocks.cobblestone, { inDwarvenMines }, OreCategory.BLOCK),
+    COAL_ORE(Blocks.coal_ore, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE),
+    IRON_ORE(Blocks.iron_ore, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE),
+    GOLD_ORE(Blocks.gold_ore, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE),
+    LAPIS_ORE(Blocks.lapis_ore, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE),
     REDSTONE_ORE(
         { it.block.equalsOneOf(Blocks.redstone_ore, Blocks.lit_redstone_ore) },
         { inDwarvenMines || inCrystalHollows },
+        OreCategory.ORE,
     ),
-    EMERALD_ORE(Blocks.emerald_ore, { inDwarvenMines || inCrystalHollows }),
-    DIAMOND_ORE(Blocks.diamond_ore, { inDwarvenMines || inCrystalHollows }),
+    EMERALD_ORE(Blocks.emerald_ore, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE),
+    DIAMOND_ORE(Blocks.diamond_ore, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE),
 
     // NETHER
-    NETHERRACK(Blocks.netherrack, { inCrimsonIsle }),
-    QUARTZ_ORE(Blocks.quartz_ore, { inCrystalHollows || inCrimsonIsle }),
-    GLOWSTONE(Blocks.glowstone, { inCrimsonIsle }),
-    MYCELIUM(Blocks.mycelium, { inCrimsonIsle }),
-    RED_SAND(::isRedSand, { inCrimsonIsle }),
-    SULPHUR(Blocks.sponge, { inCrimsonIsle }),
+    NETHERRACK(Blocks.netherrack, { inCrimsonIsle }, OreCategory.BLOCK),
+    QUARTZ_ORE(Blocks.quartz_ore, { inCrystalHollows || inCrimsonIsle }, OreCategory.ORE),
+    GLOWSTONE(Blocks.glowstone, { inCrimsonIsle }, OreCategory.BLOCK),
+    MYCELIUM(Blocks.mycelium, { inCrimsonIsle }, OreCategory.BLOCK),
+    RED_SAND(::isRedSand, { inCrimsonIsle }, OreCategory.BLOCK),
+    SULPHUR(Blocks.sponge, { inCrimsonIsle }, OreCategory.ORE),
 
     // SPIDER'S DEN
-    GRAVEL(Blocks.gravel, { inSpidersDen }),
+    GRAVEL(Blocks.gravel, { inSpidersDen }, OreCategory.BLOCK),
 
     // END
-    END_STONE(Blocks.end_stone, { inEnd }),
-    OBSIDIAN(Blocks.obsidian, { inCrystalHollows || inMineshaft || inEnd }),
+    END_STONE(Blocks.end_stone, { inEnd }, OreCategory.BLOCK),
+    OBSIDIAN(Blocks.obsidian, { inCrystalHollows || inMineshaft || inEnd }, OreCategory.ORE),
 
     // HARD STONE
-    HARD_STONE_HOLLOWS(::isHardStoneHollows, { inCrystalHollows }),
-    HARD_STONE_TUNNELS(::isHardstoneTunnels, { inTunnels }),
-    HARD_STONE_MINESHAFT(::isHardstoneMineshaft, { inMineshaft }),
+    HARD_STONE_HOLLOWS(::isHardStoneHollows, { inCrystalHollows }, OreCategory.BLOCK),
+    HARD_STONE_TUNNELS(::isHardstoneTunnels, { inTunnels }, OreCategory.BLOCK),
+    HARD_STONE_MINESHAFT(::isHardstoneMineshaft, { inMineshaft }, OreCategory.BLOCK),
 
     // DWARVEN BLOCKS
-    PURE_COAL(Blocks.coal_block, { inDwarvenMines || inCrystalHollows }),
-    PURE_IRON(Blocks.iron_block, { inDwarvenMines || inCrystalHollows }, hasInitSound = false),
-    PURE_GOLD(Blocks.gold_block, { inDwarvenMines || inCrystalHollows || inMineshaft }, hasInitSound = false),
-    PURE_LAPIS(Blocks.lapis_block, { inDwarvenMines || inCrystalHollows }),
-    PURE_REDSTONE(Blocks.redstone_block, { inDwarvenMines || inCrystalHollows }, hasInitSound = false),
-    PURE_EMERALD(Blocks.emerald_block, { inDwarvenMines || inCrystalHollows }, hasInitSound = false),
-    PURE_DIAMOND(Blocks.diamond_block, { inDwarvenMines || inCrystalHollows }, hasInitSound = false),
+    PURE_COAL(Blocks.coal_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE),
+    PURE_IRON(Blocks.iron_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE, hasInitSound = false),
+    PURE_GOLD(
+        Blocks.gold_block,
+        { inDwarvenMines || inCrystalHollows || inMineshaft },
+        OreCategory.ORE, hasInitSound = false,
+    ),
+    PURE_LAPIS(Blocks.lapis_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE),
+    PURE_REDSTONE(Blocks.redstone_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE, hasInitSound = false),
+    PURE_EMERALD(Blocks.emerald_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE, hasInitSound = false),
+    PURE_DIAMOND(Blocks.diamond_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE, hasInitSound = false),
 
     // GEMSTONES
-    RUBY(EnumDyeColor.RED, { inCrystalHollows || inGlacite }),
-    AMBER(EnumDyeColor.ORANGE, { inCrystalHollows || inGlacite }),
-    AMETHYST(EnumDyeColor.PURPLE, { inCrystalHollows || inGlacite }),
-    JADE(EnumDyeColor.LIME, { inCrystalHollows || inGlacite }),
-    SAPPHIRE(EnumDyeColor.LIGHT_BLUE, { inCrystalHollows || inGlacite }),
-    TOPAZ(EnumDyeColor.YELLOW, { inCrystalHollows || inGlacite }),
-    JASPER(EnumDyeColor.MAGENTA, { inCrystalHollows || inGlacite }),
-    OPAL(EnumDyeColor.WHITE, { inGlacite || inCrimsonIsle }),
-    AQUAMARINE(EnumDyeColor.BLUE, { inGlacite }),
-    CITRINE(EnumDyeColor.BROWN, { inGlacite }),
-    ONYX(EnumDyeColor.BLACK, { inGlacite }),
-    PERIDOT(EnumDyeColor.GREEN, { inGlacite }),
+    RUBY(EnumDyeColor.RED, { inCrystalHollows || inGlacite }, OreCategory.GEMSTONE),
+    AMBER(EnumDyeColor.ORANGE, { inCrystalHollows || inGlacite }, OreCategory.GEMSTONE),
+    AMETHYST(EnumDyeColor.PURPLE, { inCrystalHollows || inGlacite }, OreCategory.GEMSTONE),
+    JADE(EnumDyeColor.LIME, { inCrystalHollows || inGlacite }, OreCategory.GEMSTONE),
+    SAPPHIRE(EnumDyeColor.LIGHT_BLUE, { inCrystalHollows || inGlacite }, OreCategory.GEMSTONE),
+    TOPAZ(EnumDyeColor.YELLOW, { inCrystalHollows || inGlacite }, OreCategory.GEMSTONE),
+    JASPER(EnumDyeColor.MAGENTA, { inCrystalHollows || inGlacite }, OreCategory.GEMSTONE),
+    OPAL(EnumDyeColor.WHITE, { inGlacite || inCrimsonIsle }, OreCategory.GEMSTONE),
+    AQUAMARINE(EnumDyeColor.BLUE, { inGlacite }, OreCategory.GEMSTONE),
+    CITRINE(EnumDyeColor.BROWN, { inGlacite }, OreCategory.GEMSTONE),
+    ONYX(EnumDyeColor.BLACK, { inGlacite }, OreCategory.GEMSTONE),
+    PERIDOT(EnumDyeColor.GREEN, { inGlacite }, OreCategory.GEMSTONE),
 
     // GLACIAL
-    LOW_TIER_UMBER(::isLowTierUmber, { inGlacite }),
-    MID_TIER_UMBER(::isMidTierUmber, { inGlacite }),
-    HIGH_TIER_UMBER(::isHighTierUmber, { inGlacite }),
+    LOW_TIER_UMBER(::isLowTierUmber, { inGlacite }, OreCategory.DWARVEN_METAL),
+    MID_TIER_UMBER(::isMidTierUmber, { inGlacite }, OreCategory.DWARVEN_METAL),
+    HIGH_TIER_UMBER(::isHighTierUmber, { inGlacite }, OreCategory.DWARVEN_METAL),
 
-    LOW_TIER_TUNGSTEN_TUNNELS(::isLowTierTungstenTunnels, { inTunnels }),
-    LOW_TIER_TUNGSTEN_MINESHAFT(::isLowTierTungstenMineshaft, { inMineshaft }),
-    HIGH_TIER_TUNGSTEN(Blocks.clay, { inGlacite }),
+    LOW_TIER_TUNGSTEN_TUNNELS(::isLowTierTungstenTunnels, { inTunnels }, OreCategory.DWARVEN_METAL),
+    LOW_TIER_TUNGSTEN_MINESHAFT(::isLowTierTungstenMineshaft, { inMineshaft }, OreCategory.DWARVEN_METAL),
+    HIGH_TIER_TUNGSTEN(Blocks.clay, { inGlacite }, OreCategory.DWARVEN_METAL),
 
-    GLACITE(Blocks.packed_ice, { inGlacite }),
+    GLACITE(Blocks.packed_ice, { inGlacite }, OreCategory.DWARVEN_METAL),
     ;
 
-    constructor(block: Block, checkArea: () -> Boolean, hasInitSound: Boolean = true) :
-        this({ it.block == block }, checkArea, hasInitSound)
+    val strength get() = MiningApi.blockStrengths[this] ?: 0
 
-    constructor(gemstoneColor: EnumDyeColor, checkArea: () -> Boolean, hasInitSound: Boolean = true) :
-        this({ it.isGemstoneWithColor(gemstoneColor) }, checkArea, hasInitSound)
+    val speedSoftCap get() = ceil(20.0 / 3.0 * strength).toInt()
+
+    val speedForInstantMine get() = strength * if (category != OreCategory.BLOCK) 60 else 30
+
+    fun miningTicks(speed: Double): Int = when {
+        speed >= speedForInstantMine -> 1
+        speed >= speedSoftCap -> 4
+        else -> round((strength * 30.0) / speed).toInt()
+    }
+
+    constructor(block: Block, checkArea: () -> Boolean, category: OreCategory, hasInitSound: Boolean = true) :
+        this({ it.block == block }, checkArea, category, hasInitSound)
+
+    constructor(gemstoneColor: EnumDyeColor, checkArea: () -> Boolean, category: OreCategory, hasInitSound: Boolean = true) :
+        this({ it.isGemstoneWithColor(gemstoneColor) }, checkArea, category, hasInitSound)
 
     companion object {
         fun getByStateOrNull(state: IBlockState): OreBlock? = currentAreaOreBlocks.find { it.checkBlock(state) }
+
+        fun getByNameOrNull(string: String) = entries.firstOrNull { it.name == string }
     }
 }
 

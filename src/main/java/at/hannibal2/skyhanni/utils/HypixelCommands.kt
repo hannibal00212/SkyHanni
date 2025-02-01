@@ -22,6 +22,10 @@ object HypixelCommands {
         send("playtime")
     }
 
+    fun skyblockMenu() {
+        send("sbmenu")
+    }
+
     fun skills() {
         send("skills")
     }
