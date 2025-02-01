@@ -16,6 +16,11 @@ public class CarnivalConfig {
     public ZombieShootoutConfig zombieShootout = new ZombieShootoutConfig();
 
     @Expose
+    @ConfigOption(name = "Mask Shop Price", desc = "")
+    @Accordion
+    public MaskShopPriceConfig maskShopPrice = new MaskShopPriceConfig();
+
+    @Expose
     @ConfigOption(name = "Reminder Daily Tickets", desc = "Reminds you when tickets can be claimed from the carnival leader.")
     @ConfigEditorBoolean
     @FeatureToggle
