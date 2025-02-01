@@ -50,7 +50,7 @@ object ExperimentsDryStreakDisplay {
 
     @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!isEnabled() || didJustFind || ExperimentationTableApi.getCurrentExperiment() == null) return
+        if (!isEnabled() || didJustFind || ExperimentationTableApi.currentExperiment == null) return
 
         for (lore in event.inventoryItems.map { it.value.getLore() }) {
             val firstLine = lore.firstOrNull() ?: continue
@@ -72,7 +72,7 @@ object ExperimentsDryStreakDisplay {
 
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        if (didJustFind || ExperimentationTableApi.getCurrentExperiment() == null) return
+        if (didJustFind || ExperimentationTableApi.currentExperiment == null) return
 
         val storage = storage ?: return
         storage.attemptsSince += 1
