@@ -6,7 +6,6 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
@@ -65,9 +64,9 @@ public class HoppityEventSummaryConfig {
         SIDE_DISH_EGGS("§7You found §b4 §6§lSide Dish Eggs §r§7in the §6Chocolate Factory§7."),
         MILESTONE_RABBITS("§7You claimed §b2 §6§lMilestone Rabbits§7."),
         EMPTY_1(""),
-        NEW_RABBITS("§7Unique Rabbits: §b7\n §f1 §7- §a1 §7- §91 §7- §51 §7- §61 §7- §d1 §7- §b1"),
+        NEW_RABBITS("§7Unique Rabbits: §f7\n §f1 §7- §a1 §7- §91 §7- §51 §7- §61 §7- §d1 §7- §b1"),
         EMPTY_2(""),
-        DUPLICATE_RABBITS("§7Duplicate Rabbits: §c10\n §f4 §7- §a3 §7- §92 §7- §51 §7- §60 §7- §d0 §7- §b0\n §6+250,000,000 Chocolate"),
+        DUPLICATE_RABBITS("§7Duplicate Rabbits: §f10\n §f4 §7- §a3 §7- §92 §7- §51 §7- §60 §7- §d0 §7- §b0\n §6+250,000,000 Chocolate"),
         EMPTY_3(""),
         STRAY_RABBITS("§7Stray Rabbits: §f20\n §f10 §7- §a6 §7- §93 §7- §51 §7- §60 §7- §d0 §7- §b0\n §6+8,000,000 Chocolate\n  §4* §c§oRequires Stray Tracker being enabled to work§4§o."),
         EMPTY_4(""),
@@ -87,4 +86,13 @@ public class HoppityEventSummaryConfig {
             return display;
         }
     }
+
+    @Expose
+    @ConfigOption(
+        name = "Show Count Diff",
+        desc = "Store and display the count of Uniques/Duplicates next to their respective rabbit count.\n" +
+            ".e.g. §7Unique Rabbits: §f5 §7(270 -> 275)"
+    )
+    @ConfigEditorBoolean
+    public boolean showCountDiff = true;
 }
