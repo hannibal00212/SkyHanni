@@ -91,7 +91,7 @@ public class PestTimerConfig {
     @Expose
     @ConfigOption(
         name = "AFK Timeout",
-        desc = "Don't include spawn time in average spawn time display when the player goes AFK for at least this many seconds"
+        desc = "Don't include spawn time in average spawn time display when the player goes AFK for at least this many seconds."
     )
     @ConfigEditorSlider(minValue = 5, maxValue = 300, minStep = 1)
     public int averagePestSpawnTimeout = 30;
