@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
 import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
-import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
@@ -342,11 +341,6 @@ object Commands {
             description = "Test the inquisitor waypoint share"
             category = CommandCategory.DEVELOPER_DEBUG
             callback { InquisitorWaypointShare.test() }
-        }
-        event.register("shshowcropmoneycalculation") {
-            description = "Show the calculation of the crop money"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { CropMoneyDisplay.toggleShowCalculation() }
         }
         event.register("shcropspeedmeter") {
             description = "Debugs how many crops you collect over time"
