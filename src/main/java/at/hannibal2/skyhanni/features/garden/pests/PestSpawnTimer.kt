@@ -69,11 +69,6 @@ object PestSpawnTimer {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
 
-        if (pestSpawned) {
-            hasWarned = false
-            pestSpawned = false
-        }
-
         pestCooldownPattern.firstMatcher(event.widget.lines) {
             val minutes = groupOrNull("minutes")?.formatInt()
             val seconds = groupOrNull("seconds")?.formatInt()
@@ -102,6 +97,12 @@ object PestSpawnTimer {
                 }
             }
         }
+
+        if (pestSpawned) {
+            hasWarned = false
+            pestSpawned = false
+        }
+
     }
 
     @HandleEvent
@@ -157,7 +158,7 @@ object PestSpawnTimer {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (hasWarned || !config.pestCooldownOverWarning || pestSpawned) return
+        if (hasWarned || !config.pestCooldownOverWarning) return
 
         if ((pestCooldownEndTime - config.cooldownWarningTime.seconds).isInPast()) {
             warn()
