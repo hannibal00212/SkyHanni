@@ -452,3 +452,24 @@ These helper methods should generally be placed in the `at.hannibal2.skyhanni.ut
 compatability methods for. For example, `WorldClient.getAllEntities()` could be placed in `WorldCompat.kt`. This is not a strict rule, but
 it is a good guideline to follow as for the most part we do not want to be doing large amount of preprocessing in the feature files
 themselves.
+
+## Creating a new Release
+<details>
+<summary>Minimized, for your convenience</summary>
+
+### Preparing a release
+
+To prepare a release, first merge all the PRs that you want, and then run `/gradlew prepareRelease -Pver=X.X.X`.
+Do *not* use a `vX.X.X` prefix, just raw-dog the `X.X.X` version. If you want this to be a pre-release set the patch version
+to something `!= 0`. Note that we follow normal semver rules here, so `3.1.1 > 3.1.0`.
+
+GitHub actions will automatically build a JAR and generate a changelog and upload both to a draft release. 
+It will send a copy of the proposed changelog to the Discord channel `#hanni-predicting-the-next-sh-update`
+
+### Publishing a release
+
+Once the release is ready it can be published. It should be automatically
+available to all people with an auto updater, and be automatically published on modrinth too. 
+The release message needs to be manually uploaded to discord.
+
+</details>

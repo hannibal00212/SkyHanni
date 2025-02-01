@@ -1,0 +1,67 @@
+name: Pre-Publish
+
+on:
+    push:
+        tags:
+            - "*"
+
+jobs:
+    prepare-release:
+        if: github.repository_id == '511310721'
+        runs-on: ubuntu-latest
+        env:
+            UPDATE_VERSION: ${{ github.ref_name }}
+
+        steps:
+            -   name: Checkout code
+                uses: actions/checkout@v4
+
+            -   name: Verify tag format
+                run: |
+                    if [[ ! "${UPDATE_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                      echo "Invalid tag format. Expected tag format: major.minor.patch"
+                      exit 1
+                    fi
+            # todo change the version with an env variable like neu does, once sh already used new versioning for a bit
+            -   name: Update version in root.gradle.kts
+                run: |
+                    sed -i "s/version = \".*\"/version = \"${UPDATE_VERSION}\"/" root.gradle.kts
+
+            -   uses: ./.github/actions/setup-normal-workspace
+
+            -   name: Grant execute permission for gradlew
+                run: chmod +x gradlew
+
+            -   name: Build with Gradle
+                run: ./gradlew assemble -x test --stacktrace -PskipDetekt=true
+
+            -   uses: actions/upload-artifact@v4
+                with:
+                    path: build/libs/*.jar
+
+            -   name: Generate Github Changelog
+                env:
+                    OUTPUT_TYPE: "GITHUB"
+                run: ./gradlew generateChangelog -PmodVersion=${UPDATE_VERSION} -PoutputType=${OUTPUT_TYPE}
+
+            -   name: Format Changelogs
+                run: ./.github/scripts/format-update-notes.sh
+
+            -   run: ./.github/scripts/upload-release.sh
+                env:
+                    GH_TOKEN: ${{ github.token }}
+
+            -   name: Generate Discord Internal Changelog
+                env:
+                    OUTPUT_TYPE: "DISCORD_INTERNAL"
+                run: ./gradlew generateChangelog -PmodVersion=${UPDATE_VERSION} -PoutputType=${OUTPUT_TYPE}
+
+            -   name: Grant execute permission for discord webhook script
+                run: chmod +x ./.github/scripts/send-discord-changelog-webhook.sh
+
+            # todo make sure this webhook is made and points to correct channel
+            -   name: Upload Proposed Changelog to Discord Webhook
+                env:
+                    DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_PRE_UPDATE }}
+                    CHANGELOG_FILE: build/changelog-DISCORD_INTERNAL.txt
+                run: ./.github/scripts/send-discord-changelog-webhook.sh

@@ -9,8 +9,10 @@ import net.fabricmc.loom.api.processor.SpecContext
 import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import skyhannibuildsystem.ChangelogGeneration
 import skyhannibuildsystem.ChangelogVerification
 import skyhannibuildsystem.DownloadBackupRepo
+import skyhannibuildsystem.PrepareRelease
 import java.io.Serializable
 import java.nio.file.Path
 import java.util.zip.ZipFile
@@ -124,10 +126,23 @@ tasks.runClient {
     )
 }
 
-tasks.register("checkPrDescription", ChangelogVerification::class) {
-    this.outputDirectory.set(layout.buildDirectory)
-    this.prTitle = project.findProperty("prTitle") as String
-    this.prBody = project.findProperty("prBody") as String
+if (target == ProjectTarget.MAIN) {
+    tasks.register("checkPrDescription", ChangelogVerification::class) {
+        this.outputDirectory.set(layout.buildDirectory)
+        this.prTitle = project.findProperty("prTitle") as String
+        this.prBody = project.findProperty("prBody") as String
+    }
+
+    tasks.register("generateChangelog", ChangelogGeneration::class) {
+        this.outputDirectory.set(layout.buildDirectory)
+        project.findProperty("modVersion")?.let { this.modVersion = it as String }
+        project.findProperty("outputType")?.let { this.outputType = it as String }
+    }
+
+    tasks.register("prepareRelease", PrepareRelease::class) {
+        project.findProperty("ver")?.let { this.modVersion = it as String }
+        project.findProperty("remote")?.let { this.remote = it as String }
+    }
 }
 
 file("shots.txt")

@@ -1,0 +1,186 @@
+name: Post-Publish
+
+on:
+    release:
+        types:
+            - published
+
+env:
+    UPDATE_VERSION: ${{ github.event.release.tag_name }}
+    REPO: ${{ github.repository }}
+
+jobs:
+    post-publish:
+        if: github.repository_id == '511310721'
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Checkout code
+                uses: actions/checkout@v4
+
+            -   uses: ./.github/actions/setup-normal-workspace
+
+            -   name: Grant execute permission for gradlew
+                run: chmod +x gradlew
+
+            -   name: Generate Github Changelog
+                env:
+                    OUTPUT_TYPE: "GITHUB"
+                run: ./gradlew generateChangelog -PmodVersion=${UPDATE_VERSION} -PoutputType=${OUTPUT_TYPE}
+
+            -   name: Generate Discord Changelog
+                env:
+                    OUTPUT_TYPE: "DISCORD_PUBLIC"
+                run: ./gradlew generateChangelog -PmodVersion=${UPDATE_VERSION} -PoutputType=${OUTPUT_TYPE}
+
+            -   name: Download release file
+                env:
+                    GITHUB_TOKEN: ${{ github.token }}
+                run: |
+                    mkdir -p build/libs
+                    gh release download "${UPDATE_VERSION}" -p '*.jar' --repo "${REPO}"
+                    mv *.jar build/libs/
+            -   name: Print current working directory
+                run: pwd
+
+            -   name: Print full path of the downloaded file
+                run: realpath build/libs/*.jar
+
+            -   name: List all files
+                run: ls -la
+
+            -   name: List all files in build
+                run: ls -la build
+
+            -   name: List all files in build/libs
+                run: ls -la build/libs
+
+            -   name: Format Changelogs
+                run: ./.github/scripts/format-update-notes.sh
+
+            -   name: Upload Changelogs
+                uses: actions/upload-artifact@v4
+                with:
+                    name: build-artifacts
+                    path: |
+                        build/**/*.txt
+
+    upload-to-modrinth:
+        needs: post-publish
+        runs-on: ubuntu-latest
+
+        #      todo multi version support
+        steps:
+            -   name: Download Changelogs
+                uses: actions/download-artifact@v4
+
+                with:
+                    name: build-artifacts
+                    path: build
+
+            -   name: Download release file
+                env:
+                    GITHUB_TOKEN: ${{ github.token }}
+                run: |
+                    gh release download "${UPDATE_VERSION}" -p '*.jar' --repo "${REPO}"
+
+            -   name: Remove Modrinth Link
+                run: |
+                    grep -v "Modrinth download" build/update-notes.txt | sed '1{/^$/d;}' > Changelog.md
+
+            -   name: Set Release Type
+                run: |
+                    releaseType="release"
+                    if ! echo "${UPDATE_VERSION}" | grep -E '.*\.0$'>/dev/null; then
+                      releaseType="beta"
+                    fi
+                    echo "RELEASE_TYPE=${releaseType}" >> $GITHUB_ENV
+
+            -   name: Publish to Modrinth
+                uses: Kir-Antipov/mc-publish@v3.3
+                with:
+                    modrinth-id: byNkmv5G
+                    # todo make sure this is setup
+                    modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+                    # todo multi version at a later point
+                    files: "build/*.jar"
+                    loaders: forge
+                    game-versions: 1.8.9
+                    version: ${{ github.event.release.tag_name }}
+                    version-type: ${{ releaseType }}
+
+    finalise-github-changelog:
+        needs: post-publish
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Download Changelogs
+                uses: actions/download-artifact@v4
+                with:
+                    name: build-artifacts
+                    path: build
+
+            -   name: Update GitHub Release Body
+                env:
+                    GITHUB_TOKEN: ${{ github.token }}
+                run: |
+                    changelog=$(cat build/update-notes.txt)
+                    gh release edit "${UPDATE_VERSION}" --notes "${changelog}" --repo "${REPO}"
+
+    # todo decide later if this is wanted
+    #    send-discord-webhook:
+    #        needs: post-publish
+    #        runs-on: ubuntu-latest
+    #
+    #        steps:
+    #            -   name: Download Changelogs
+    #                uses: actions/download-artifact@v4
+    #                with:
+    #                    name: build-artifacts
+    #
+    #            -   name: Grant execute permission for discord webhook script
+    #                run: chmod +x ./.github/scripts/send-discord-changelog-webhook.sh
+    #
+    #            # todo make sure this webhook is made and points to correct channel
+    #            -   name: Upload Release Changelog to Discord Webhook
+    #                env:
+    #                    # todo depending on if this is a beta or full release change the webhook
+    #                    DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_POST_UPDATE }}
+    #                    CHANGELOG_FILE: build/changelog-DISCORD_PUBLIC.txt
+    #                run: ./.github/scripts/send-discord-changelog-webhook.sh
+
+    bump-mod-version:
+        needs: post-publish
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Checkout beta branch
+                uses: actions/checkout@v4
+                with:
+                    ref: beta
+
+            -   name: Update mod version in root.gradle.kts
+                run: |
+                    original_content=$(cat root.gradle.kts)
+                    sed -i "s/version = \".*\"/version = \"${UPDATE_VERSION}\"/" root.gradle.kts
+                    updated_content=$(cat root.gradle.kts)
+                    
+                    if [ "$original_content" = "$updated_content" ]; then
+                      echo "Version is already up-to-date, exiting."
+                      echo "VERSION_UPDATED=false" >> $GITHUB_ENV
+                    else
+                      echo "Version in root.gradle.kts updated to ${UPDATE_VERSION}."
+                      echo "VERSION_UPDATED=true" >> $GITHUB_ENV
+                    fi
+            # todo in future change the changelog.md file to have new changes
+
+            -   name: Commit version bump
+                if: env.VERSION_UPDATED == 'true'
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: |
+                    git config user.name 'github-actions[bot]'
+                    git config user.email 'github-action@users.noreply.github.com'
+                    git add root.gradle.kts
+                    git commit -m "Bump version to ${UPDATE_VERSION}"
+                    git push
