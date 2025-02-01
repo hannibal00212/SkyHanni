@@ -1,10 +1,8 @@
 package at.hannibal2.skyhanni.detektrules.grammar
 
 import at.hannibal2.skyhanni.detektrules.SkyHanniRule
-import io.gitlab.arturbosch.detekt.api.CodeSmell
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression

@@ -44,7 +44,6 @@ public class MiningEventConfig {
     @ConfigEditorBoolean
     public boolean passedEvents = false;
 
-
     public enum ShowType {
         ALL("All Mining Islands"),
         CRYSTAL("Crystal Hollows Only"),

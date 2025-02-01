@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.CollectionUtils.countBy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -174,20 +173,17 @@ object MiningApi {
 
     fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isInIsland() && glaciteAreaPattern.matches(LorenzUtils.skyBlockArea)
 
-    fun inCustomMiningIsland() = inAnyIsland(
-        IslandType.DWARVEN_MINES,
-        IslandType.MINESHAFT,
-        IslandType.CRYSTAL_HOLLOWS,
-        IslandType.THE_END,
-        IslandType.CRIMSON_ISLE,
-        IslandType.SPIDER_DEN,
-    )
+    @Deprecated("Use IslandTypeTags.CUSTOM_MINING.inAny() instead", ReplaceWith("IslandTypeTags.CUSTOM_MINING.inAny()"))
+    fun inCustomMiningIsland() = IslandTypeTags.CUSTOM_MINING.inAny()
 
-    fun inAdvancedMiningIsland() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.CRYSTAL_HOLLOWS, IslandType.MINESHAFT)
+    @Deprecated("Use IslandTypeTags.ADVANCED_MINING.inAny() instead", ReplaceWith("IslandTypeTags.ADVANCED_MINING.inAny()"))
+    fun inAdvancedMiningIsland() = IslandTypeTags.ADVANCED_MINING.inAny()
 
-    fun inMiningIsland() = inAdvancedMiningIsland() || inAnyIsland(IslandType.GOLD_MINES, IslandType.DEEP_CAVERNS)
+    @Deprecated("Use IslandTypeTags.MINING.inAny() instead", ReplaceWith("IslandTypeTags.MINING.inAny()"))
+    fun inMiningIsland() = IslandTypeTags.MINING.inAny()
 
-    fun inColdIsland() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)
+    @Deprecated("Use IslandTypeTags.IS_COLD.inAny() instead", ReplaceWith("IslandTypeTags.IS_COLD.inAny()"))
+    fun inColdIsland() = IslandTypeTags.IS_COLD.inAny()
 
     @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {

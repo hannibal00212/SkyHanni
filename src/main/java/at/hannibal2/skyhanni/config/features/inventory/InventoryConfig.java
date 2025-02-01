@@ -138,7 +138,7 @@ public class InventoryConfig {
     @ConfigOption(name = "New Year Cake Tracker", desc = "")
     @Accordion
     public CakeTrackerConfig cakeTracker = new CakeTrackerConfig();
-  
+
     @Expose
     @ConfigOption(name = "Magical Power Display", desc = "")
     @Accordion
@@ -318,7 +318,7 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean essenceShopHelper = true;
-  
+
     @Expose
     @ConfigOption(name = "Snake Game Keybinds", desc = "Use WASD-Keys to move around in the Abiphone snake game.")
     @ConfigEditorBoolean
