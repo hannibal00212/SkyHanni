@@ -108,7 +108,7 @@ object PestSpawnTimer {
     fun onPestSpawn(event: PestSpawnEvent) {
         val spawnTime = lastSpawnTime.passedSince()
 
-        if (!lastSpawnTime.isFarPast()) {
+        if (!lastSpawnTime.isFarPast() && !pestSpawned) {
             if (longestCropBrokenTime.inWholeSeconds.toInt() <= config.averagePestSpawnTimeout) {
                 pestSpawnTimes.add(spawnTime.inWholeSeconds.toInt())
                 ChatUtils.debug("Added pest spawn time ${spawnTime.format()}")
