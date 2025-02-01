@@ -50,6 +50,7 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
 
     override fun toString(): String = coloredLabel
 
+    @Deprecated("Use CustomColor instead", ReplaceWith("CustomColor(this)", "at.hannibal2.skyhanni.config.core.config.CustomColor"))
     fun toConfigColor(): String = "0:255:${color.red}:${color.green}:${color.blue}"
 
     fun toDyeColor(): EnumDyeColor = when (this) {

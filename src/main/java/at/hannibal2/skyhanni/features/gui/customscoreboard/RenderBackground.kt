@@ -52,7 +52,7 @@ object RenderBackground {
         } else {
             Renderable.drawInsideRoundedRect(
                 renderable,
-                backgroundConfig.color.toSpecialColor(),
+                backgroundConfig.color.toColor(),
                 borderSize,
                 backgroundConfig.roundedCornerSmoothness,
                 1,
