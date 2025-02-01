@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ToolTipData
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -49,20 +50,26 @@ object PageScrolling {
 
     private val scroll = ScrollValue()
 
+    // these checks are to prevent cheat-like behaviour, where the player could scroll through the inventory without any delay
+    // currentlyScrollable is the primary check, to see if the player is currently able to scroll,
+    // with cooldown beeing a fallback to still allow for scrolling if currentlyScrollable is stuck
+    private var currentlyScrollable = false
     private var cooldown = SimpleTimeMark.farPast()
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return
-        if (cooldown.isInFuture()) return
+        if (!currentlyScrollable && !cooldown.isInFuture()) return
         if (!scroll.isMouseEventValid()) return
 
         val inventoryName = InventoryUtils.openInventoryName()
         if (inventoryName.isEmpty()) return
         if (illegalInventory.matches(inventoryName)) return
 
-        if (((ToolTipData.lastSlot != null) xor config.invertBypass xor config.bypassKey.isKeyHeld())) return
+        if (ToolTipData.lastSlot != null) {
+            if (!(config.invertBypass xor config.bypassKey.isKeyHeld())) return
+        }
 
         val dWheel = Mouse.getEventDWheel()
         if (dWheel == 0) return
@@ -71,7 +78,15 @@ object PageScrolling {
             patterns.matches(it.stack?.displayName)
         } ?: return
         InventoryUtils.clickSlot(slot.slotNumber)
-        cooldown = 1.0.seconds.fromNow() // 1 second is not specific it is just a reasonable cooldown
+
+        currentlyScrollable = false
+        cooldown = 1.0.seconds.fromNow()
+    }
+
+    @HandleEvent
+    fun onInventoryOpen(event: InventoryOpenEvent) {
+        if (!isEnabled()) return
+        currentlyScrollable = true
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enable && InventoryUtils.inInventory()
