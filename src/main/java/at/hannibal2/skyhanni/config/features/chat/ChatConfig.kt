@@ -97,6 +97,15 @@ class ChatConfig {
 
     @Expose
     @ConfigOption(
+        name = "Compact Jacob Claim",
+        desc = "Compact the Jacob Claim message, only showing full information when hovering."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var compactJacobClaim: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Arachne Hider",
         desc = "Hide chat messages about the Arachne Fight while outside of §eArachne's Sanctuary§7."
     )
