@@ -287,14 +287,10 @@ object HypixelData {
         scoreboardVisitingAmountPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
             return group("maxamount").toInt() + playerAmountOnIsland
         }
-
-        return when (skyBlockIsland) {
-            IslandType.MINESHAFT -> 4
-            IslandType.CATACOMBS -> 5
-            IslandType.CRYSTAL_HOLLOWS -> 24
-            IslandType.CRIMSON_ISLE -> 24
-            else -> if (serverId?.startsWith("mega") == true) 80 else 26
+        if (serverId?.startsWith("mega") == true) {
+            return IslandType.maxPlayersMega
         }
+        return skyBlockIsland.islandData?.maxPlayers ?: IslandType.maxPlayers
     }
 
     // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
