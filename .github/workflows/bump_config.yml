@@ -1,0 +1,65 @@
+name: Update Config Version
+
+on:
+    pull_request_target:
+        types:
+            - closed  # Only trigger on PR merge
+
+jobs:
+    update-config:
+        if: github.event.pull_request.merged == true
+        runs-on: ubuntu-latest
+        env:
+            VERSION_FILE : Config_Version
+        steps:
+            -   name: Checkout Repository
+                uses: actions/checkout@v4
+
+            -   name: Get Version
+                run: |
+                    old_version=$(cat $VERSION_FILE)
+                    new_version=$((old_version + 1))
+                    echo "CONFIG_VERSION=${new_version}" >> $GITHUB_ENV
+
+            -   name: Check for configFixes Template
+                id: check-template
+                run: |
+                    replacement_made=false
+        
+                    directory="./src"
+                    import="import at.hannibal2.skyhanni.config.CONFIG_MOVE_VERSION"
+                    
+                    for file in $(grep -rl "$import" "$directory"); do
+                        echo "File: $file"
+                        replacement_made=true
+                        sed -i "/$import/d" "$file"
+                        sed -i "s/CONFIG_MOVE_VERSION/$CONFIG_VERSION/g" "$file"
+                    done
+                    
+                    echo "Close"
+                    
+                    if [[ "$replacement_made" == true ]]; then
+                        echo "REPLACEMENT_MADE=true" >> $GITHUB_ENV
+                        echo "Has replaced"
+                    else
+                        echo "REPLACEMENT_MADE=false" >> $GITHUB_ENV
+                        echo "Hasn't replaced"
+                    fi
+
+            -   name: Increment Config Version
+                if: env.REPLACEMENT_MADE == 'true'
+                run: |
+                    echo $CONFIG_VERSION > $VERSION_FILE
+
+            -   name: Commit Changes
+                if: env.REPLACEMENT_MADE == 'true'
+                run: |
+                    git config user.name "GitHub Actions"
+                    git config user.email "actions@github.com"
+                    git add .
+                    git commit -m "Bumped configVersion to $CONFIG_VERSION"
+
+            -   name: Push Changes
+                if: env.REPLACEMENT_MADE == 'true'
+                run: |
+                    git push origin HEAD
