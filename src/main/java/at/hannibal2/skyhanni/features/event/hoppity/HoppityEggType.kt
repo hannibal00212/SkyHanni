@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.isAlternateDay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
@@ -18,7 +20,6 @@ enum class HoppityEggType(
     val mealName: String,
     private val mealColor: String,
     val resetsAt: Int,
-    var lastResetDay: Int = -1,
     private var claimed: Boolean = false,
     val altDay: Boolean = false
 ) {
@@ -37,31 +38,53 @@ enum class HoppityEggType(
     STRAY("Stray", "§a", -1)
     ;
 
-    fun timeUntil(): Duration {
-        if (resetsAt == -1) return Duration.INFINITE
-        val now = SkyBlockTime.now()
-        val isEggDayToday = altDay == now.isAlternateDay()
+    val isResetting get() = resettingEntries.contains(this)
+    val formattedName get() = "${if (isClaimed()) "§7§m" else mealColor}$mealName:$mealColor"
+    val coloredName get() = "$mealColor$mealName"
+
+    val timeUntil: Duration get() = nextSpawn.timeUntil()
+    private val nextSpawn: SimpleTimeMark get() = nextSpawnCache[this]?.takeIf { !it.isInPast() }
+        ?: calculateNextSpawn()
+
+    private fun calculateNextSpawn(): SimpleTimeMark {
+        if (resetsAt == -1) return SimpleTimeMark.farFuture()
+        val sbTimeNow = SkyBlockTime.now()
+        val isEggDayToday = altDay == sbTimeNow.isAlternateDay()
 
         val daysToAdd = when {
-            isEggDayToday && now.hour < resetsAt -> 0
-            isEggDayToday && now.hour >= resetsAt -> 2
+            isEggDayToday && sbTimeNow.hour < resetsAt -> 0
+            isEggDayToday && sbTimeNow.hour >= resetsAt -> 2
             else -> 1
         }
 
-        return now.copy(day = now.day + daysToAdd, hour = resetsAt, minute = 0, second = 0).asTimeMark().timeUntil()
-    }
-
-    fun nextTime(): SimpleTimeMark {
-        return SimpleTimeMark.now() + timeUntil()
+        return sbTimeNow.copy(
+            day = sbTimeNow.day + daysToAdd,
+            hour = resetsAt,
+            minute = 0,
+            second = 0
+        ).asTimeMark().also {
+            nextSpawnCache[this] = it
+        }
     }
 
     fun markClaimed(mark: SimpleTimeMark? = null) {
-        mealLastFound[this] = mark ?: SimpleTimeMark.now()
         claimed = true
+        mark?.let { profileStorage?.mealLastFound?.set(this, it) }
     }
 
     fun markSpawned() {
         claimed = false
+        HoppityEggLocator.mealSpawned(this)
+    }
+
+    fun isClaimed() = claimed || hasNotFirstSpawnedYet()
+
+    fun hasRemainingSpawns(): Boolean {
+        val hoppityEndMark = HoppityApi.getEventEndMark() ?: return false
+        // If it's before the last two days of the event, we can assume there are more spawns
+        if (hoppityEndMark.toMillis() > SkyBlockTime.SKYBLOCK_DAY_MILLIS * 2) return true
+        // Otherwise we have to check if the next spawn is after the end of the event
+        return timeUntil < hoppityEndMark.timeUntil()
     }
 
     private fun hasNotFirstSpawnedYet(): Boolean {
@@ -70,71 +93,40 @@ enum class HoppityEggType(
         return (altDay && now.day < 2) || now.hour < resetsAt
     }
 
-    fun hasRemainingSpawns(): Boolean {
-        val hoppityEndMark = HoppityApi.getEventEndMark() ?: return false
-        // If it's before the last two days of the event, we can assume there are more spawns
-        if (hoppityEndMark.toMillis() > SkyBlockTime.SKYBLOCK_DAY_MILLIS * 2) return true
-        // Otherwise we have to check if the next spawn is after the end of the event
-        return timeUntil() < hoppityEndMark.timeUntil()
-    }
-
-    fun isClaimed() = claimed || hasNotFirstSpawnedYet()
-    val isResetting get() = resettingEntries.contains(this)
-    val formattedName get() = "${if (isClaimed()) "§7§m" else mealColor}$mealName:$mealColor"
-    val coloredName get() = "$mealColor$mealName"
-
     @SkyHanniModule
     companion object {
-        private val mealLastFound
-            get() = ProfileStorageData.profileSpecific?.chocolateFactory?.mealLastFound ?: mutableMapOf()
-
-        @HandleEvent
-        fun onProfileJoin(event: ProfileJoinEvent) {
-            mealLastFound.forEach { (meal, mark) ->
-                if (mark.passedSince() < 40.minutes) meal.markClaimed(mark)
-                else meal.markSpawned()
-            }
-        }
-
+        private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
+        private val nextSpawnCache = CollectionUtils.ObservableMutableMap<HoppityEggType, SimpleTimeMark>(
+            enumMapOf(),
+            onUpdate = { type, markOrNull ->
+                val mark = markOrNull ?: return@ObservableMutableMap
+                profileStorage?.mealNextSpawn?.set(type, mark)
+            },
+        )
         val resettingEntries = entries.filter { it.resetsAt != -1 }
         val sortedResettingEntries = resettingEntries.sortedBy { it.resetsAt }
 
-        fun allFound() = resettingEntries.forEach { it.markClaimed() }
+        fun markAllFound() = resettingEntries.forEach { it.markClaimed() }
+        fun anyEggsUnclaimed(): Boolean = resettingEntries.any { !it.claimed }
+        fun allEggsUnclaimed(): Boolean = resettingEntries.all { !it.claimed }
 
-        private fun getMealByName(mealName: String) = entries.find { it.mealName == mealName }
+        @HandleEvent
+        fun onProfileJoin(event: ProfileJoinEvent) {
+            val spawnMap = profileStorage?.mealNextSpawn ?: return
+            val findMap = profileStorage?.mealLastFound ?: return
+            for ((meal, mark) in spawnMap) {
+                val lastFound = findMap[meal] ?: continue
+                if (mark.isInPast()) meal.markSpawned()
+                else if (lastFound.passedSince() <= 40.minutes) meal.markClaimed(lastFound)
+            }
+        }
 
         internal fun Matcher.getEggType(event: SkyHanniChatEvent): HoppityEggType =
-            HoppityEggType.getMealByName(group("meal")) ?: run {
+            entries.find { it.mealName == group("meal") } ?: run {
                 ErrorManager.skyHanniError(
                     "Unknown meal: ${group("meal")}",
                     "message" to event.message,
                 )
             }
-
-        fun checkClaimed() {
-            val currentSBTime = SkyBlockTime.now()
-            val currentSBDay = currentSBTime.day
-            val currentSBHour = currentSBTime.hour
-            val isAltDay = currentSBTime.isAlternateDay()
-
-            for (eggType in resettingEntries.filter { it.altDay == isAltDay }) {
-                if (currentSBHour < eggType.resetsAt || eggType.lastResetDay == currentSBDay) continue
-                eggType.markSpawned()
-                eggType.lastResetDay = currentSBDay
-                if (HoppityEggLocator.currentEggType == eggType) {
-                    HoppityEggLocator.currentEggType = null
-                    HoppityEggLocator.currentEggNote = null
-                    HoppityEggLocator.sharedEggLocation = null
-                }
-            }
-        }
-
-        fun eggsRemaining(): Boolean {
-            return resettingEntries.any { !it.claimed }
-        }
-
-        fun allEggsRemaining(): Boolean {
-            return resettingEntries.all { !it.claimed }
-        }
     }
 }

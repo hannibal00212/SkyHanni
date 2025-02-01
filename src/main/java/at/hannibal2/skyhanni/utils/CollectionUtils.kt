@@ -463,13 +463,20 @@ object CollectionUtils {
         return destination
     }
 
-    inline fun <T, C : Number, D : Number> Iterable<T>.sumOfPair(selector: (T) -> Pair<C, D>): Pair<Double, Double> {
-        var sum = Pair(0.0, 0.0)
+    inline fun <T, C : Number, D : Number, R : Number> Iterable<T>.sumOfPair(
+        crossinline selector: (T) -> Pair<C, D>,
+        crossinline resultConverter: (Double) -> R
+    ): Pair<R, R> {
+        var sumFirst = 0.0
+        var sumSecond = 0.0
+
         for (element in this) {
-            val add = selector(element)
-            sum = sum.first + add.first.toDouble() to sum.second + add.second.toDouble()
+            val (c, d) = selector(element)
+            sumFirst += c.toDouble()
+            sumSecond += d.toDouble()
         }
-        return sum
+
+        return resultConverter(sumFirst) to resultConverter(sumSecond)
     }
 
     inline fun <T, R> Iterable<T>.zipWithNext3(transform: (a: T, b: T, c: T) -> R): List<R> {
@@ -539,6 +546,30 @@ object CollectionUtils {
             if (predicate(iterator.next().key)) {
                 iterator.remove()
             }
+        }
+    }
+
+    class ObservableMutableMap<K, V>(
+        private val map: MutableMap<K, V> = mutableMapOf(),
+        private val onUpdate: (K, V?) -> Unit = { _, _ -> },
+        private val onGet: (K, V?) -> Unit = { _, _ -> },
+    ) : MutableMap<K, V> by map {
+
+        override fun put(key: K, value: V): V? {
+            onUpdate(key, value)
+            return map.put(key, value)
+        }
+
+        override fun remove(key: K): V? {
+            val removedValue = map.remove(key)
+            onUpdate(key, null)
+            return removedValue
+        }
+
+        override fun get(key: K): V? {
+            val value = map[key]
+            onGet(key, value)
+            return value
         }
     }
 

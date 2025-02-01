@@ -157,11 +157,11 @@ object HoppityEggsManager {
         if (!HoppityApi.isHoppityEvent()) return
 
         noEggsLeftPattern.matchMatcher(event.message) {
-            HoppityEggType.allFound()
+            HoppityEggType.markAllFound()
 
             if (config.timeInChat) {
-                val nextEgg = HoppityEggType.resettingEntries.minByOrNull { it.timeUntil() } ?: return
-                ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil().format()}§e.")
+                val nextEgg = HoppityEggType.resettingEntries.minByOrNull { it.timeUntil } ?: return
+                ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil.format()}§e.")
                 event.blockedReason = "hoppity_egg"
             }
             return
@@ -170,8 +170,8 @@ object HoppityEggsManager {
         eggAlreadyCollectedPattern.matchMatcher(event.message) {
             getEggType(event).markClaimed()
             if (config.timeInChat) {
-                val nextEgg = HoppityEggType.resettingEntries.minByOrNull { it.timeUntil() } ?: return
-                ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil().format()}§e.")
+                val nextEgg = HoppityEggType.resettingEntries.minByOrNull { it.timeUntil } ?: return
+                ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil.format()}§e.")
                 event.blockedReason = "hoppity_egg"
             }
             return
@@ -214,12 +214,11 @@ object HoppityEggsManager {
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isActive()) return
-        HoppityEggType.checkClaimed()
         checkWarn()
     }
 
     private fun checkWarn() {
-        val allEggsRemaining = HoppityEggType.allEggsRemaining()
+        val allEggsRemaining = HoppityEggType.allEggsUnclaimed()
         if (!warningActive) {
             warningActive = !allEggsRemaining
         }

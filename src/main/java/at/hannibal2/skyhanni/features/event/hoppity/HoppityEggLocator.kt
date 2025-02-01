@@ -84,6 +84,10 @@ object HoppityEggLocator {
         lastParticlePosition = null
     }
 
+    fun mealSpawned(meal: HoppityEggType) {
+        if (currentEggType == meal) resetData()
+    }
+
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
@@ -172,7 +176,7 @@ object HoppityEggLocator {
         drawDynamicText(location.up(), possibleDuplicateLabel, 1.5)
     }
 
-    private fun shouldShowAllEggs() = config.showAllWaypoints && !locatorInHotbar && HoppityEggType.eggsRemaining()
+    private fun shouldShowAllEggs() = config.showAllWaypoints && !locatorInHotbar && HoppityEggType.anyEggsUnclaimed()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
