@@ -21,6 +21,8 @@ import java.util.Locale
 
 object SkyBlockItemModifierUtils {
 
+    fun ItemStack.getCoinsOfAvarice() = getAttributeLong("collected_coins")
+
     private val drillPartTypes = listOf("drill_part_upgrade_module", "drill_part_engine", "drill_part_fuel_tank")
 
     fun ItemStack.getHotPotatoCount() = getAttributeInt("hot_potato_count")
