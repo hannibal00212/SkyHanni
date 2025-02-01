@@ -56,6 +56,15 @@ public class SprayConfig {
     public boolean expiryNotification = true;
 
     @Expose
+    @ConfigOption(
+        name = "New Spray Notice",
+        desc = "Send a message in chat if a new spray is detected when entering a plot."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean newSprayNotification = false;
+
+    @Expose
     @ConfigLink(owner = SprayConfig.class, field = "displayEnabled")
     public Position displayPosition = new Position(390, 75, false, true);
 }
