@@ -197,7 +197,7 @@ internal object RenderableUtils {
             add("§bRight-click to go backwards!")
             add("§eClick to switch $label!")
             if (enableUniverseScroll) {
-                add("§8§oYou can also scroll here!")
+                add("§8You can also mouse scroll!")
             }
         }
 
