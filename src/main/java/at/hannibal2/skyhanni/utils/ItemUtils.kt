@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.NotificationManager
-import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -18,6 +17,8 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.PetUtils.getCleanName
+import at.hannibal2.skyhanni.utils.PetUtils.petItemNamePattern
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -321,19 +322,28 @@ object ItemUtils {
         LorenzRarity.entries.joinToString(separator = "|") { it.name },
     )
 
-    private fun ItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
-        val cleanName = this.cleanName()
+    private val ignoredPetStrings = listOf(
+        "Archer",
+        "Berserk",
+        "Mage",
+        "Tank",
+        "Healer",
+        "➡",
+    )
 
-        if (PetApi.hasPetName(cleanName)) {
-            return getPetRarity(this) to ItemCategory.PET
-        }
+    private fun ItemStack.isPet() = petItemNamePattern.matches(cleanName()) && !ignoredPetStrings.any {
+        cleanName().contains(it)
+    }
+
+    private fun ItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
+        if (this.isPet()) return getPetRarity(this) to ItemCategory.PET
 
         for (line in this.getLore().reversed()) {
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
                 group("itemCategory").replace(" ", "_") to group("rarity").replace(" ", "_")
             } ?: continue
 
-            val itemCategory = getItemCategory(category, name, cleanName)
+            val itemCategory = getItemCategory(category)
             val itemRarity = LorenzRarity.getByName(rarity)
 
             if (itemCategory == null) {
@@ -368,11 +378,11 @@ object ItemUtils {
         return null to null
     }
 
-    private fun getItemCategory(itemCategory: String, name: String, cleanName: String = name.removeColor()) =
+    private fun ItemStack.getItemCategory(itemCategory: String) =
         if (itemCategory.isEmpty()) when {
             UtilsPatterns.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
-            PetApi.hasPetName(cleanName) -> ItemCategory.PET
-            UtilsPatterns.baitPattern.matches(cleanName) -> ItemCategory.FISHING_BAIT
+            isPet() -> ItemCategory.PET
+            UtilsPatterns.baitPattern.matches(cleanName()) -> ItemCategory.FISHING_BAIT
             UtilsPatterns.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
             UtilsPatterns.potionPattern.matches(name) -> ItemCategory.POTION
             UtilsPatterns.sackPattern.matches(name) -> ItemCategory.SACK
@@ -576,7 +586,7 @@ object ItemUtils {
         }
 
         // hide pet level
-        PetApi.getCleanName(name)?.let {
+        getCleanName(name)?.let {
             return "$it Pet"
         }
         return name

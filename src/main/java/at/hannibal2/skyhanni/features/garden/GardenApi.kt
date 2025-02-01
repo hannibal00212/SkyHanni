@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.CurrentPetApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
@@ -57,7 +57,7 @@ object GardenApi {
     var itemInHand: ItemStack? = null
     var cropInHand: CropType? = null
     val mushroomCowPet
-        get() = PetApi.isCurrentPet("Mooshroom Cow") &&
+        get() = CurrentPetApi.isCurrentPet("Mooshroom Cow") &&
             storage?.fortune?.farmingItems?.get(FarmingItems.MOOSHROOM_COW)
                 ?.let { it.getItemRarityOrNull()?.isAtLeast(LorenzRarity.RARE) } ?: false
     private var inBarn = false

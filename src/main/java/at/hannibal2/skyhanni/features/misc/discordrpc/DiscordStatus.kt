@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 // SkyblockAddons code, adapted for SkyHanni with some additions and fixes
 
+import at.hannibal2.skyhanni.api.CurrentPetApi
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getTierForCropCount
@@ -9,7 +10,6 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.data.GardenCropMilestones.progressToNextLevel
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
@@ -28,8 +27,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 
@@ -73,13 +70,8 @@ private fun getCropMilestoneDisplay(): String {
     return "${crop.cropName}: $text"
 }
 
-fun getPetDisplay(): String = PetApi.currentPet?.let {
-    val colorCode = it.substring(1..2).first()
-    val petName = it.substring(2).removeColor()
-    val petLevel = if (PlatformUtils.isNeuLoaded()) getCurrentPet()?.petLevel?.currentLevel ?: "?" else "?"
-
-    "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
-} ?: "No pet equipped"
+private fun getPetDisplay(): String = CurrentPetApi.currentPet?.getUserFriendlyName()
+    ?: "No pet equipped"
 
 enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
@@ -108,7 +100,6 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                 else -> location.takeIf { it != "None" && it != "invalid" }
                     ?: lastKnownDisplayStrings[LOCATION].orEmpty()
             }
-
             // Only display None if we don't have a last known area
             lastKnownDisplayStrings[LOCATION].takeIf { it?.isNotEmpty() == true } ?: "None"
         },
@@ -275,6 +266,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             // Logic for getting the currently held stacking enchant is from Skytils
             val itemInHand = InventoryUtils.getItemInHand()
             val itemName = itemInHand?.displayName?.removeColor().orEmpty()
+            val extraAttributes = itemInHand?.extraAttributes
 
             fun getProgressPercent(amount: Int, levels: List<Int>): String {
                 var percent = "MAXED"
@@ -292,7 +284,6 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                 return percent
             }
 
-            val extraAttributes = itemInHand?.extraAttributes
             var stackingReturn = AutoStatus.STACKING.placeholderText
             if (extraAttributes != null) {
                 val enchantments = extraAttributes.getCompoundTag("enchantments")

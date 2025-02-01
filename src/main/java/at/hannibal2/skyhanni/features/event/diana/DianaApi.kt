@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.event.diana
 
+import at.hannibal2.skyhanni.api.CurrentPetApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
-import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -24,7 +24,7 @@ object DianaApi {
     private fun isRitualActive() = Perk.MYTHOLOGICAL_RITUAL.isActive ||
         Perk.PERKPOCALYPSE.isActive
 
-    fun hasGriffinPet() = PetApi.isCurrentPet("Griffin")
+    fun hasGriffinPet() = CurrentPetApi.isCurrentPet("Griffin")
 
     fun isDoingDiana() = IslandType.HUB.isInIsland() && isRitualActive() && hasSpadeInInventory()
 

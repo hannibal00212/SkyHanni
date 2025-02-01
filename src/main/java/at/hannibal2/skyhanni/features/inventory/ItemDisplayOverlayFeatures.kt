@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionApi
+import at.hannibal2.skyhanni.api.CurrentPetApi
 import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -25,7 +26,6 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKYBLOCK_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.TIME_POCKET_ITEMS
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN
-import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
@@ -74,6 +74,7 @@ object ItemDisplayOverlayFeatures {
         "masterskull.id",
         "MASTER_SKULL_TIER_(?<tier>\\d)",
     )
+
     /**
      * REGEX-TEST: §7Vacuum Bag: §21 Pest
      * REGEX-TEST: §7Vacuum Bag: §2444 Pests
@@ -231,7 +232,7 @@ object ItemDisplayOverlayFeatures {
 
         if (RANCHERS_BOOTS_SPEED.isSelected() && internalName == "RANCHERS_BOOTS".toInternalName()) {
             item.getRanchersSpeed()?.let {
-                val isUsingBlackCat = PetApi.isCurrentPet("Black Cat")
+                val isUsingBlackCat = CurrentPetApi.isCurrentPet("Black Cat")
                 val helmet = InventoryUtils.getHelmet()?.getInternalName()
                 val hand = InventoryUtils.getItemInHand()?.getInternalName()
                 val racingHelmet = "RACING_HELMET".toInternalName()

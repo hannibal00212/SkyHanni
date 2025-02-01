@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
+import at.hannibal2.skyhanni.api.CurrentPetApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -23,10 +23,9 @@ import net.minecraft.entity.item.EntityArmorStand
 object ExperimentationTableApi {
 
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation
-
-    val inTable get() = inventoriesPattern.matches(openInventoryName())
-
-    var openExperiment: Experiment? = null
+    private val inTable get() = inventoriesPattern.matches(openInventoryName())
+    private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
+    private val patternGroup = RepoPattern.group("enchanting.experiments")
 
     val superpairInventory = InventoryDetector(
         openInventory = { name ->
@@ -36,9 +35,9 @@ object ExperimentationTableApi {
         },
     ) { name -> superpairsPattern.matches(name) }
 
-    private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
-    private val patternGroup = RepoPattern.group("enchanting.experiments")
+    private var openExperiment: Experiment? = null
 
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: Superpairs (Metaphysical)
      */
@@ -154,15 +153,7 @@ object ExperimentationTableApi {
         "book",
         "§9(?<enchant>.*)",
     )
-
-    /**
-     * REGEX-TEST: §dGuardian
-     * REGEX-TEST: §9Guardian§e
-     */
-    private val petNamePattern by patternGroup.pattern(
-        "guardianpet",
-        "§[956d]Guardian.*",
-    )
+    // </editor-fold>
 
     @Deprecated("outdated", ReplaceWith("this.openExperiment"))
     fun getCurrentExperiment(): Experiment? = openExperiment
@@ -183,5 +174,5 @@ object ExperimentationTableApi {
         return storage?.tablePos?.let { it.distance(vec) <= max } ?: false
     }
 
-    fun hasGuardianPet(): Boolean = petNamePattern.matches(PetApi.currentPet)
+    fun guardianPetActive(): Boolean = CurrentPetApi.currentPet?.cleanName == "Guardian"
 }

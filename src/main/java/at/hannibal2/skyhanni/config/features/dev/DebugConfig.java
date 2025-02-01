@@ -148,6 +148,11 @@ public class DebugConfig {
     public boolean oreEventMessages = false;
 
     @Expose
+    @ConfigOption(name = "Pet Event Messages", desc = "Shows debug messages every time the Pet Event happens.")
+    @ConfigEditorBoolean
+    public boolean petEventMessages = false;
+
+    @Expose
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
     @ConfigEditorDropdown
     public Property<ElectionCandidate> assumeMayor = Property.of(ElectionCandidate.DISABLED);

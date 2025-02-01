@@ -55,6 +55,9 @@ object RegexUtils {
     fun Pattern.anyMatches(list: Sequence<String>?): Boolean = anyMatches(list?.toList())
 
     fun Pattern.matchGroup(text: String, groupName: String): String? = matchMatcher(text) { groupOrNull(groupName) }
+    fun Pattern.firstMatchGroup(list: List<String>, groupName: String): String? = firstMatcher(list) {
+        groupOrNull(groupName)
+    }
 
     fun Pattern.matchGroups(text: String, vararg groups: String): List<String?>? =
         matchMatcher(text) { groups.toList().map { groupOrNull(it) } }
