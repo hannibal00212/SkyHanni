@@ -28,11 +28,6 @@ object HitmanApi {
     }
 
     /**
-     * Determine if the given meal will 'still' be claimed before the given duration
-     */
-    private fun HoppityEggType.willBeClaimableAfter(duration: Duration): Boolean = timeUntil() < duration
-
-    /**
      * Get the time until the given number of slots are available.
      */
     private fun HitmanStatsStorage.getTimeToNumSlots(numSlots: Int): Duration {
@@ -55,8 +50,8 @@ object HitmanApi {
      * Determine the first meal that would be hunted by Hitman if given an infinite amount of time.
      */
     private fun getFirstHuntedMeal(): HoppityEggType =
-        sortedEntries.filter { !it.isClaimed() }.minByOrNull { it.timeUntil() }
-            ?: sortedEntries.minByOrNull { it.timeUntil() }
+        sortedEntries.filter { !it.isClaimed() }.minByOrNull { it.timeUntil }
+            ?: sortedEntries.minByOrNull { it.timeUntil }
             ?: ErrorManager.skyHanniError("Could not find initial meal to hunt")
 
     /**
@@ -66,7 +61,7 @@ object HitmanApi {
         previousMeal: HoppityEggType,
         duration: Duration,
     ): HoppityEggType = sortedEntries
-        .filter { it.willBeClaimableAfter(duration) }
+        .filter { it.timeUntil < duration }
         .let { passingEggs ->
             passingEggs.firstOrNull { it.resetsAt > previousMeal.resetsAt && it.altDay == previousMeal.altDay }
                 ?: passingEggs.firstOrNull { it.altDay != previousMeal.altDay }
@@ -86,15 +81,15 @@ object HitmanApi {
         val initialClaimable = sortedEntries.filter {
             !it.isClaimed()
         }.sortedBy {
-            it.timeUntil()
+            it.timeUntil
         }.toMutableList()
 
         // If the claimable eggs will cover the number of hunts we need to perform, just return the time until the last meal
-        if (huntsToPerform <= initialClaimable.size) return initialClaimable.take(huntsToPerform).last().timeUntil()
+        if (huntsToPerform <= initialClaimable.size) return initialClaimable.take(huntsToPerform).last().timeUntil
 
         // Determine the next (first) meal to hunt
         var nextHuntMeal = initialClaimable.maxByOrNull {
-            it.timeUntil()
+            it.timeUntil
         } ?: getFirstHuntedMeal()
 
         // -1 as default to account for the initial meal
@@ -103,8 +98,8 @@ object HitmanApi {
 
         // Will store the total time until the given number of meals can be hunted
         var tilSpawnDuration =
-            if (nextHuntMeal.isClaimed()) nextHuntMeal.timeUntil() + (MINUTES_PER_DAY * 2).minutes // -next- cycle after spawn
-            else nextHuntMeal.timeUntil() // Otherwise, just the time until the next spawn
+            if (nextHuntMeal.isClaimed()) nextHuntMeal.timeUntil + (MINUTES_PER_DAY * 2).minutes // -next- cycle after spawn
+            else nextHuntMeal.timeUntil // Otherwise, just the time until the next spawn
 
         // Loop through the meals until the given number of meals can be hunted
         repeat(huntsToPerform) { _ ->

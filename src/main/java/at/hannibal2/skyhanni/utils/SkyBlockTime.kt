@@ -26,6 +26,20 @@ data class SkyBlockTime(
     fun toMillis(): Long =
         calculateTimeInSkyBlockMillis(year, month, day, hour, minute, second) + SKYBLOCK_EPOCH_START_MILLIS
 
+    fun getSeason(): SkyblockSeason = when (month) {
+        in 1..3 -> SkyblockSeason.SPRING
+        in 4..6 -> SkyblockSeason.SUMMER
+        in 7..9 -> SkyblockSeason.AUTUMN
+        else -> SkyblockSeason.WINTER
+    }
+
+    fun getSeasonModifier(): SkyblockSeason.SkyblockSeasonModifier = when ((month - 1) % 3) {
+        0 -> SkyblockSeason.SkyblockSeasonModifier.EARLY
+        1 -> SkyblockSeason.SkyblockSeasonModifier.NONE
+        2 -> SkyblockSeason.SkyblockSeasonModifier.LATE
+        else -> SkyblockSeason.SkyblockSeasonModifier.NONE
+    }
+
     companion object {
         private const val SKYBLOCK_EPOCH_START_MILLIS = 1559829300000L // Day 1, Year 1
         const val SKYBLOCK_YEAR_MILLIS = 124 * 60 * 60 * 1000L
