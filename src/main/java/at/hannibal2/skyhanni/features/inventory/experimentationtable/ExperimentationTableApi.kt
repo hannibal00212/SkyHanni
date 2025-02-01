@@ -132,11 +132,11 @@ object ExperimentationTableApi {
     )
 
     /**
-     * REGEX-TEST: ☕ You renewed the experiment table! (1/3)
+     * REGEX-TEST: §d☕ §r§eYou bought a bonus charge for the Experimentation Table! §r§b(2/3)
      */
     val experimentRenewPattern by patternGroup.pattern(
         "renew",
-        "^☕ You renewed the experiment table! \\((?<current>\\d)/3\\)$",
+        "§d☕ §r§eYou bought a bonus charge for the Experimentation Table! §r§b\\((?<current>\\d)/3\\)",
     )
 
     /**

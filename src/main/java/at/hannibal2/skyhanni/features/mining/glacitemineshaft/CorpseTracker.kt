@@ -5,8 +5,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
@@ -25,7 +27,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
-import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.annotations.Expose
 
@@ -45,9 +46,9 @@ object CorpseTracker {
             corpsesLooted = enumMapOf()
         }
 
-        override fun getDescription(timesGained: Long): List<String> {
+        override fun getDescription(bucket: CorpseType?, timesGained: Long): List<String> {
             val divisor = 1.coerceAtLeast(
-                getSelectedBucket()?.let {
+                selectedBucket?.let {
                     corpsesLooted[it]?.toInt()
                 } ?: corpsesLooted.sumAllValues().toInt(),
             )
@@ -62,13 +63,21 @@ object CorpseTracker {
         override fun getCoinName(bucket: CorpseType?, item: TrackedItem) = "<no coins>"
         override fun getCoinDescription(bucket: CorpseType?, item: TrackedItem): List<String> = listOf("<no coins>")
 
+        override fun CorpseType.isBucketSelectable() = true
+
         @Expose
         var corpsesLooted: MutableMap<CorpseType, Long> = enumMapOf()
 
-        fun getCorpseCount(): Long = getSelectedBucket()?.let { corpsesLooted[it] } ?: corpsesLooted.values.sum()
+        fun getCorpseCount(): Long = selectedBucket?.let { corpsesLooted[it] } ?: corpsesLooted.values.sum()
     }
 
     private fun addLootedCorpse(type: CorpseType) = tracker.modify { it.corpsesLooted.addOrPut(type, 1) }
+
+    @HandleEvent
+    fun onItemAdd(event: ItemAddEvent) {
+        if (!isEnabled() || event.source != ItemAddManager.Source.COMMAND) return
+        with(tracker) { event.addItemFromEvent() }
+    }
 
     @HandleEvent
     fun onCorpseLooted(event: CorpseLootedEvent) {
@@ -90,7 +99,7 @@ object CorpseTracker {
         if (bucketData.getCorpseCount() == 0L) return@buildList
 
         var profit = tracker.drawItems(bucketData, { true }, this)
-        val applicableKeys: List<CorpseType> = bucketData.getSelectedBucket()?.let {
+        val applicableKeys: List<CorpseType> = bucketData.selectedBucket?.let {
             listOf(it)
         } ?: enumValues<CorpseType>().toList()
             .filter { bucketData.corpsesLooted[it] != null }

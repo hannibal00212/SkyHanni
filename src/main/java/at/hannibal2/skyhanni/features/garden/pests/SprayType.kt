@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+
 enum class SprayType(val displayName: String) {
     COMPOST("Compost"),
     PLANT_MATTER("Plant Matter"),
@@ -9,8 +12,15 @@ enum class SprayType(val displayName: String) {
     FINE_FLOUR("Fine Flour"),
     ;
 
+    fun toInternalName(): NeuInternalName = name.toInternalName()
+
     companion object {
 
-        fun getByName(name: String) = entries.firstOrNull { it.displayName == name }
+        fun getByNameOrNull(name: String) = entries.firstOrNull { it.displayName == name }
+        fun getByPestTypeOrAll(pestType: PestType?) = entries.filter {
+            it == pestType?.spray
+        }.takeIf {
+            it.isNotEmpty()
+        } ?: entries
     }
 }
