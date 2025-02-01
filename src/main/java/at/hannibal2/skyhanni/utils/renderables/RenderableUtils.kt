@@ -6,11 +6,14 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.putAt
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.hoverTips
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.leftAndRightClickable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import java.awt.Color
+
+private typealias Direction = Renderable.Companion.Direction
 
 internal object RenderableUtils {
 
@@ -101,56 +104,58 @@ internal object RenderableUtils {
 
     inline fun <T> MutableList<Searchable>.addNullableButton(
         label: String,
-        current: T,
+        current: T?,
         crossinline onChange: (T?) -> Unit,
-        universe: List<T>,
+        universe: List<T?>,
         nullLabel: String,
+        enableUniverseScroll: Boolean = true,
     ) {
-        val map = universe.associateWithTo(LinkedHashMap<T?, String>()) { it.toString() }
+        val map = universe.associateWithTo(LinkedHashMap()) { it.toString() }
         map.putAt(0, null, nullLabel)
 
-        val currentName = map[current] ?: error("unknown entry in map")
+        val currentName = map[current] ?: error("unknown entry $current in map")
         addButton(
             label = label,
             current = currentName,
-            getName = { it },
-            onChange = { new ->
-                onChange(
-                    map.filter { it.value == new }.keys.firstOrNull() ?: error("")
-                )
+            getName = { it ?: nullLabel },
+            onChange = { newString ->
+                val newKey = map.entries.first { it.value == newString }.key
+                onChange(newKey)
             },
             universe = map.values.toList(),
+            enableUniverseScroll = enableUniverseScroll,
         )
     }
 
     inline fun <T> MutableList<Searchable>.addButton(
         label: String,
         current: T,
-        crossinline getName: (T) -> String,
-        crossinline onChange: (T) -> Unit,
-        universe: List<T>,
+        crossinline getName: (T?) -> String,
+        crossinline onChange: (T?) -> Unit,
+        universe: List<T?>,
+        enableUniverseScroll: Boolean = true,
     ) {
-        add(createButtonNew(label, current, getName, onChange, universe))
+        add(createButtonNew(label, current, getName, onChange, universe, enableUniverseScroll))
     }
 
-    //
-    inline fun <T> MutableList<Renderable>.addRenderableButton(
+    inline fun <reified T : Enum<T>> MutableList<Renderable>.addRenderableButton(
         label: String,
-        current: T,
-        crossinline getName: (T) -> String,
-        crossinline onChange: (T) -> Unit,
-        universe: List<T>,
+        current: T?,
+        crossinline getName: (T?) -> String,
+        crossinline onChange: (T?) -> Unit,
+        universe: List<T?> = enumValues<T>().toList(),
+        enableUniverseScroll: Boolean = true,
     ) {
-        add(createButtonNew(label, current, getName, onChange, universe).renderable)
+        add(createButtonNew(label, current, getName, onChange, universe, enableUniverseScroll).renderable)
     }
 
-    fun <T> List<T>.circle(current: T): T {
+    fun <T> List<T?>.circle(current: T?): T? {
         val index = indexOf(current)
         val newIndex = (index + 1) % size // Increment index and wrap around
         return get(newIndex)
     }
 
-    fun <T> List<T>.circleBackwards(current: T): T {
+    fun <T> List<T?>.circleBackwards(current: T?): T? {
         val index = indexOf(current)
         val newIndex = ((index - 1 + size)) % size // Increment index and wrap around
         return get(newIndex)
@@ -158,17 +163,17 @@ internal object RenderableUtils {
 
     inline fun <T> createButtonNew(
         label: String,
-        current: T,
-        crossinline getName: (T) -> String,
-        crossinline onChange: (T) -> Unit,
-        universe: List<T>,
+        current: T?,
+        crossinline getName: (T?) -> String,
+        crossinline onChange: (T?) -> Unit,
+        universe: List<T?>,
+        enableUniverseScroll: Boolean = true,
     ): Searchable {
-        val onClick: (Renderable.Companion.Direction) -> Unit = { d ->
+        val onClick: (Direction) -> Unit = { direction ->
             if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) > 150) { // funny thing happen if I don't do that
-                val next = if (d == Renderable.Companion.Direction.LEFT) {
-                    universe.circle(current)
-                } else {
-                    universe.circleBackwards(current)
+                val next = when (direction) {
+                    Direction.LEFT -> universe.circle(current)
+                    Direction.RIGHT -> universe.circleBackwards(current)
                 }
                 onChange(next)
                 SoundUtils.playClickSound()
@@ -191,17 +196,18 @@ internal object RenderableUtils {
             add(" ")
             add("§bRight-click to go backwards!")
             add("§eClick to switch $label!")
+            if (enableUniverseScroll) {
+                add("§8You can also mouse scroll!")
+            }
         }
 
         return Renderable.line {
             addString("§7$label §a[")
-            val clickable = leftAndRightClickable(
-                hoverTips("§e$currentName", tips, bypassChecks = false, onHover = {}),
-                onClick,
-                bypassChecks = false,
-            )
-            add(leftAndRightClickable(clickable, onClick = onClick))
-
+            val displayFormat = hoverTips("§e$currentName", tips, bypassChecks = false, onHover = {})
+            when (enableUniverseScroll) {
+                true -> clickableAndScrollable(displayFormat, onClick = onClick, bypassChecks = false)
+                false -> leftAndRightClickable(displayFormat, onClick = onClick, bypassChecks = false)
+            }.let { add(it) }
             addString("§a]")
         }.toSearchable()
     }

@@ -73,7 +73,6 @@ interface Renderable {
 
         val logger = LorenzLogger("debug/renderable")
         var currentRenderPassMousePosition: Pair<Int, Int>? = null
-            set
 
         fun <T> withMousePosition(posX: Int, posY: Int, block: () -> T): T {
             val last = currentRenderPassMousePosition
@@ -181,12 +180,42 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
-                    if ((-100).isKeyClicked()) {
-                        onClick(Direction.LEFT)
-                    }
-                    if ((-99).isKeyClicked()) {
-                        onClick(Direction.RIGHT)
-                    }
+                    if ((-100).isKeyClicked()) onClick(Direction.LEFT)
+                    else if ((-99).isKeyClicked()) onClick(Direction.RIGHT)
+                }
+                render.render(posX, posY)
+            }
+        }
+
+        fun clickableAndScrollable(
+            render: Renderable,
+            onClick: (Direction) -> Unit,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+            scrollValue: ScrollValue = ScrollValue(),
+        ) = object : Renderable {
+            override val width = render.width
+            override val height = render.height
+            override val horizontalAlign = render.horizontalAlign
+            override val verticalAlign = render.verticalAlign
+
+            private val pureScrollInput = ScrollInput.Companion.PureVertical(scrollValue)
+
+            private fun ScrollInput.Companion.PureVertical.tryUpdateScroll() {
+                pureScrollInput.update(true)
+                when (asInt()) {
+                    -1 -> onClick(Direction.RIGHT) // Scroll Up -> Right Click
+                    1 -> onClick(Direction.LEFT) // Scroll Down -> Left Click
+                    else -> return
+                }
+                dispose()
+            }
+
+            override fun render(posX: Int, posY: Int) {
+                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                    if ((-100).isKeyClicked()) onClick(Direction.LEFT)
+                    else if ((-99).isKeyClicked()) onClick(Direction.RIGHT)
+                    else pureScrollInput.tryUpdateScroll()
                 }
                 render.render(posX, posY)
             }

@@ -194,46 +194,42 @@ object SackDisplay {
         addRenderableButton<SortingTypeEntry>(
             label = "Sorted By",
             current = config.sortingType,
-            getName = { it.displayName },
+            getName = { it?.displayName.orEmpty() },
             onChange = {
                 config.sortingType = it
                 update(false)
             },
-            universe = SortingTypeEntry.entries,
         )
 
         addRenderableButton<NumberFormatEntry>(
             label = "Number Format",
             current = config.numberFormat,
-            getName = { it.displayName },
+            getName = { it?.displayName.orEmpty() },
             onChange = {
                 config.numberFormat = it
                 update(false)
             },
-            universe = NumberFormatEntry.entries,
         )
 
         if (config.showPrice) {
             addRenderableButton<ItemPriceSource>(
                 label = "Price Source",
                 current = config.priceSource,
-                getName = { it.sellName },
+                getName = { it?.sellName.orEmpty() },
                 onChange = {
                     config.priceSource = it
                     update(false)
                 },
-                universe = ItemPriceSource.entries,
             )
 
             addRenderableButton<PriceFormatEntry>(
                 label = "Price Source",
                 current = config.priceFormat,
-                getName = { it.displayName },
+                getName = { it?.displayName.orEmpty() },
                 onChange = {
                     config.priceFormat = it
                     update(false)
                 },
-                universe = PriceFormatEntry.entries,
             )
 
             addString("§eTotal price: §6${format(totalPrice)}")

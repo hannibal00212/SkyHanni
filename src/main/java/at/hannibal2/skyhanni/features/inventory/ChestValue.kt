@@ -149,35 +149,32 @@ object ChestValue {
         addRenderableButton<SortingTypeEntry>(
             label = "Price Sorting",
             current = config.sortingType,
-            getName = { it.displayName },
+            getName = { it?.displayName.orEmpty() },
             onChange = {
                 config.sortingType = it
                 update()
             },
-            universe = SortingTypeEntry.entries,
         )
 
         addRenderableButton<NumberFormatEntry>(
             label = "Value Format",
             current = config.formatType,
-            getName = { it.displayName },
+            getName = { it?.displayName.orEmpty() },
             onChange = {
                 config.formatType = it
                 update()
             },
-            universe = NumberFormatEntry.entries,
         )
 
         // TODO boolean support
         addRenderableButton<DisplayType>(
             label = "Display Type",
             current = DisplayType.entries[if (config.alignedDisplay) 1 else 0],
-            getName = { it.type },
+            getName = { it?.type.orEmpty() },
             onChange = {
                 config.alignedDisplay = !config.alignedDisplay
                 update()
             },
-            universe = DisplayType.entries,
         )
     }
 
