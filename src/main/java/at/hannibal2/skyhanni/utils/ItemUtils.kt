@@ -217,6 +217,10 @@ object ItemUtils {
         if (name == "§fWisp's Ice-Flavored Water I Splash Potion") {
             return NeuInternalName.WISP_POTION
         }
+        val lore = getLore()
+        if (lore.getOrNull(0) == "§7Lump-sum amount") {
+            return NeuInternalName.SKYBLOCK_COIN
+        }
         val internalName = NeuItems.getInternalName(this)?.replace("ULTIMATE_ULTIMATE_", "ULTIMATE_")
         return internalName?.let { ItemNameResolver.fixEnchantmentName(it) }
     }
@@ -660,8 +664,7 @@ object ItemUtils {
         }
     }
 
-    fun NBTTagCompound.getCompoundList(key: String): List<NBTTagCompound> =
-        getTagList(key, Constants.NBT.TAG_COMPOUND).let { loreList ->
-            List(loreList.tagCount()) { loreList.getCompoundTagAt(it) }
-        }
+    fun NBTTagCompound.getCompoundList(key: String): List<NBTTagCompound> = getTagList(key, Constants.NBT.TAG_COMPOUND).let { loreList ->
+        List(loreList.tagCount()) { loreList.getCompoundTagAt(it) }
+    }
 }

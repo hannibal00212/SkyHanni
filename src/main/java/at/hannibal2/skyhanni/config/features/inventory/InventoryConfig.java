@@ -150,6 +150,11 @@ public class InventoryConfig {
     public AttributeOverlayConfig attributeOverlay = new AttributeOverlayConfig();
 
     @Expose
+    @ConfigOption(name = "Trade Value", desc = "Creates a trade value overlay")
+    @Accordion
+    public TradeConfig trade = new TradeConfig();
+
+    @Expose
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
     @ConfigEditorDraggableList
     public List<ItemNumberEntry> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(
