@@ -1,35 +1,25 @@
-package at.hannibal2.skyhanni.config.features.garden;
+package at.hannibal2.skyhanni.config.features.garden.keybinds;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.features.garden.farming.GardenCustomKeybinds;
 import at.hannibal2.skyhanni.utils.KeyboardManager;
 import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
-public class KeyBindConfig {
-    @Expose
-    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool or Daedalus Axe in the hand.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean enabled = false;
+import java.util.Arrays;
+import java.util.List;
 
-    @Expose
-    @ConfigOption(name = "Exclude Barn", desc = "Disable this feature while on the barn plot.")
-    @ConfigEditorBoolean
-    public boolean excludeBarn = false;
-
+public class KeyBindLayout {
     @ConfigOption(name = "Disable All", desc = "Disable all keys.")
     @ConfigEditorButton(buttonText = "Disable")
-    public Runnable presetDisable = GardenCustomKeybinds::disableAll;
+    public Runnable presetDisable = () -> GardenCustomKeybinds.disableAll(this);
 
     @ConfigOption(name = "Set Default", desc = "Reset all keys to default.")
     @ConfigEditorButton(buttonText = "Default")
-    public Runnable presetDefault = GardenCustomKeybinds::defaultAll;
+    public Runnable presetDefault = () -> GardenCustomKeybinds.defaultAll(this);
 
     @Expose
     @ConfigOption(name = "Attack", desc = "")
@@ -70,4 +60,8 @@ public class KeyBindConfig {
     @ConfigOption(name = "Sneak", desc = "")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
     public Property<Integer> sneak = Property.of(Keyboard.KEY_LSHIFT);
+
+    public List<Property<Integer>> getAllKeybindingFields() {
+        return Arrays.asList(attack, useItem, left, right, forward, back, jump, sneak);
+    }
 }
