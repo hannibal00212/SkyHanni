@@ -146,6 +146,16 @@ public class GUIConfig {
     public Position tpsDisplayPosition = new Position(10, 10, false, true);
 
     @Expose
+    @ConfigOption(name = "Ping Display", desc = "Show your current ping, like in Skytils.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean pingDisplay = false;
+
+    @Expose
+    @ConfigLink(owner = GUIConfig.class, field = "pingDisplay")
+    public Position pingDisplayPosition = new Position(10, 22, false, true);
+
+    @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     @FeatureToggle
