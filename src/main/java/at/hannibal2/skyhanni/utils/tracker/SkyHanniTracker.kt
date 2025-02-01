@@ -157,10 +157,11 @@ open class SkyHanniTracker<Data : TrackerData>(
         addRenderableButton<DisplayMode>(
             label = "Display Mode",
             current = getDisplayMode(),
-            getName = { it.displayName },
-            onChange = {
-                displayMode = it
-                storedTrackers[name] = it
+            getName = { it?.displayName.orEmpty() },
+            onChange = { new ->
+                if (new == null) return@addRenderableButton
+                displayMode = new
+                storedTrackers[name] = new
                 update()
             },
             universe = availableTrackers,
@@ -252,7 +253,7 @@ open class SkyHanniTracker<Data : TrackerData>(
             lists.addButton<ItemPriceSource>(
                 label = "Price Source",
                 current = config.priceSource,
-                getName = { it.sellName },
+                getName = { it?.sellName.orEmpty() },
                 onChange = {
                     config.priceSource = it
                     update()

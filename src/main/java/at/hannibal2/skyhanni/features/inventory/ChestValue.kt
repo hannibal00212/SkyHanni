@@ -145,13 +145,11 @@ object ChestValue {
         else -> chestItems.values.sortedByDescending { it.total }
     }
 
-    // TODO: Avoid Ordinal
     private fun MutableList<Renderable>.addButton() {
-
         addRenderableButton<SortingTypeEntry>(
             label = "Price Sorting",
             current = config.sortingType,
-            getName = { it.displayName },
+            getName = { it?.displayName.orEmpty() },
             onChange = {
                 config.sortingType = it
                 update()
@@ -162,7 +160,7 @@ object ChestValue {
         addRenderableButton<NumberFormatEntry>(
             label = "Value Format",
             current = config.formatType,
-            getName = { it.displayName },
+            getName = { it?.displayName.orEmpty() },
             onChange = {
                 config.formatType = it
                 update()
@@ -174,7 +172,7 @@ object ChestValue {
         addRenderableButton<DisplayType>(
             label = "Display Type",
             current = DisplayType.entries[if (config.alignedDisplay) 1 else 0],
-            getName = { it.type },
+            getName = { it?.type.orEmpty() },
             onChange = {
                 config.alignedDisplay = !config.alignedDisplay
                 update()

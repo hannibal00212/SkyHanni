@@ -351,7 +351,7 @@ object BestiaryData {
         addRenderableButton<NumberFormatEntry>(
             label = "Number Format",
             current = config.numberFormat,
-            getName = { it.displayName },
+            getName = { it?.displayName.orEmpty() },
             onChange = {
                 config.numberFormat = it
                 update()
@@ -362,7 +362,7 @@ object BestiaryData {
         addRenderableButton<DisplayTypeEntry>(
             label = "Display Type",
             current = config.displayType,
-            getName = { it.displayName },
+            getName = { it?.displayName.orEmpty() },
             onChange = {
                 config.displayType = it
                 update()
@@ -374,7 +374,7 @@ object BestiaryData {
         addRenderableButton<NumberType>(
             label = "Number Type",
             current = NumberType.entries[if (config.replaceRoman) 0 else 1],
-            getName = { it.type },
+            getName = { it?.type.orEmpty() },
             onChange = {
                 config.replaceRoman = !config.replaceRoman
                 update()
@@ -385,7 +385,7 @@ object BestiaryData {
         addRenderableButton<HideMaxed>(
             label = "Hide Maxed",
             current = HideMaxed.entries[if (config.hideMaxed) 1 else 0],
-            getName = { it.type },
+            getName = { it?.type.orEmpty() },
             onChange = {
                 config.hideMaxed = !config.hideMaxed
                 update()
