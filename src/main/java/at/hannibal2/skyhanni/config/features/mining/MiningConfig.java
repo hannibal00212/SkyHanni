@@ -36,6 +36,11 @@ public class MiningConfig {
     public PowderTrackerConfig powderTracker = new PowderTrackerConfig();
 
     @Expose
+    @ConfigOption(name = "Powder Chest Timer", desc = "")
+    @Accordion
+    public PowderChestTimerConfig powderChestTimer = new PowderChestTimerConfig();
+
+    @Expose
     @ConfigOption(name = "King Talisman", desc = "")
     @Accordion
     public KingTalismanConfig kingTalisman = new KingTalismanConfig();
