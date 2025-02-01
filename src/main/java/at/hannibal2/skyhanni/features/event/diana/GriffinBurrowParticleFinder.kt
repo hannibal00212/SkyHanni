@@ -60,7 +60,7 @@ object GriffinBurrowParticleFinder {
     @HandleEvent(onlyOnIsland = IslandType.HUB, priority = HandleEvent.LOW, receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
         if (!isEnabled()) return
-        if (!config.burrowsSoopyGuess) return
+        if (!config.burrowsGuess) return
         val packet = event.packet
 
         if (packet is S2APacketParticles) {
@@ -150,7 +150,7 @@ object GriffinBurrowParticleFinder {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        if (!config.burrowsSoopyGuess) return
+        if (!config.burrowsGuess) return
         val message = event.message
         if (message.startsWith("§eYou dug out a Griffin Burrow!") ||
             message == "§eYou finished the Griffin burrow chain! §r§7(4/4)"
@@ -182,7 +182,7 @@ object GriffinBurrowParticleFinder {
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
-        if (!config.burrowsSoopyGuess) return
+        if (!config.burrowsGuess) return
 
         val location = event.position
         if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.grass) return

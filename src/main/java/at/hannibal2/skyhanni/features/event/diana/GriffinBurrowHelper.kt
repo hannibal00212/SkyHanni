@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
@@ -333,9 +334,9 @@ object GriffinBurrowHelper {
             }
         }
 
-        if (config.burrowsSoopyGuess) {
+        if (config.burrowsGuess) {
             guessLocation?.let {
-                val guessLocation = findBlock(it)
+                val guessLocation = if (config.burrowsGuessType == DianaConfig.BurrowGuessType.PRECISE_GUESS) it else findBlock(it)
                 val distance = guessLocation.distance(playerLocation)
                 event.drawColor(guessLocation, LorenzColor.WHITE, distance > 10)
                 val color = if (currentWarp != null && targetLocation == guessLocation) "§b" else "§f"

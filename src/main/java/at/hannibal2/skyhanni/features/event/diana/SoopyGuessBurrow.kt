@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig.BurrowGuessType
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
@@ -24,6 +25,7 @@ import kotlin.math.sin
  */
 @SkyHanniModule
 object SoopyGuessBurrow {
+    private val config get() = SkyHanniMod.feature.event.diana
 
     private var dingIndex = 0
     private var hasDinged = false
@@ -118,7 +120,6 @@ object SoopyGuessBurrow {
             // workaround: returning if the distance is too big
             return
         }
-
         calcNewGuessPoint()
     }
 
@@ -271,5 +272,5 @@ object SoopyGuessBurrow {
         }
     }
 
-    private fun isEnabled() = DianaApi.isDoingDiana() && SkyHanniMod.feature.event.diana.burrowsSoopyGuess
+    private fun isEnabled() = DianaApi.isDoingDiana() && config.burrowsGuess && config.burrowsGuessType == BurrowGuessType.SOOPY_GUESS
 }
