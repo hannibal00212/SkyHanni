@@ -10,6 +10,7 @@ import net.minecraft.client.audio.PositionedSound
 import net.minecraft.client.audio.SoundCategory
 import net.minecraft.util.ResourceLocation
 
+@Deprecated("Use McSound instead")
 object SoundUtils {
 
     private val beepSound by lazy { createSound("random.orb", 1f) }

@@ -37,6 +37,7 @@
     <ID>InjectDispatcher:ElectionApi.kt$ElectionApi$IO</ID>
     <ID>InjectDispatcher:GardenNextJacobContest.kt$GardenNextJacobContest$IO</ID>
     <ID>InjectDispatcher:HypixelBazaarFetcher.kt$HypixelBazaarFetcher$IO</ID>
+    <ID>InstanceOfCheckForException:McSound.kt$McSound$e is IllegalArgumentException</ID>
     <ID>LongMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>
     <ID>LongMethod:DamageIndicatorManager.kt$DamageIndicatorManager$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
     <ID>LongMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
@@ -55,6 +56,185 @@
     <ID>LoopWithTooManyJumpStatements:SkyHanniConfigSearchResetCommand.kt$SkyHanniConfigSearchResetCommand$for</ID>
     <ID>LoopWithTooManyJumpStatements:SuperpairsClicksAlert.kt$SuperpairsClicksAlert$for</ID>
     <ID>MapGetWithNotNullAssertionOperator:NavigationHelper.kt$NavigationHelper$distances[node]!!</ID>
+    <ID>McPlayerRule:ArrowTrail.kt$ArrowTrail$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:BingoCardDisplay.kt$BingoCardDisplay$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:BingoCardDisplay.kt$BingoCardDisplay$Minecraft.getMinecraft().thePlayer.isSneaking</ID>
+    <ID>McPlayerRule:BlockUtils.kt$BlockUtils$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:BlockUtils.kt$BlockUtils$Minecraft.getMinecraft().thePlayer.lookVec</ID>
+    <ID>McPlayerRule:BlockUtils.kt$BlockUtils$Minecraft.getMinecraft().thePlayer.lookVec.toLorenzVec()</ID>
+    <ID>McPlayerRule:ChatPeek.kt$ChatPeek$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:ChatUtils.kt$ChatUtils$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:ChestValue.kt$ChestValue$InventoryUtils.getItemsInOpenChest().filter { it.hasStack &amp;&amp; it.inventory != Minecraft.getMinecraft().thePlayer.inventory &amp;&amp; (!isMinion || it.slotNumber % 9 != 1) }</ID>
+    <ID>McPlayerRule:ChestValue.kt$ChestValue$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:ChestValue.kt$ChestValue$Minecraft.getMinecraft().thePlayer.inventory</ID>
+    <ID>McPlayerRule:ChestValue.kt$ChestValue$if (inOwnInventory) { InventoryUtils.getSlotsInOwnInventory() } else { val isMinion = InventoryUtils.openInventoryName().contains(" Minion ") InventoryUtils.getItemsInOpenChest().filter { it.hasStack &amp;&amp; it.inventory != Minecraft.getMinecraft().thePlayer.inventory &amp;&amp; (!isMinion || it.slotNumber % 9 != 1) } }</ID>
+    <ID>McPlayerRule:CollectionTracker.kt$CollectionTracker$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:CollectionTracker.kt$CollectionTracker$Minecraft.getMinecraft().thePlayer ?: return</ID>
+    <ID>McPlayerRule:CosmeticFollowingLine.kt$CosmeticFollowingLine$LocationSpot(SimpleTimeMark.now(), Minecraft.getMinecraft().thePlayer.onGround)</ID>
+    <ID>McPlayerRule:CosmeticFollowingLine.kt$CosmeticFollowingLine$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:CosmeticFollowingLine.kt$CosmeticFollowingLine$Minecraft.getMinecraft().thePlayer.onGround</ID>
+    <ID>McPlayerRule:CosmeticFollowingLine.kt$CosmeticFollowingLine$event.exactLocation(Minecraft.getMinecraft().thePlayer)</ID>
+    <ID>McPlayerRule:CosmeticFollowingLine.kt$CosmeticFollowingLine$event.exactLocation(Minecraft.getMinecraft().thePlayer).up(0.3)</ID>
+    <ID>McPlayerRule:CosmeticFollowingLine.kt$CosmeticFollowingLine$latestLocations.editCopy { val locationSpot = LocationSpot(SimpleTimeMark.now(), Minecraft.getMinecraft().thePlayer.onGround) this[playerLocation] = locationSpot values.removeIf { it.time.passedSince() &gt; 600.milliseconds } }</ID>
+    <ID>McPlayerRule:CosmeticFollowingLine.kt$CosmeticFollowingLine$locations.editCopy { this[playerLocation] = LocationSpot(SimpleTimeMark.now(), Minecraft.getMinecraft().thePlayer.onGround) }</ID>
+    <ID>McPlayerRule:CrystalHollowsWalls.kt$CrystalHollowsWalls$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:CrystalHollowsWalls.kt$CrystalHollowsWalls$Minecraft.getMinecraft().thePlayer.getEyeHeight()</ID>
+    <ID>McPlayerRule:CrystalHollowsWalls.kt$CrystalHollowsWalls$Minecraft.getMinecraft().thePlayer.getEyeHeight().toDouble()</ID>
+    <ID>McPlayerRule:DefaultConfigFeatures.kt$DefaultConfigFeatures$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:DungeonCleanEnd.kt$DungeonCleanEnd$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:DungeonCleanEnd.kt$DungeonCleanEnd$Minecraft.getMinecraft().thePlayer.isSneaking</ID>
+    <ID>McPlayerRule:DungeonLividFinder.kt$DungeonLividFinder$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:EnderNodeTracker.kt$EnderNodeTracker$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:EnderNodeTracker.kt$EnderNodeTracker$Minecraft.getMinecraft().thePlayer.inventory</ID>
+    <ID>McPlayerRule:EnderNodeTracker.kt$EnderNodeTracker$Minecraft.getMinecraft().thePlayer.inventory.mainInventory</ID>
+    <ID>McPlayerRule:EnderNodeTracker.kt$EnderNodeTracker$Minecraft.getMinecraft().thePlayer.inventory.mainInventory.filter { it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName }</ID>
+    <ID>McPlayerRule:EnderNodeTracker.kt$EnderNodeTracker$Minecraft.getMinecraft().thePlayer.inventory.mainInventory.filter { it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName }.sumOf { it.stackSize }</ID>
+    <ID>McPlayerRule:EntityMoveEvent.kt$EntityMoveEvent$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:EntityMovementData.kt$EntityMovementData$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:EntityUtils.kt$EntityUtils$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:ErrorManager.kt$ErrorManager$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:FakePlayer.kt$FakePlayer$DefaultPlayerSkin.getDefaultSkin(Minecraft.getMinecraft().thePlayer.uniqueID)</ID>
+    <ID>McPlayerRule:FakePlayer.kt$FakePlayer$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:FakePlayer.kt$FakePlayer$Minecraft.getMinecraft().thePlayer.gameProfile</ID>
+    <ID>McPlayerRule:FakePlayer.kt$FakePlayer$Minecraft.getMinecraft().thePlayer.isWearing(part)</ID>
+    <ID>McPlayerRule:FakePlayer.kt$FakePlayer$Minecraft.getMinecraft().thePlayer.locationSkin</ID>
+    <ID>McPlayerRule:FakePlayer.kt$FakePlayer$Minecraft.getMinecraft().thePlayer.uniqueID</ID>
+    <ID>McPlayerRule:FireVeilWandParticles.kt$FireVeilWandParticles$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:FireVeilWandParticles.kt$FireVeilWandParticles$RenderUtils.drawCircle(Minecraft.getMinecraft().thePlayer, event.partialTicks, 3.5, color)</ID>
+    <ID>McPlayerRule:FishingApi.kt$FishingApi$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:GardenOptimalSpeed.kt$GardenOptimalSpeed$(Minecraft.getMinecraft().thePlayer.capabilities.walkSpeed * 1000).toInt()</ID>
+    <ID>McPlayerRule:GardenOptimalSpeed.kt$GardenOptimalSpeed$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:GardenOptimalSpeed.kt$GardenOptimalSpeed$Minecraft.getMinecraft().thePlayer.capabilities</ID>
+    <ID>McPlayerRule:GardenOptimalSpeed.kt$GardenOptimalSpeed$Minecraft.getMinecraft().thePlayer.capabilities.walkSpeed</ID>
+    <ID>McPlayerRule:GardenOptimalSpeed.kt$GardenOptimalSpeed$Minecraft.getMinecraft().thePlayer.isSneaking</ID>
+    <ID>McPlayerRule:GardenOptimalSpeed.kt$GardenOptimalSpeed$Minecraft.getMinecraft().thePlayer.onGround</ID>
+    <ID>McPlayerRule:GardenYawAndPitch.kt$GardenYawAndPitch$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:GriffinBurrowHelper.kt$GriffinBurrowHelper$EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)</ID>
+    <ID>McPlayerRule:GriffinBurrowHelper.kt$GriffinBurrowHelper$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:HighlightMissingRepoItems.kt$HighlightMissingRepoItems$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:HighlightVisitorsOutsideOfGarden.kt$HighlightVisitorsOutsideOfGarden$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:HighlightVisitorsOutsideOfGarden.kt$HighlightVisitorsOutsideOfGarden$Minecraft.getMinecraft().thePlayer ?: return</ID>
+    <ID>McPlayerRule:InWaterDisplay.kt$InWaterDisplay$"§7In Water: " + if (Minecraft.getMinecraft().thePlayer.isInWater) "§aTrue" else "§cFalse"</ID>
+    <ID>McPlayerRule:InWaterDisplay.kt$InWaterDisplay$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:InWaterDisplay.kt$InWaterDisplay$Minecraft.getMinecraft().thePlayer.isInWater</ID>
+    <ID>McPlayerRule:InventoryUtils.kt$InventoryUtils$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:InventoryUtils.kt$InventoryUtils$Minecraft.getMinecraft().thePlayer.getArmorInventory()</ID>
+    <ID>McPlayerRule:InventoryUtils.kt$InventoryUtils$Minecraft.getMinecraft().thePlayer.heldItem</ID>
+    <ID>McPlayerRule:InventoryUtils.kt$InventoryUtils$controller.windowClick(windowId, slot, mouseButton, mode, Minecraft.getMinecraft().thePlayer)</ID>
+    <ID>McPlayerRule:IslandGraphs.kt$IslandGraphs$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:IslandGraphs.kt$IslandGraphs$Minecraft.getMinecraft().thePlayer.onGround</ID>
+    <ID>McPlayerRule:IslandGraphs.kt$IslandGraphs$if (Minecraft.getMinecraft().thePlayer.onGround) 3 else 5</ID>
+    <ID>McPlayerRule:ItemCompat.kt$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:ItemCompat.kt$this.getTooltip(Minecraft.getMinecraft().thePlayer, advanced)</ID>
+    <ID>McPlayerRule:ItemPickupLog.kt$ItemPickupLog$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:ItemPickupLog.kt$ItemPickupLog$Minecraft.getMinecraft().thePlayer?.inventory?.itemStack</ID>
+    <ID>McPlayerRule:ItemUtils.kt$ItemUtils$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:ItemUtils.kt$ItemUtils$Minecraft.getMinecraft().thePlayer ?: ErrorManager.skyHanniError("getItemsInInventoryWithSlots: player is null!")</ID>
+    <ID>McPlayerRule:LimboTimeTracker.kt$LimboTimeTracker$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:LimboTimeTracker.kt$LimboTimeTracker$Minecraft.getMinecraft().thePlayer.isBurning</ID>
+    <ID>McPlayerRule:LocationUtils.kt$LocationUtils$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:LocationUtils.kt$LocationUtils$Minecraft.getMinecraft().thePlayer.getLorenzVec()</ID>
+    <ID>McPlayerRule:LorenzUtils.kt$LorenzUtils$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:LorenzUtils.kt$LorenzUtils$Minecraft.getMinecraft().thePlayer.name</ID>
+    <ID>McPlayerRule:LorenzUtils.kt$LorenzUtils$Minecraft.getMinecraft().thePlayer.uniqueID</ID>
+    <ID>McPlayerRule:MarkedPlayerManager.kt$MarkedPlayerManager$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:MaxPurseItems.kt$MaxPurseItems$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:MaxPurseItems.kt$MaxPurseItems$Minecraft.getMinecraft().thePlayer.openContainer</ID>
+    <ID>McPlayerRule:MaxPurseItems.kt$MaxPurseItems$Minecraft.getMinecraft().thePlayer.openContainer.inventory</ID>
+    <ID>McPlayerRule:MinecraftData.kt$MinecraftData$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:MineshaftWaypoints.kt$MineshaftWaypoints$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:MineshaftWaypoints.kt$MineshaftWaypoints$Minecraft.getMinecraft().thePlayer.horizontalFacing</ID>
+    <ID>McPlayerRule:MineshaftWaypoints.kt$MineshaftWaypoints$Minecraft.getMinecraft().thePlayer.horizontalFacing.directionVec</ID>
+    <ID>McPlayerRule:MiningCommissionsBlocksColor.kt$MiningCommissionsBlocksColor$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:MiningCommissionsBlocksColor.kt$MiningCommissionsBlocksColor$Minecraft.getMinecraft().thePlayer.isSneaking</ID>
+    <ID>McPlayerRule:MobDebug.kt$MobDebug$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:MobDebug.kt$MobDebug$MobUtils.rayTraceForMobs(Minecraft.getMinecraft().thePlayer, event.partialTicks)</ID>
+    <ID>McPlayerRule:MovableHotBar.kt$MovableHotBar$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:MovableXPBar.kt$MovableXPBar$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:MovementSpeedDisplay.kt$MovementSpeedDisplay$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:OutsideSBFeature.kt$OutsideSBFeature$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:OwnInventoryData.kt$OwnInventoryData$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:OwnInventoryData.kt$OwnInventoryData$Minecraft.getMinecraft().thePlayer.inventory</ID>
+    <ID>McPlayerRule:OwnInventoryData.kt$OwnInventoryData$Minecraft.getMinecraft().thePlayer.inventory.itemStack</ID>
+    <ID>McPlayerRule:OwnInventoryData.kt$OwnInventoryData$Minecraft.getMinecraft().thePlayer.inventory.itemStack ?: return</ID>
+    <ID>McPlayerRule:PacketTest.kt$PacketTest$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:PacketTest.kt$PacketTest$buildString { append("Receive: $packetName") val id = getEntityId() if (id != null) { append(" ID: $id") } val entity = getEntity(this@print, id) val distance = getDistance(getLocation(this@print, entity)) if (entity != null) { if (entity == Minecraft.getMinecraft().thePlayer) { append(" own") return@buildString } else { append(" distance: $distance other") } } else { if (id == null) { return@buildString } append(" entity is null.") } }.let { println(it) }</ID>
+    <ID>McPlayerRule:ParkourHelper.kt$ParkourHelper$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:ParkourHelper.kt$ParkourHelper$Minecraft.getMinecraft().thePlayer.onGround</ID>
+    <ID>McPlayerRule:PestParticleWaypoint.kt$PestParticleWaypoint$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:PestParticleWaypoint.kt$PestParticleWaypoint$Minecraft.getMinecraft().thePlayer.isSneaking</ID>
+    <ID>McPlayerRule:QuickModMenuSwitch.kt$QuickModMenuSwitch$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:RaycastUtils.kt$RaycastUtils$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:RaycastUtils.kt$RaycastUtils$Minecraft.getMinecraft().thePlayer.lookVec</ID>
+    <ID>McPlayerRule:RaycastUtils.kt$RaycastUtils$Minecraft.getMinecraft().thePlayer.lookVec.toLorenzVec()</ID>
+    <ID>McPlayerRule:ReforgeHelper.kt$ReforgeHelper$DelayedRun.runNextTick { inventoryContainer = Minecraft.getMinecraft().thePlayer.openContainer }</ID>
+    <ID>McPlayerRule:ReforgeHelper.kt$ReforgeHelper$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:ReforgeHelper.kt$ReforgeHelper$Minecraft.getMinecraft().thePlayer.openContainer</ID>
+    <ID>McPlayerRule:RenderUtils.kt$RenderUtils$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:RenderUtils.kt$RenderUtils$Minecraft.getMinecraft().thePlayer ?: return</ID>
+    <ID>McPlayerRule:RenderUtils.kt$RenderUtils$Minecraft.getMinecraft().thePlayer.getLook(this.partialTicks)</ID>
+    <ID>McPlayerRule:RenderUtils.kt$RenderUtils$Minecraft.getMinecraft().thePlayer.getLook(this.partialTicks) .toLorenzVec()</ID>
+    <ID>McPlayerRule:RenderUtils.kt$RenderUtils$Minecraft.getMinecraft().thePlayer.getLook(this.partialTicks) .toLorenzVec() /* .rotateXZ(-Math.PI / 72.0) */ .times(2)</ID>
+    <ID>McPlayerRule:RenderUtils.kt$RenderUtils$if (startAtEye) { listOf( this.exactPlayerEyeLocation() + Minecraft.getMinecraft().thePlayer.getLook(this.partialTicks) .toLorenzVec() /* .rotateXZ(-Math.PI / 72.0) */ .times(2), ) } else { emptyList() } + path.toPositionsList().map { it.add(0.5, 0.5, 0.5) }</ID>
+    <ID>McPlayerRule:RenderUtils.kt$RenderUtils.LineDrawer$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:RenderUtils.kt$RenderUtils.LineDrawer$Minecraft.getMinecraft().thePlayer.eyeHeight</ID>
+    <ID>McPlayerRule:RenderUtils.kt$RenderUtils.LineDrawer$Minecraft.getMinecraft().thePlayer.eyeHeight.toDouble()</ID>
+    <ID>McPlayerRule:RenderUtils.kt$RenderUtils.LineDrawer$inverseView.add(y = Minecraft.getMinecraft().thePlayer.eyeHeight.toDouble())</ID>
+    <ID>McPlayerRule:RiftTimer.kt$RiftTimer$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:RiftTimer.kt$RiftTimer$Minecraft.getMinecraft().thePlayer.experienceLevel</ID>
+    <ID>McPlayerRule:RiftTimer.kt$RiftTimer$Minecraft.getMinecraft().thePlayer.experienceLevel.toString()</ID>
+    <ID>McPlayerRule:RiftTimer.kt$RiftTimer$TimeUtils.getDuration(Minecraft.getMinecraft().thePlayer.experienceLevel.toString() + " s")</ID>
+    <ID>McPlayerRule:RiftWiltedBerberisHelper.kt$RiftWiltedBerberisHelper$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:RiftWiltedBerberisHelper.kt$RiftWiltedBerberisHelper$Minecraft.getMinecraft().thePlayer.onGround</ID>
+    <ID>McPlayerRule:ShaderManager.kt$ShaderManager$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:SkyBlockXPBar.kt$SkyBlockXPBar$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:SkyBlockXPBar.kt$SkyBlockXPBar$Minecraft.getMinecraft().thePlayer.setXPStats(currentXP, maxXP, level)</ID>
+    <ID>McPlayerRule:SkyHanniMod.kt$SkyHanniMod$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:SkyHanniMod.kt$SkyHanniMod$Minecraft.getMinecraft().thePlayer.closeScreen()</ID>
+    <ID>McPlayerRule:TabListData.kt$TabListData$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:TabListData.kt$TabListData$Minecraft.getMinecraft().thePlayer ?: return null</ID>
+    <ID>McPlayerRule:UpdateManager.kt$UpdateManager$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:VoltHighlighter.kt$VoltHighlighter$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:VoltHighlighter.kt$VoltHighlighter$Minecraft.getMinecraft().thePlayer ?: return</ID>
+    <ID>McPlayerRule:XPInInventories.kt$XPInInventories$Minecraft.getMinecraft().thePlayer</ID>
+    <ID>McPlayerRule:XPInInventories.kt$XPInInventories$Minecraft.getMinecraft().thePlayer.experienceLevel</ID>
+    <ID>McPlayerRule:XPInInventories.kt$XPInInventories$event.toolTip.add(indexOfCost + 1, "§7Your XP: $color${Minecraft.getMinecraft().thePlayer.experienceLevel}")</ID>
+    <ID>McWorldRule:BlockUtils.kt$BlockUtils$Minecraft.getMinecraft().theWorld</ID>
+    <ID>McWorldRule:EntityUtils.kt$EntityUtils$Minecraft.getMinecraft().theWorld</ID>
+    <ID>McWorldRule:EntityUtils.kt$EntityUtils$Minecraft.getMinecraft().theWorld ?: return emptyList()</ID>
+    <ID>McWorldRule:EntityUtils.kt$EntityUtils$Minecraft.getMinecraft().theWorld?.getAllEntities()?.let { if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it // TODO: while i am here, i want to point out that copying the entity list does not constitute proper synchronization, // but *does* make crashes because of it rarer. else it.toMutableList() }?.asSequence().orEmpty()</ID>
+    <ID>McWorldRule:EntityUtils.kt$EntityUtils$Minecraft.getMinecraft().theWorld?.getLoadedPlayers().orEmpty()</ID>
+    <ID>McWorldRule:EntityUtils.kt$EntityUtils$Minecraft.getMinecraft().theWorld?.loadedTileEntityList?.let { if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList() }?.asSequence()?.filterNotNull().orEmpty()</ID>
+    <ID>McWorldRule:FakePlayer.kt$FakePlayer$Minecraft.getMinecraft().theWorld</ID>
+    <ID>McWorldRule:HighlightVisitorsOutsideOfGarden.kt$HighlightVisitorsOutsideOfGarden$Minecraft.getMinecraft().theWorld</ID>
+    <ID>McWorldRule:HighlightVisitorsOutsideOfGarden.kt$HighlightVisitorsOutsideOfGarden$Minecraft.getMinecraft().theWorld ?: return</ID>
+    <ID>McWorldRule:ItemClickData.kt$ItemClickData$Minecraft.getMinecraft().theWorld</ID>
+    <ID>McWorldRule:ItemClickData.kt$ItemClickData$packet.getEntityFromWorld(Minecraft.getMinecraft().theWorld)</ID>
+    <ID>McWorldRule:ItemClickData.kt$ItemClickData$packet.getEntityFromWorld(Minecraft.getMinecraft().theWorld) ?: return</ID>
+    <ID>McWorldRule:ItemClickData.kt$ItemClickData$when { packet is C08PacketPlayerBlockPlacement -&gt; { if (packet.placedBlockDirection != 255) { val position = packet.position.toLorenzVec() BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.getUsedItem()).post() } else { ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).post() } } packet is C07PacketPlayerDigging &amp;&amp; packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK -&gt; { val position = packet.position.toLorenzVec() val blockClickCancelled = BlockClickEvent(ClickType.LEFT_CLICK, position, InventoryUtils.getItemInHand()).post() ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).also { if (blockClickCancelled) it.cancel() }.post() } packet is C0APacketAnimation -&gt; { ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).post() } packet is C02PacketUseEntity -&gt; { val clickType = when (packet.action) { C02PacketUseEntity.Action.INTERACT -&gt; ClickType.RIGHT_CLICK C02PacketUseEntity.Action.ATTACK -&gt; ClickType.LEFT_CLICK C02PacketUseEntity.Action.INTERACT_AT -&gt; ClickType.RIGHT_CLICK else -&gt; return } val clickedEntity = packet.getEntityFromWorld(Minecraft.getMinecraft().theWorld) ?: return EntityClickEvent(clickType, clickedEntity, InventoryUtils.getItemInHand()).post() } else -&gt; { return } }</ID>
+    <ID>McWorldRule:LocationUtils.kt$LocationUtils$Minecraft.getMinecraft().theWorld</ID>
+    <ID>McWorldRule:LocationUtils.kt$LocationUtils$Minecraft.getMinecraft().theWorld.rayTraceBlocks(a.toVec3(), b.toVec3(), false, true, false)</ID>
+    <ID>McWorldRule:MinionXP.kt$MinionXP$Minecraft.getMinecraft().theWorld</ID>
+    <ID>McWorldRule:MinionXP.kt$MinionXP$Minecraft.getMinecraft().theWorld.getBlockState(pos)</ID>
+    <ID>McWorldRule:MinionXP.kt$MinionXP$Minecraft.getMinecraft().theWorld.getBlockState(pos).block</ID>
+    <ID>McWorldRule:MinionXP.kt$MinionXP$positionsToCheck.any { position -&gt; val pos = (minionPosition + position).toBlockPos() val block = Minecraft.getMinecraft().theWorld.getBlockState(pos).block block is BlockChest }</ID>
+    <ID>McWorldRule:PacketTest.kt$PacketTest$Minecraft.getMinecraft().theWorld</ID>
+    <ID>McWorldRule:RenderEntityOutlineEvent.kt$RenderEntityOutlineEvent$Minecraft.getMinecraft().theWorld</ID>
+    <ID>McWorldRule:RenderEntityOutlineEvent.kt$RenderEntityOutlineEvent$Minecraft.getMinecraft().theWorld.getLoadedEntityList()</ID>
+    <ID>McWorldRule:RenderUtils.kt$RenderUtils$Minecraft.getMinecraft().theWorld</ID>
+    <ID>McWorldRule:RenderUtils.kt$RenderUtils$Minecraft.getMinecraft().theWorld.totalWorldTime</ID>
+    <ID>McWorldRule:RenderUtils.kt$RenderUtils$Minecraft.getMinecraft().theWorld.totalWorldTime + partialTicks.toDouble()</ID>
+    <ID>McWorldRule:ScoreboardData.kt$ScoreboardData$Minecraft.getMinecraft().theWorld</ID>
+    <ID>McWorldRule:ScoreboardData.kt$ScoreboardData$Minecraft.getMinecraft().theWorld?.scoreboard ?: return emptyList()</ID>
+    <ID>McWorldRule:ScoreboardData.kt$ScoreboardData$Minecraft.getMinecraft().theWorld?.scoreboard?.getObjectiveInDisplaySlot(1)?.displayName.orEmpty()</ID>
+    <ID>McWorldRule:ShaderManager.kt$ShaderManager$Minecraft.getMinecraft().theWorld</ID>
+    <ID>McWorldRule:SkyBlockTime.kt$SkyBlockTime.Companion$Minecraft.getMinecraft().theWorld</ID>
+    <ID>McWorldRule:SkyBlockTime.kt$SkyBlockTime.Companion$Minecraft.getMinecraft().theWorld.worldTime</ID>
+    <ID>McWorldRule:VampireSlayerFeatures.kt$VampireSlayerFeatures$Minecraft.getMinecraft().theWorld</ID>
+    <ID>McWorldRule:VampireSlayerFeatures.kt$VampireSlayerFeatures$Minecraft.getMinecraft().theWorld.loadedEntityList</ID>
+    <ID>McWorldRule:VampireSlayerFeatures.kt$VampireSlayerFeatures$Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance&lt;EntityArmorStand&gt;()</ID>
+    <ID>McWorldRule:VampireSlayerFeatures.kt$VampireSlayerFeatures$Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance&lt;EntityOtherPlayerMP&gt;()</ID>
+    <ID>McWorldRule:VisitorListener.kt$VisitorListener$Minecraft.getMinecraft().theWorld</ID>
     <ID>MemberNameEqualsClassName:CaptureFarmingGear.kt$CaptureFarmingGear$fun captureFarmingGear()</ID>
     <ID>MemberNameEqualsClassName:FameRanks.kt$FameRanks$var fameRanks = emptyMap&lt;String, FameRank&gt;() private set</ID>
     <ID>MemberNameEqualsClassName:FirstMinionTier.kt$FirstMinionTier$fun firstMinionTier( otherItems: Map&lt;NeuInternalName, Int&gt;, minions: MutableMap&lt;String, NeuInternalName&gt;, tierOneMinions: MutableList&lt;NeuInternalName&gt;, tierOneMinionsDone: MutableSet&lt;NeuInternalName&gt;, )</ID>
@@ -341,6 +521,7 @@
     <ID>UnsafeCallOnNullableType:JacobContestTimeNeeded.kt$JacobContestTimeNeeded$map[crop]!!</ID>
     <ID>UnsafeCallOnNullableType:KSerializable.kt$KotlinTypeAdapterFactory$kotlinClass.memberProperties.find { it.name == param.name }!!</ID>
     <ID>UnsafeCallOnNullableType:KSerializable.kt$KotlinTypeAdapterFactory$param.name!!</ID>
+    <ID>UnsafeCallOnNullableType:McWorld.kt$McWorld$world!!</ID>
     <ID>UnsafeCallOnNullableType:MinionFeatures.kt$MinionFeatures$newMinion!!</ID>
     <ID>UnsafeCallOnNullableType:MobFinder.kt$MobFinder$floor6GiantsSeparateDelay[uuid]!!</ID>
     <ID>UnsafeCallOnNullableType:NavigationHelper.kt$NavigationHelper$distances[node]!!</ID>
