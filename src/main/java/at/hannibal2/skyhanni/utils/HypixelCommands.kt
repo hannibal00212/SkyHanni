@@ -142,6 +142,10 @@ object HypixelCommands {
         send("pc $message")
     }
 
+    fun partyInvite(player: String) {
+        send("party $player")
+    }
+
     fun allChat(message: String) {
         send("ac $message")
     }
