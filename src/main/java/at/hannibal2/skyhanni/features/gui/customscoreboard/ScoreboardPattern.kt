@@ -643,6 +643,15 @@ object ScoreboardPattern {
         "anniversary",
         "(?:§d\\d+(?:st|nd|rd|th) Anniversary|§bCentury Raffle)§f (?:\\d|:)+",
     )
+    /
+    /**
+     * REGEX-TEST: §bCentury Raffle§f 124:00:00
+     * To fix custom scoreboard erroring every second
+     */
+    val tempRafflePattern by miscSB.pattern(
+        "tempfix",
+        "§bCentury Raffle§f (?:\\d|:)+",
+    )
 
     // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third (and fourth) scoreboard line
     /**
