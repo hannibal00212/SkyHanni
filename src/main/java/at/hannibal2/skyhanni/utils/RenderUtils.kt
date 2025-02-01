@@ -593,7 +593,7 @@ object RenderUtils {
     }
 
     /** This function is discouraged to be used. Please use renderRenderables with List<Renderable> instead with horizontal container.*/
-    fun Position.renderRenderablesDouble(
+    private fun Position.renderRenderablesDouble(
         renderables: List<List<Renderable>>,
         extraSpace: Int = 0,
         posLabel: String,

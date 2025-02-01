@@ -54,11 +54,12 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.renderables.Container
 import at.hannibal2.skyhanni.utils.renderables.DragNDrop
 import at.hannibal2.skyhanni.utils.renderables.Droppable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -80,7 +81,7 @@ object SkyHanniDebugsAndTests {
     private val config get() = SkyHanniMod.feature.dev
     private val debugConfig get() = config.debug
     var displayLine = ""
-    var displayList = emptyList<List<Any>>()
+    var displayList: Renderable? = null
 
     var globalRender = true
 
@@ -216,42 +217,38 @@ object SkyHanniDebugsAndTests {
     }
 
     fun testGardenVisitors() {
-        if (displayList.isNotEmpty()) {
-            displayList = mutableListOf()
+        if (displayList != null) {
+            displayList = null
             return
         }
 
-        val bigList = mutableListOf<List<Any>>()
-        var list = mutableListOf<Any>()
-        var i = 0
         var errors = 0
-        for (item in GardenVisitorColorNames.visitorItems) {
-            val name = item.key
-            i++
-            if (i == 5) {
-                i = 0
-                bigList.add(list)
-                list = mutableListOf()
-            }
 
-            val coloredName = GardenVisitorColorNames.getColoredName(name)
-            list.add("$coloredName§7 (")
-            for (itemName in item.value) {
-                try {
-                    val internalName = NeuInternalName.fromItemName(itemName)
-                    list.add(internalName.getItemStack())
-                } catch (e: Error) {
-                    ChatUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
-                    errors++
+        displayList = Container.vertical {
+            for (item in GardenVisitorColorNames.visitorItems) {
+                val name = item.key
+
+                horizontal {
+                    val coloredName = GardenVisitorColorNames.getColoredName(name)
+                    string("$coloredName§7 (")
+
+                    for (itemName in item.value) {
+                        try {
+                            val internalName = NeuInternalName.fromItemName(itemName)
+                            item(internalName.getItemStack())
+                        } catch (e: Error) {
+                            ChatUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
+                            errors++
+                        }
+                    }
+                    if (item.value.isEmpty()) {
+                        string("Any")
+                    }
+                    string("§7) ")
                 }
             }
-            if (item.value.isEmpty()) {
-                list.add("Any")
-            }
-            list.add("§7) ")
         }
-        bigList.add(list)
-        displayList = bigList
+
         if (errors == 0) {
             ChatUtils.debug("Test garden visitor renderer: no errors")
         } else {
@@ -535,7 +532,7 @@ object SkyHanniDebugsAndTests {
         if (displayLine.isNotEmpty()) {
             config.debugPos.renderString("test: $displayLine", posLabel = "Test")
         }
-        config.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
+        displayList?.let { config.debugPos.renderRenderable(it, posLabel = "Test Display") }
     }
 
     @HandleEvent

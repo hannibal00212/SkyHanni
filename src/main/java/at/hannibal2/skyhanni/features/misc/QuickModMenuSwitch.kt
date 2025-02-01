@@ -12,10 +12,10 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.renderables.Container
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -24,7 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object QuickModMenuSwitch {
 
     private val config get() = SkyHanniMod.feature.misc.quickModMenuSwitch
-    private var display = emptyList<List<Any>>()
+    private var display: Renderable? = null
     private var latestGuiPath = ""
 
     private var mods: List<Mod>? = null
@@ -52,7 +52,6 @@ object QuickModMenuSwitch {
     }
 
     class Mod(val name: String, val description: List<String>, val command: String, private val guiPath: List<String>) {
-
         fun isInGui() = guiPath.any { latestGuiPath.startsWith(it) }
     }
 
@@ -69,7 +68,7 @@ object QuickModMenuSwitch {
         val mods = mods ?: return
 
         display = if (!shouldShow(mods)) {
-            emptyList()
+            null
         } else {
             renderDisplay(mods)
         }
@@ -122,7 +121,7 @@ object QuickModMenuSwitch {
         return openGui
     }
 
-    private fun renderDisplay(mods: List<Mod>) = buildList {
+    private fun renderDisplay(mods: List<Mod>) = Container.vertical {
         for (mod in mods) {
             val currentlyOpen = mod.isInGui()
             val nameFormat = if (currentlyOpen) "§c" else ""
@@ -132,13 +131,16 @@ object QuickModMenuSwitch {
                 opening = false
             }
             val nameSuffix = if (opening) " §7(opening...)" else ""
-            val renderable = Renderable.link(
+            val clickable = Renderable.link(
                 Renderable.string(nameFormat + mod.name),
                 bypassChecks = true,
                 onClick = { open(mod) },
                 condition = { System.currentTimeMillis() > lastGuiOpen + 250 },
             )
-            add(listOf(renderable, nameSuffix))
+            horizontal {
+                renderable(clickable)
+                string(nameSuffix)
+            }
         }
     }
 
@@ -158,12 +160,10 @@ object QuickModMenuSwitch {
     fun onRenderOverlay(event: GuiScreenEvent.DrawScreenEvent.Post) {
         if (!isEnabled()) return
 
-        GlStateManager.pushMatrix()
-        config.pos.renderStringsAndItems(display, posLabel = "Quick Mod Menu Switch")
-        GlStateManager.popMatrix()
+        display?.let { config.pos.renderRenderable(it, posLabel = "Quick Mod Menu Switch") }
     }
 
-    fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSBFeature.QUICK_MOD_MENU_SWITCH.isSelected()) && config.enabled
+    private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSBFeature.QUICK_MOD_MENU_SWITCH.isSelected()) && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

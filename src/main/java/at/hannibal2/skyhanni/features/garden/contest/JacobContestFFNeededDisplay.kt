@@ -9,14 +9,15 @@ import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.getLatestTrue
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getLatestBlocksPerSecond
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.renderables.Container
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.item.ItemStack
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
@@ -25,9 +26,9 @@ import kotlin.time.Duration.Companion.milliseconds
 object JacobContestFFNeededDisplay {
 
     private val config get() = GardenApi.config
-    private var display = emptyList<List<Any>>()
+    private var display: Renderable? = null
     private var lastToolTipTime = SimpleTimeMark.farPast()
-    private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
+    private val cache = mutableMapOf<ItemStack, Renderable?>()
 
     @HandleEvent
     fun onRenderItemTooltip(event: RenderItemTooltipEvent) {
@@ -57,51 +58,75 @@ object JacobContestFFNeededDisplay {
         cache.clear()
     }
 
-    private fun drawDisplay(contest: FarmingContest) = buildList<List<Any>> {
-        addAsSingletonList("§6Minimum Farming Fortune needed")
-        addAsSingletonList("")
+    private fun drawDisplay(contest: FarmingContest) = Container.vertical {
+        string("§6Minimum Farming Fortune needed")
+        spacer()
 
         val crop = contest.crop
-        add(listOf("§7For this ", crop.icon, "§7${crop.cropName} contest:"))
-        for (bracket in ContestBracket.entries) {
-            addAsSingletonList(getLine(bracket, contest.brackets, crop))
+        horizontal {
+            string("§7For this ")
+            item(crop.icon)
+            string("§7${crop.cropName} contest:")
         }
-        addAsSingletonList("")
+        for (bracket in ContestBracket.entries) {
+            string(getLine(bracket, contest.brackets, crop))
+        }
+        spacer()
 
         val (size, averages) = FarmingContestApi.calculateAverages(crop)
-        add(listOf("§7For the last §e$size ", crop.icon, "§7${crop.cropName} contests:"))
-        for (bracket in ContestBracket.entries) {
-            addAsSingletonList(getLine(bracket, averages, crop))
+        horizontal {
+            string("§7For the last §e$size ")
+            item(crop.icon)
+            string("§7${crop.cropName} contests:")
         }
-        addAsSingletonList("")
+        for (bracket in ContestBracket.entries) {
+            string(getLine(bracket, averages, crop))
+        }
+        spacer()
 
         var blocksPerSecond = crop.getLatestBlocksPerSecond()
         if (blocksPerSecond == null) {
-            add(listOf("§cNo ", crop.icon, "§cblocks/second data,"))
-            addAsSingletonList("§cassuming 19.9 instead.")
+            horizontal {
+                string("§cNo ")
+                item(crop.icon)
+                string("§cblocks/second data,")
+            }
+            string("§cassuming 19.9 instead.")
         } else {
             if (blocksPerSecond < 15.0) {
-                add(listOf("§7Your latest ", crop.icon, "§7blocks/second: §e${blocksPerSecond.roundTo(2)}"))
-                add(listOf("§cThis is too low, showing 19.9 Blocks/second instead!"))
+                val formatted = blocksPerSecond.roundTo(2)
+                horizontal {
+                    string("§cYour latest ")
+                    item(crop.icon)
+                    string("§cblocks/second: §e$formatted")
+                }
+                string("§cThis is too low, showing 19.9 Blocks/second instead!")
                 blocksPerSecond = 19.9
             }
         }
-        addAsSingletonList("")
+        spacer()
 
         val trueFF = crop.getLatestTrueFarmingFortune()
         if (trueFF == null) {
-            addAsSingletonList("§cNo latest true FF saved!")
+            string("§cNo latest true FF saved!")
         } else {
             val farmingFortune = formatFarmingFortune(trueFF)
-            add(listOf("§6Your ", crop.icon, "§6FF: $farmingFortune"))
+            horizontal {
+                string("§6Your latest ")
+                item(crop.icon)
+                string("§6FF: $farmingFortune")
+            }
         }
-        addAsSingletonList("")
+        spacer()
         if (blocksPerSecond == null || trueFF == null) {
-            add(listOf("§cMissing data from above!"))
+            string("§cMissing data from above!")
         } else {
-            val predictedScore =
-                ((100.0 + trueFF) * blocksPerSecond * crop.baseDrops * 20 * 60 / 100).toInt().addSeparators()
-            add(listOf("§6Predicted ", crop.icon, "§6crops: $predictedScore"))
+            val predictedScore = ((100.0 + trueFF) * blocksPerSecond * crop.baseDrops * 20 * 60 / 100).toInt().addSeparators()
+            horizontal {
+                string("§6Predicted ")
+                item(crop.icon)
+                string("§6crops: $predictedScore")
+            }
         }
     }
 
@@ -121,7 +146,7 @@ object JacobContestFFNeededDisplay {
         if (!isEnabled()) return
         if (!FarmingContestApi.inInventory) return
         if (lastToolTipTime.passedSince() > 200.milliseconds) return
-        config.farmingFortuneForContestPos.renderStringsAndItems(display, posLabel = "Jacob Contest Crop Data")
+        display?.let { config.farmingFortuneForContestPos.renderRenderable(it, posLabel = "Jacob Contest Crop Data") }
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.farmingFortuneForContest
