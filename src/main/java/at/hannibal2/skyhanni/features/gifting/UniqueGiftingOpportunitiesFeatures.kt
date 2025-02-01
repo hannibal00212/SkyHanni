@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event
+package at.hannibal2.skyhanni.features.gifting
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.event.winter.UniqueGiftCounter
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
@@ -56,13 +55,15 @@ object UniqueGiftingOpportunitiesFeatures {
 
     private var holdingGift = false
 
+    fun isHoldingGift() = holdingGift
+
     private fun hasGiftedPlayer(player: EntityPlayer) = playerList?.contains(player.name) == true
 
     private fun addGiftedPlayer(playerName: String) {
         playerList?.add(playerName)
     }
 
-    private val config get() = SkyHanniMod.feature.event.winter.giftingOpportunities
+    private val config get() = SkyHanniMod.feature.event.gifting.giftingOpportunities
 
     private fun isEnabled() = holdingGift
 
