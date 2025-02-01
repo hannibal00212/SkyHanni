@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import org.lwjgl.input.Mouse
+import kotlin.time.Duration.Companion.milliseconds
 
 abstract class ScrollInput(
-    protected val scrollValue: ScrollValue,
+    private val scrollValue: ScrollValue,
     protected val minValue: Int,
     protected val maxValue: Int,
     protected val velocity: Double,
@@ -33,6 +35,8 @@ abstract class ScrollInput(
         }
 
     protected fun isMouseEventValid(): Boolean = scrollValue.isMouseEventValid()
+    protected fun isPureScrollEvent() = scrollValue.isPureScrollEvent()
+    protected fun hasRecentScrollEvent() = scrollValue.hasRecentScrollEvent()
 
     abstract fun update(isValid: Boolean)
 
@@ -69,9 +73,9 @@ abstract class ScrollInput(
                 // For pure events, we don't care about tracking state
                 // and only care about tracking a 1/-1 for the scroll status.
                 // We reset to 0 to avoid repeatedly applying the same scroll value.
-                val isBad = Mouse.getEventDWheel() == 0 || !scrollValue.isPureScrollEvent() || !scrollValue.hasRecentScrollEvent()
-                if (isBad) return dispose()
+                if (!isPureScrollEvent() || !hasRecentScrollEvent()) return dispose()
 
+                // Otherwise we let the parent class handle the rest.
                 super.update(isValid)
             }
 
@@ -88,7 +92,7 @@ class ScrollValue {
     private var mouseEventTime = 0L
     private var lastMouseX = 0
     private var lastMouseY = 0
-    private var lastScrollTime = 0L
+    private var lastScrollTime: SimpleTimeMark = SimpleTimeMark.farPast()
 
     fun getValue(): Double =
         field ?: throw IllegalStateException("ScrollValue should be initialized before get.")
@@ -112,23 +116,20 @@ class ScrollValue {
     fun isPureScrollEvent(): Boolean {
         val mouseX = Mouse.getEventX()
         val mouseY = Mouse.getEventY()
-        val deltaWheel = Mouse.getEventDWheel()
-
-        val isScrollEvent = deltaWheel != 0
+        val isScrollEvent = Mouse.getEventDWheel() != 0
         val hasMouseMoved = mouseX != lastMouseX || mouseY != lastMouseY
 
         // Update last mouse position
         lastMouseX = mouseX
         lastMouseY = mouseY
 
-        if (isScrollEvent) {
-            lastScrollTime = System.currentTimeMillis() // Store last valid scroll time
-        }
+        // Update last scroll time if it's a scroll event
+        if (isScrollEvent) lastScrollTime = SimpleTimeMark.now()
 
         return isScrollEvent && !hasMouseMoved
     }
 
     fun hasRecentScrollEvent(): Boolean {
-        return System.currentTimeMillis() - lastScrollTime < 50L
+        return lastScrollTime.passedSince() < 50.milliseconds
     }
 }

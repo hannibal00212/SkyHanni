@@ -356,7 +356,6 @@ object BestiaryData {
                 config.numberFormat = it
                 update()
             },
-            universe = NumberFormatEntry.entries,
         )
 
         addRenderableButton<DisplayTypeEntry>(
@@ -367,7 +366,6 @@ object BestiaryData {
                 config.displayType = it
                 update()
             },
-            universe = DisplayTypeEntry.entries,
         )
 
         // TODO add boolean support
@@ -379,7 +377,6 @@ object BestiaryData {
                 config.replaceRoman = !config.replaceRoman
                 update()
             },
-            universe = NumberType.entries,
         )
 
         addRenderableButton<HideMaxed>(
@@ -390,7 +387,6 @@ object BestiaryData {
                 config.hideMaxed = !config.hideMaxed
                 update()
             },
-            universe = HideMaxed.entries,
         )
     }
 

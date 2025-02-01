@@ -138,7 +138,7 @@ internal object RenderableUtils {
         add(createButtonNew(label, current, getName, onChange, universe, enableUniverseScroll))
     }
 
-    inline fun <reified T: Enum<T>> MutableList<Renderable>.addRenderableButton(
+    inline fun <reified T : Enum<T>> MutableList<Renderable>.addRenderableButton(
         label: String,
         current: T?,
         crossinline getName: (T?) -> String,
