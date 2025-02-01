@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryHashUpdatedEvent
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
@@ -18,7 +20,7 @@ object OtherInventoryData {
 
     private var currentInventory: Inventory? = null
     private var acceptItems = false
-    private var lateEvent: InventoryUpdatedEvent? = null
+    private val lateEvents: MutableSet<InventoryOpenEvent> = mutableSetOf()
 
     @HandleEvent
     fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
@@ -32,10 +34,8 @@ object OtherInventoryData {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        lateEvent?.let {
-            it.post()
-            lateEvent = null
-        }
+        lateEvents.forEach { it.post() }
+        lateEvents.clear()
     }
 
     @HandleEvent
@@ -57,40 +57,31 @@ object OtherInventoryData {
         }
 
         if (packet is S2FPacketSetSlot) {
-            if (!acceptItems) {
-                currentInventory?.let {
-                    if (it.windowId != packet.func_149175_c()) return
+            val inventory = currentInventory?.takeIf { it.windowId == packet.func_149175_c() } ?: return
 
-                    val slot = packet.func_149173_d()
-                    if (slot < it.slotCount) {
-                        val itemStack = packet.func_149174_e()
-                        if (itemStack != null) {
-                            it.items[slot] = itemStack
-                            lateEvent = InventoryUpdatedEvent(it)
-                        }
-                    }
-                }
-                return
-            }
-            currentInventory?.let {
-                if (it.windowId != packet.func_149175_c()) return
+            val slot = packet.func_149173_d()
+            val itemStack = packet.func_149174_e()
 
-                val slot = packet.func_149173_d()
-                if (slot < it.slotCount) {
-                    val itemStack = packet.func_149174_e()
-                    if (itemStack != null) {
-                        it.items[slot] = itemStack
+            if (slot < inventory.slotCount) {
+                if (!acceptItems) {
+                    itemStack?.let {
+                        inventory.items[slot] = it
+                        lateEvents.add(InventoryUpdatedEvent(inventory))
+                        recheckHash(inventory)
                     }
-                } else {
-                    done(it)
                     return
                 }
 
-                if (it.items.size == it.slotCount) {
-                    done(it)
-                }
-            }
+                itemStack?.let { inventory.items[slot] = it }
+
+                if (inventory.items.size == inventory.slotCount) done(inventory)
+            } else if (acceptItems) done(inventory)
         }
+    }
+
+    private fun recheckHash(inventory: Inventory) {
+        if (inventory.itemHash == inventory.items.hashCode()) return
+        lateEvents.add(InventoryHashUpdatedEvent(inventory))
     }
 
     private fun done(inventory: Inventory) {
@@ -105,6 +96,7 @@ object OtherInventoryData {
         val title: String,
         val slotCount: Int,
         val items: MutableMap<Int, ItemStack> = mutableMapOf(),
+        val itemHash: Int = items.hashCode(),
         var fullyOpenedOnce: Boolean = false,
     )
 }
