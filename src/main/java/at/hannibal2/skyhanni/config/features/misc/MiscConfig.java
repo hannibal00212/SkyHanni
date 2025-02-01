@@ -259,6 +259,12 @@ public class MiscConfig {
     public boolean serverRestartTitle = true;
 
     @Expose
+    @ConfigOption(name = "Offline Cake Counter", desc = "Send a chat message with Century Cakes eaten and any Cake Souls found while you were away from your Private Island.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean offlineCakeCounter = false;
+
+    @Expose
     @ConfigOption(name = "Piece Of Wizard Portal", desc = "Restore the Earned By lore line on bought Piece Of Wizard Portal.")
     @ConfigEditorBoolean
     @FeatureToggle
