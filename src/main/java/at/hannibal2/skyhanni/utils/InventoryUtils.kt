@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
@@ -15,6 +16,7 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.IInventory
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
+import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 //#if MC > 1.12
 //$$ import net.minecraft.inventory.ClickType
@@ -33,8 +35,13 @@ object InventoryUtils {
     }
 
     fun getSlotsInOwnInventory(): List<Slot> {
-        val guiInventory = Minecraft.getMinecraft().currentScreen as? GuiInventory ?: return emptyList<Slot>()
-        return guiInventory.inventorySlots.inventorySlots
+        val guiInventory = Minecraft.getMinecraft().currentScreen as? GuiInventory
+        val inventorySlots = guiInventory?.inventorySlots?.inventorySlots
+            ?: Minecraft.getMinecraft().thePlayer?.inventory?.mainInventory?.mapIndexed { index, _ ->
+                Slot(Minecraft.getMinecraft().thePlayer.inventory, index, 0, 0)
+            }
+            ?: return emptyList()
+        return inventorySlots
             .filter { it.inventory is InventoryPlayer && it.stack != null }
     }
 
@@ -160,5 +167,13 @@ object InventoryUtils {
 
     fun closeInventory() {
         Minecraft.getMinecraft().currentScreen = null
+    }
+
+    infix fun Collection<Slot>.highlightAll(lorenzColor: LorenzColor) {
+        forEach { it highlight lorenzColor }
+    }
+
+    infix fun Collection<Slot>.highlightAll(color: Color) {
+        forEach { it highlight color }
     }
 }

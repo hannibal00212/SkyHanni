@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.features.rift.area.dreadfarm.WoodenButtonsHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
+import at.hannibal2.skyhanni.utils.InventoryUtils.highlightAll
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -144,16 +145,13 @@ object EnigmaSoulWaypoints {
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
 
-        for ((slot, stack) in chest.getAllItems()) {
-            for (soul in trackedSouls) {
-                if (stack.displayName.removeColor().contains(soul)) {
-                    slot highlight LorenzColor.DARK_PURPLE
-                }
+        chest.getAllItems().filter { (_, stack) ->
+            trackedSouls.any { soul ->
+                stack.displayName.removeColor().contains(soul)
             }
-        }
-        if (!adding) {
-            chest.inventorySlots[31] highlight LorenzColor.DARK_PURPLE
-        }
+        }.keys.highlightAll(LorenzColor.DARK_PURPLE)
+
+        if (!adding) chest.inventorySlots[31] highlight LorenzColor.DARK_PURPLE
     }
 
     @HandleEvent

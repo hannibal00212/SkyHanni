@@ -16,12 +16,12 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.clickMeRabbitPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
+import at.hannibal2.skyhanni.utils.InventoryUtils.highlightAll
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
@@ -98,21 +98,17 @@ object ChocolateFactoryStrayWarning {
 
     private fun GuiContainerEvent.BackgroundDrawnEvent.partyModeHighlight() {
         val eventChest = getEventChest() ?: return
-        eventChest.getUpperItems().keys.forEach { it highlight CHROMA_COLOR_ALT.toSpecialColor() }
+        eventChest.getUpperItems().keys.highlightAll(CHROMA_COLOR_ALT.toSpecialColor())
         eventChest.inventorySlots.filter {
             it.slotNumber != it.slotIndex
-        }.forEach {
-            it highlight CHROMA_COLOR_ALT2.toSpecialColor()
-        }
+        }.highlightAll(CHROMA_COLOR_ALT2.toSpecialColor())
     }
 
     private fun GuiContainerEvent.BackgroundDrawnEvent.strayHighlight() {
         val eventChest = getEventChest() ?: return
         eventChest.getUpperItems().keys.filter {
             it.slotNumber in activeStraySlots
-        }.forEach {
-            it highlight warningConfig.inventoryHighlightColor.toSpecialColor()
-        }
+        }.highlightAll(warningConfig.inventoryHighlightColor.toSpecialColor())
     }
 
     @HandleEvent
