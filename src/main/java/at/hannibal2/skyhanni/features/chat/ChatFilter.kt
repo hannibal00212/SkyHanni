@@ -216,6 +216,12 @@ object ChatFilter {
         "§6§lRARE DROP! §r§5Crystal Fragment",
     )
 
+    // Legacy Items
+    @Suppress("MaxLineLength")
+    private val legacyItems = listOf(
+        "§cYou currently have one or more Legacy Items in your inventory or sacks that are no longer used throughout the game! Exchange them in the Legacy Trades menu, accessed through /legacytrades!".toPattern(),
+    )
+
     // Useless Notification
     private val uselessNotificationPatterns = listOf(
         "§aYou tipped \\d+ players? in \\d+(?: different)? games?!".toPattern(),
@@ -468,6 +474,7 @@ object ChatFilter {
         "slayer" to slayerPatterns,
         "slayer_drop" to slayerDropPatterns,
         "useless_drop" to uselessDropPatterns,
+        "legacy_items" to legacyItems,
         "useless_notification" to uselessNotificationPatterns,
         "money" to bazaarPatterns,
         "winter_island" to winterIslandPatterns,
@@ -562,6 +569,7 @@ object ChatFilter {
         dungeonConfig.soloStats && DungeonApi.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
         dungeonConfig.fairy && DungeonApi.inDungeon() && message.isPresent("fairy") -> "fairy"
         config.gardenNoPest && GardenApi.inGarden() && PestApi.noPestsChatPattern.matches(message) -> "garden_pest"
+        config.legacyItemsWarning && message.isPresent("legacy_items") -> "legacy_items"
 
         else -> null
     }
