@@ -69,6 +69,6 @@ public class ChocolateFactoryStrayRabbitWarningConfig {
 
     @ConfigOption(name = "Sounds", desc = "Click to open the list of available sounds.")
     @ConfigEditorButton(buttonText = "OPEN")
-    public Runnable sounds = () -> OSUtils.openBrowser("https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/mapping-and-modding-tutorials/2213619-1-8-all-playsound-sound-arguments");
+    public Runnable sounds = OSUtils::openSoundsListInBrowser;
 
 }
