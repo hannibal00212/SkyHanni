@@ -637,10 +637,11 @@ object ScoreboardPattern {
 
     /**
      * REGEX-TEST: §d5th Anniversary§f 167:59:54
+     * REGEX-TEST: §bCentury Raffle§f 124:00:00
      */
     val anniversaryPattern by miscSB.pattern(
         "anniversary",
-        "§d\\d+(?:st|nd|rd|th) Anniversary§f (?:\\d|:)+",
+        "(?:§d\\d+(?:st|nd|rd|th) Anniversary|§bCentury Raffle)§f (?:\\d|:)+",
     )
 
     // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third (and fourth) scoreboard line
