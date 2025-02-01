@@ -37,11 +37,10 @@ object SkyHanniEvents {
 
     @Suppress("UNCHECKED_CAST")
     private fun registerMethod(method: Method, instance: Any) {
-        if (method.parameterCount != 1) return
         val options = method.getAnnotation(HandleEvent::class.java) ?: return
-        val event = method.parameterTypes[0]
-        if (!SkyHanniEvent::class.java.isAssignableFrom(event)) return
-        listeners.getOrPut(event as Class<SkyHanniEvent>) { EventListeners(event) }
+        val eventType = method.parameterTypes.getOrNull(0) ?: options.eventType.java
+        if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return
+        listeners.getOrPut(eventType as Class<SkyHanniEvent>) { EventListeners(eventType) }
             .addListener(method, instance, options)
     }
 

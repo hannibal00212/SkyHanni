@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.types.typeUtil.supertypes
 
 val skyhanniEvent = "at.hannibal2.skyhanni.api.event.SkyHanniEvent"
 val handleEvent = "HandleEvent"
+val eventType = "eventType"
 
 registerInspection(HandleEventInspectionKotlin())
 
@@ -28,16 +29,33 @@ class HandleEventInspectionKotlin : AbstractKotlinInspection() {
         val visitor = object : KtVisitorVoid() {
             override fun visitNamedFunction(function: KtNamedFunction) {
                 val hasEventAnnotation = function.annotationEntries.any { it.shortName!!.asString() == handleEvent }
+
+                // Check if the function's parameter is a SkyHanniEvent or its subtype
                 val isEvent = function.valueParameters.firstOrNull()?.type()?.supertypes()
                     ?.any { it.fqName?.asString() == skyhanniEvent } ?: false
 
+                // Find the annotation entry
+                val annotationEntry = function.annotationEntries
+                    .find { it.shortName!!.asString() == handleEvent }
+
+                // Check if the annotation specifies the eventType explicitly or as a positional parameter
+                val hasEventType = annotationEntry?.valueArguments
+                    ?.any { argument ->
+                        // Check if it is a named parameter for `eventType`
+                        argument.getArgumentName()?.asName?.asString() == "eventType" ||
+                            // Check if it is a positional argument (first argument)
+                            (annotationEntry.valueArguments.indexOf(argument) == 0 &&
+                                argument.getArgumentExpression()?.text != null)
+                    } ?: false
+
+                // Validate function annotation and parameters
                 if (isEvent && !hasEventAnnotation && function.valueParameters.size == 1 && function.isPublic) {
                     holder.registerProblem(
                         function,
                         "Event handler function should be annotated with @HandleEvent",
                         HandleEventQuickFix()
                     )
-                } else if (!isEvent && hasEventAnnotation) {
+                } else if (!isEvent && !hasEventType && hasEventAnnotation) {
                     holder.registerProblem(
                         function,
                         "Function should not be annotated with @HandleEvent if it does not take a SkyHanniEvent",
