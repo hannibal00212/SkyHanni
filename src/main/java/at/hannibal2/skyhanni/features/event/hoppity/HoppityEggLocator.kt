@@ -40,6 +40,8 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object HoppityEggLocator {
     private val config get() = HoppityEggsManager.config
+    private val waypointsConfig get() = config.waypoints
+    private val locationConfig get() = config.locations
     val locatorItem = "EGGLOCATOR".toInternalName()
 
     private var lastParticlePosition: LorenzVec? = null
@@ -96,7 +98,7 @@ object HoppityEggLocator {
         }
 
         sharedEggLocation?.let {
-            if (config.sharedWaypoints) {
+            if (waypointsConfig.shared) {
                 event.drawEggWaypoint(it, "§aShared Egg")
                 return
             }
@@ -105,7 +107,7 @@ object HoppityEggLocator {
         var islandEggsLocations = HoppityEggLocations.islandLocations
 
         if (shouldShowAllEggs()) {
-            if (config.hideDuplicateWaypoints) {
+            if (waypointsConfig.hideDuplicates) {
                 islandEggsLocations = islandEggsLocations.filter {
                     !HoppityEggLocations.hasCollectedEgg(it)
                 }.toSet()
@@ -122,14 +124,14 @@ object HoppityEggLocator {
     private fun SkyHanniRenderWorldEvent.drawGuessLocations() {
         for ((index, eggLocation) in possibleEggLocations.withIndex()) {
             drawEggWaypoint(eggLocation, "§aGuess #${index + 1}")
-            if (config.showLine) {
+            if (waypointsConfig.showLine) {
                 drawLineToEye(eggLocation.blockCenter(), LorenzColor.GREEN.toColor(), 2, false)
             }
         }
     }
 
     private fun SkyHanniRenderWorldEvent.drawDuplicateEggs(islandEggsLocations: Set<LorenzVec>) {
-        if (!config.highlightDuplicateEggLocations || !config.showNearbyDuplicateEggLocations) return
+        if (!locationConfig.highlightDuplicates || !locationConfig.showNearbyDuplicates) return
         for (eggLocation in islandEggsLocations) {
             val dist = eggLocation.distanceToPlayer()
             if (dist < 10 && HoppityEggLocations.hasCollectedEgg(eggLocation)) {
@@ -141,19 +143,19 @@ object HoppityEggLocator {
     }
 
     private fun SkyHanniRenderWorldEvent.drawGuessImmediately() {
-        if (config.waypointsImmediately && lastClick.passedSince() < 5.seconds) {
+        if (waypointsConfig.showImmediately && lastClick.passedSince() < 5.seconds) {
             lastParticlePositionForever?.let {
                 if (lastChange.passedSince() < 300.milliseconds) {
                     val eyeLocation = exactPlayerEyeLocation()
                     if (eyeLocation.distance(it) > 2) {
                         drawWaypointFilled(
                             it,
-                            config.waypointColor.toSpecialColor(),
+                            waypointsConfig.color.toSpecialColor(),
                             seeThroughBlocks = true,
                         )
                         drawDynamicText(it.up(), "§aGuess", 1.5)
                     }
-                    if (!drawLocations && config.showLine) {
+                    if (!drawLocations && waypointsConfig.showLine) {
                         drawLineToEye(it.blockCenter(), LorenzColor.GREEN.toColor(), 2, false)
                     }
                 }
@@ -162,17 +164,17 @@ object HoppityEggLocator {
     }
 
     private fun SkyHanniRenderWorldEvent.drawEggWaypoint(location: LorenzVec, label: String) {
-        val shouldMarkDuplicate = config.highlightDuplicateEggLocations && HoppityEggLocations.hasCollectedEgg(location)
+        val shouldMarkDuplicate = locationConfig.highlightDuplicates && HoppityEggLocations.hasCollectedEgg(location)
         val possibleDuplicateLabel = if (shouldMarkDuplicate) "$label §c(Duplicate Location)" else label
         if (!shouldMarkDuplicate) {
-            drawWaypointFilled(location, config.waypointColor.toSpecialColor(), seeThroughBlocks = true)
+            drawWaypointFilled(location, waypointsConfig.color.toSpecialColor(), seeThroughBlocks = true)
         } else {
             drawColor(location, LorenzColor.RED.toColor(), false, 0.5f)
         }
         drawDynamicText(location.up(), possibleDuplicateLabel, 1.5)
     }
 
-    private fun shouldShowAllEggs() = config.showAllWaypoints && !locatorInHotbar && HoppityEggType.eggsRemaining()
+    private fun shouldShowAllEggs() = waypointsConfig.showAll && !locatorInHotbar && HoppityEggType.eggsRemaining()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
@@ -274,12 +276,12 @@ object HoppityEggLocator {
     }
 
     private fun trySendingGraph() {
-        if (!config.showPathFinder) return
+        if (!waypointsConfig.showPathFinder) return
         val location = possibleEggLocations.firstOrNull() ?: return
 
-        val color = config.waypointColor.toSpecialColor()
+        val color = waypointsConfig.color.toSpecialColor()
 
-        IslandGraphs.pathFind(location, "Hoppity Egg", color, condition = { config.showPathFinder })
+        IslandGraphs.pathFind(location, "Hoppity Egg", color, condition = { waypointsConfig.showPathFinder })
     }
 
     fun isValidEggLocation(location: LorenzVec): Boolean = HoppityEggLocations.islandLocations.any {
@@ -291,7 +293,8 @@ object HoppityEggLocator {
     private fun ReceiveParticleEvent.isEnchantmentParticle() = type == EnumParticleTypes.ENCHANTMENT_TABLE && speed == -2.0f && count == 10
 
     fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.waypoints && !GardenApi.inGarden() && !ReminderUtils.isBusy(true) && HoppityApi.isHoppityEvent()
+        LorenzUtils.inSkyBlock && config.waypoints.enabled && !GardenApi.inGarden() && !ReminderUtils.isBusy(true) &&
+            HoppityApi.isHoppityEvent()
 
     private val ItemStack.isLocatorItem get() = getInternalName() == locatorItem
 
@@ -329,7 +332,7 @@ object HoppityEggLocator {
         }
     }
 
-    private fun testPathfind(args: Array<String>) {
+    private fun testPathFind(args: Array<String>) {
         val target = args[0].formatInt()
         HoppityEggLocations.apiEggLocations[LorenzUtils.skyBlockIsland]?.let {
             for ((i, location) in it.values.withIndex()) {
@@ -346,7 +349,7 @@ object HoppityEggLocator {
         event.register("shtestrabbitpaths") {
             description = "Tests pathfinding to rabbit eggs. Use a number 0-14."
             category = CommandCategory.DEVELOPER_TEST
-            callback { testPathfind(it) }
+            callback { testPathFind(it) }
         }
     }
 }

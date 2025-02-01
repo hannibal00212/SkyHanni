@@ -744,7 +744,7 @@ object HoppityEventSummary {
         return previousEggs + currentEggs
     }
 
-    private fun getRabbitsFormat(rarityMap: Map<LorenzRarity, Int>, name: String): List<String> {
+    fun getRabbitsFormat(rarityMap: Map<LorenzRarity, Int>, name: String): List<String> {
         val rabbitsSum = rarityMap.values.sum()
         if (rabbitsSum == 0) return emptyList()
 

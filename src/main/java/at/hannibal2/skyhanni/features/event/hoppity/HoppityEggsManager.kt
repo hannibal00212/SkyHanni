@@ -31,7 +31,11 @@ import kotlin.time.Duration.Companion.seconds
 object HoppityEggsManager {
 
     val config get() = SkyHanniMod.feature.event.hoppityEggs
+    private val chatConfig get() = config.chat
+    private val unclaimedEggsConfig get() = config.unclaimedEggs
+    private val waypointsConfig get() = config.waypoints
 
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Lunch Egg §r§don a ledge next to the stairs up§r§d!
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§aChocolate Dinner Egg §r§dbehind Emissary Sisko§r§d!
@@ -116,6 +120,7 @@ object HoppityEggsManager {
         "egg.notevent",
         "§cThis only works during Hoppity's Hunt!",
     )
+    // </editor-fold>
 
     private var lastMeal: HoppityEggType? = null
     private var lastNote: String? = null
@@ -141,12 +146,18 @@ object HoppityEggsManager {
         lastNote = event.note
     }
 
+    private fun SkyHanniChatEvent.sendNextEggAvailable() {
+        val nextEgg = HoppityEggType.resettingEntries.minByOrNull { it.timeUntil() } ?: return
+        ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil().format()}§e.")
+        blockedReason = "hoppity_egg"
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
         hoppityEventNotOn.matchMatcher(event.message) {
             val currentYear = SkyBlockTime.now().year
 
-            if (config.timeInChat) {
+            if (chatConfig.eggLocatorTimeInChat) {
                 val timeUntil = SkyBlockTime(currentYear + 1).asTimeMark().timeUntil()
                 ChatUtils.chat("§eHoppity's Hunt is not active. The next Hoppity's Hunt is in §b${timeUntil.format()}§e.")
                 event.blockedReason = "hoppity_egg"
@@ -158,22 +169,13 @@ object HoppityEggsManager {
 
         noEggsLeftPattern.matchMatcher(event.message) {
             HoppityEggType.allFound()
-
-            if (config.timeInChat) {
-                val nextEgg = HoppityEggType.resettingEntries.minByOrNull { it.timeUntil() } ?: return
-                ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil().format()}§e.")
-                event.blockedReason = "hoppity_egg"
-            }
+            if (chatConfig.eggLocatorTimeInChat) event.sendNextEggAvailable()
             return
         }
 
         eggAlreadyCollectedPattern.matchMatcher(event.message) {
             getEggType(event).markClaimed()
-            if (config.timeInChat) {
-                val nextEgg = HoppityEggType.resettingEntries.minByOrNull { it.timeUntil() } ?: return
-                ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil().format()}§e.")
-                event.blockedReason = "hoppity_egg"
-            }
+            if (chatConfig.eggLocatorTimeInChat) event.sendNextEggAvailable()
             return
         }
 
@@ -190,7 +192,7 @@ object HoppityEggsManager {
     }
 
     fun shareWaypointPrompt() {
-        if (!config.sharedWaypoints) return
+        if (!waypointsConfig.shared) return
         val meal = lastMeal ?: return
         val note = lastNote ?: return
         lastMeal = null
@@ -199,7 +201,7 @@ object HoppityEggsManager {
         val currentLocation = LocationUtils.playerLocation()
         DelayedRun.runNextTick {
             latestWaypointOnclick = { HoppityEggsShared.shareNearbyEggLocation(currentLocation, meal, note) }
-            if (config.compactChat) return@runNextTick
+            if (chatConfig.compact) return@runNextTick
             ChatUtils.clickableChat(
                 "Click here to share the location of this chocolate egg with the server!",
                 onClick = latestWaypointOnclick,
@@ -229,23 +231,27 @@ object HoppityEggsManager {
         }
     }
 
+    private val warpClickAction: Pair<() -> Unit, String> get() =
+        if (LorenzUtils.inSkyBlock) {
+            { HypixelCommands.warp(unclaimedEggsConfig.warpClickDestination) } to
+                "warp to ${unclaimedEggsConfig.warpClickDestination}".trim()
+        } else {
+            { HypixelCommands.skyblock() } to "join /skyblock!"
+        }
+
     private fun warn() {
-        if (!config.warnUnclaimedEggs) return
-        if (ReminderUtils.isBusy() && !config.warnWhileBusy) return
+        if (!unclaimedEggsConfig.warningsEnabled) return
+        if (ReminderUtils.isBusy() && !unclaimedEggsConfig.warnWhileBusy) return
         if (lastWarnTime.passedSince() < 1.minutes) return
 
         lastWarnTime = now()
         val amount = HoppityEggType.resettingEntries.size
         val message = "All $amount Hoppity Eggs are ready to be found!"
-        if (config.warpUnclaimedEggs) {
-            val (action, actionName) = if (LorenzUtils.inSkyBlock) {
-                { HypixelCommands.warp(config.warpDestination) } to "warp to ${config.warpDestination}".trim()
-            } else {
-                { HypixelCommands.skyblock() } to "join /skyblock!"
-            }
+        if (unclaimedEggsConfig.warpClickEnabled) {
+            val (action, actionName) = warpClickAction
             ChatUtils.clickToActionOrDisable(
                 message,
-                config::warpUnclaimedEggs,
+                unclaimedEggsConfig::warpClickEnabled,
                 actionName = actionName,
                 action = action,
             )
@@ -253,6 +259,42 @@ object HoppityEggsManager {
         LorenzUtils.sendTitle("§e$amount Hoppity Eggs!", 5.seconds)
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
+
+    // <editor-fold desc="Mass Migration Map">
+    private val massMigrationMap by lazy {
+        mapOf(
+            "waypoints" to "waypoints.enabled",
+            "waypointsImmediately" to "waypoints.showImmediately",
+            "waypointColor" to "waypoints.color",
+            "showLine" to "waypoints.showLine",
+            "showPathFinder" to "waypoints.showPathFinder",
+            "showAllWaypoints" to "waypoints.showAll",
+            "hideDuplicateWaypoints" to "waypoints.hideDuplicates",
+            "sharedWaypoints" to "waypoints.shared",
+
+            "highlightDuplicateEggLocations" to "locations.highlightDuplicates",
+            "showNearbyDuplicateEggLocations" to "locations.showNearbyDuplicates",
+            "loadFromNeuPv" to "locations.loadFromNeuPv",
+
+            "showClaimedEggs" to "unclaimedEggs.enabled",
+            "position" to "unclaimedEggs.position",
+            "unclaimedEggsOrder" to "unclaimeddEggs.displayOrder",
+            "warnUnclaimedEggs" to "unclaimedEggs.warningsEnabled",
+            "showCollectedLocationCount" to "unclaimedEggs.showCollectedLocationCount",
+            "warpUnclaimedEggs" to "unclaimedEggs.warpClickEnabled",
+            "warpDestination" to "unclaimedEggs.warpClickDestination",
+            "showWhileBusy" to "unclaimedEggs.showWhileBusy",
+            "warnWhileBusy" to "unclaimedEggs.warnWhileBusy",
+            "showOutsideSkyblock" to "unclaimedEggs.showOutsideSkyblock",
+
+            "timeInChat" to "chat.eggLocatorTimeInChat",
+            "compactChat" to "chat.compact",
+            "rarityInCompact" to "chat.rarityInCompact",
+            "showDuplicateNumber" to "chat.showDuplicateNumber",
+            "recolorTTChocolate" to "chat.recolorTTChocolate",
+        )
+    }
+    // </editor-fold>
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -265,8 +307,13 @@ object HoppityEggsManager {
         event.move(50, "event.hoppityEggs.showDuringContest", "event.hoppityEggs.showWhileBusy")
         event.move(62, "event.hoppityEggs.uniquesWarpMenu", "event.hoppityEggs.warpMenu.enabled")
         event.move(62, "event.hoppityEggs.uniquesWarpMenuHideMax", "event.hoppityEggs.warpMenu.hideWhenMaxed")
+
+        val baseConfig = "event.hoppityEggs"
+        massMigrationMap.forEach { (oldKey, newKey) ->
+            event.move(70, "$baseConfig.$oldKey", "$baseConfig.$newKey")
+        }
     }
 
-    fun isActive() = (LorenzUtils.inSkyBlock || (LorenzUtils.onHypixel && config.showOutsideSkyblock)) &&
+    fun isActive() = (LorenzUtils.inSkyBlock || (LorenzUtils.onHypixel && unclaimedEggsConfig.showOutsideSkyblock)) &&
         HoppityApi.isHoppityEvent()
 }

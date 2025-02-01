@@ -25,12 +25,8 @@ import at.hannibal2.skyhanni.utils.StringUtils
 @SkyHanniModule
 object HoppityEggLocations {
 
-    // TODO add gui/command to show total data/missing islands
-    private var collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>
-        get() = ChocolateFactoryApi.profileStorage?.collectedEggLocations ?: mutableMapOf()
-        set(value) {
-            ChocolateFactoryApi.profileStorage?.collectedEggLocations = value
-        }
+    private val collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>> get() =
+        ChocolateFactoryApi.profileStorage?.collectedEggLocations ?: mutableMapOf()
 
     var apiEggLocations: Map<IslandType, Map<String, LorenzVec>> = mapOf()
 
@@ -83,7 +79,7 @@ object HoppityEggLocations {
 
     @HandleEvent
     fun onNeuProfileDataLoaded(event: NeuProfileDataLoadedEvent) {
-        if (loadedNeuThisProfile || !HoppityEggsManager.config.loadFromNeuPv) return
+        if (loadedNeuThisProfile || !HoppityEggsManager.config.locations.loadFromNeuPv) return
 
         val rawLocations = event.getCurrentPlayerData()?.events?.easter?.rabbits?.collectedLocations ?: return
         loadedNeuThisProfile = true
