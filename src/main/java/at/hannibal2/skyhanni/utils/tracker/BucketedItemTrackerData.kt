@@ -3,21 +3,30 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
 import com.google.gson.annotations.Expose
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl
 
-abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
+abstract class BucketedItemTrackerData<E : Enum<E>> : ItemTrackerData() {
 
-    abstract fun resetItems()
+    @Deprecated("Use getBucketItems(bucket) instead", ReplaceWith("getBucketItems(bucket)"))
+    override fun getDescription(timesGained: Long): List<String> =
+        throw UnsupportedOperationException("Use getDescription(bucket, timesGained) instead")
 
-    abstract fun getDescription(timesGained: Long): List<String>
+    abstract fun getDescription(bucket: E?, timesGained: Long): List<String>
+
+    @Deprecated("Use getBucketItems(bucket) instead", ReplaceWith("getBucketItems(bucket)"))
+    override fun getCoinName(item: TrackedItem): String =
+        throw UnsupportedOperationException("Use getCoinName(bucket, item) instead")
 
     abstract fun getCoinName(bucket: E?, item: TrackedItem): String
 
+    @Deprecated("Use getBucketItems(bucket) instead", ReplaceWith("getBucketItems(bucket)"))
+    override fun getCoinDescription(item: TrackedItem): List<String> =
+        throw UnsupportedOperationException("Use getCoinDescription(bucket, item) instead")
+
     abstract fun getCoinDescription(bucket: E?, item: TrackedItem): List<String>
 
-    open fun getCustomPricePer(internalName: NeuInternalName) = SkyHanniTracker.getPricePer(internalName)
+    abstract fun E.isBucketSelectable(): Boolean
 
     override fun reset() {
         bucketedItems.clear()
@@ -55,15 +64,18 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
         selectedBucket?.javaClass?.enumConstants
             ?: (this.javaClass.genericSuperclass as? ParameterizedTypeImpl)?.actualTypeArguments?.firstOrNull()?.let { type ->
                 (type as? Class<E>)?.enumConstants
-            } ?: ErrorManager.skyHanniError(
-            "Unable to retrieve enum constants for E in BucketedItemTrackerData",
-            "selectedBucket" to selectedBucket,
-            "dataClass" to this.javaClass.superclass.name,
-        )
+            } ?: throwBucketInitError()
     }
 
+    private fun throwBucketInitError(): Nothing = ErrorManager.skyHanniError(
+        "Unable to retrieve enum constants for E in BucketedItemTrackerData",
+        "selectedBucket" to selectedBucket,
+        "dataClass" to this.javaClass.superclass.name,
+    )
+
     @Expose
-    private var selectedBucket: E? = null
+    var selectedBucket: E? = null
+
     @Expose
     private val bucketedItems: MutableMap<E, MutableMap<NeuInternalName, TrackedItem>> = HashMap()
 
@@ -71,11 +83,12 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
     private fun getPoppedBuckets(): MutableList<E> = bucketedItems.toMutableMap().filter {
         it.value.isNotEmpty()
     }.keys.toMutableList()
-    fun getItemsProp(): MutableMap<NeuInternalName, TrackedItem> = getSelectedBucket()?.let {
+
+    fun getItemsProp(): MutableMap<NeuInternalName, TrackedItem> = selectedBucket?.let {
         getBucket(it)
-    } ?: flattenBuckets()
-    fun getSelectedBucket() = selectedBucket
-    fun selectNextSequentialBucket() {
+    } ?: flattenBucketsItems()
+
+    fun selectNextSequentialBucket(): E? {
         // Move to the next ordinal, or wrap to null if at the last value
         val nextOrdinal = selectedBucket?.let { it.ordinal + 1 } // Only calculate if selectedBucket is non-null
         selectedBucket = when {
@@ -84,12 +97,16 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
             nextOrdinal != null -> buckets[nextOrdinal] // Move to the next enum value
             else -> selectedBucket // Fallback, shouldn't happen
         }
+        val isBucketSelectable = (selectedBucket?.isBucketSelectable() == true || selectedBucket == null)
+        return if (isBucketSelectable) selectedBucket else selectNextSequentialBucket()
     }
 
-    private fun flattenBuckets(): MutableMap<NeuInternalName, TrackedItem> {
+    private fun getBucketItems(bucket: E) = bucketedItems[bucket]?.toMutableMap() ?: HashMap()
+    fun getSelectedBucketItems() = selectedBucket?.let { getBucketItems(it) } ?: flattenBucketsItems()
+    private fun flattenBucketsItems(): MutableMap<NeuInternalName, TrackedItem> {
         val flatMap: MutableMap<NeuInternalName, TrackedItem> = HashMap()
-        getPoppedBuckets().distinct().forEach { bucket ->
-            getBucket(bucket).filter { !it.value.hidden }.entries.distinctBy { it.key }.forEach { (key, value) ->
+        buckets.distinct().forEach { bucket ->
+            getBucketItems(bucket).filter { !it.value.hidden }.entries.distinctBy { it.key }.forEach { (key, value) ->
                 flatMap.merge(key, value) { existing, new ->
                     existing.copy(
                         hidden = false,

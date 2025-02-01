@@ -172,9 +172,17 @@ public class TrophyFishDisplayConfig {
     public Property<Boolean> showCheckmark = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Only Show Missing", desc = "Only show Trophy Fishes that are still missing at this rarity.")
+    @ConfigOption(name = "Only Show Missing", desc = "Only show Trophy Fish that are still missing at this tier.")
     @ConfigEditorDropdown
     public Property<HideCaught> onlyShowMissing = Property.of(HideCaught.NONE);
+
+    @Expose
+    @ConfigOption(
+        name = "Show If Caught Higher Tier",
+        desc = "Show Trophy Fish missing at the chosen tier even if a higher tier has already been caught."
+    )
+    @ConfigEditorBoolean
+    public Property<Boolean> showCaughtHigher = Property.of(false);
 
     public enum HideCaught {
         NONE("Show All"),
