@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -170,7 +171,7 @@ object CityProjectFeatures {
                     "$name §ex${amount.addSeparators()}",
                     {
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                            LorenzUtils.setTextIntoSign("$amount")
+                            SignUtils.setTextIntoSign("$amount")
                         } else {
                             BazaarApi.searchForBazaarItem(name, amount)
                         }

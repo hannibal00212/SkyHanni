@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig;
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig;
 import at.hannibal2.skyhanni.config.features.garden.laneswitch.FarmingLaneConfig;
+import at.hannibal2.skyhanni.config.features.garden.optimalAngles.OptimalAnglesConfig;
 import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedConfig;
 import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig;
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig;
@@ -45,6 +46,10 @@ public class GardenConfig {
     @Expose
     @Category(name = "Optimal Speed", desc = "Optimal Speed Settings")
     public OptimalSpeedConfig optimalSpeeds = new OptimalSpeedConfig();
+
+    @Expose
+    @Category(name = "Optimal Angles", desc = "Optimal Angles Settings")
+    public OptimalAnglesConfig optimalAngles = new OptimalAnglesConfig();
 
     @Expose
     @ConfigOption(name = "Farming Lane", desc = "")
