@@ -154,7 +154,6 @@ object ChestValue {
                 config.sortingType = it
                 update()
             },
-            universe = SortingTypeEntry.entries,
         )
 
         addRenderableButton<NumberFormatEntry>(
@@ -165,7 +164,6 @@ object ChestValue {
                 config.formatType = it
                 update()
             },
-            universe = NumberFormatEntry.entries,
         )
 
         // TODO boolean support
@@ -177,7 +175,6 @@ object ChestValue {
                 config.alignedDisplay = !config.alignedDisplay
                 update()
             },
-            universe = DisplayType.entries,
         )
     }
 

@@ -199,7 +199,6 @@ object SackDisplay {
                 config.sortingType = it
                 update(false)
             },
-            universe = SortingTypeEntry.entries,
         )
 
         addRenderableButton<NumberFormatEntry>(
@@ -210,7 +209,6 @@ object SackDisplay {
                 config.numberFormat = it
                 update(false)
             },
-            universe = NumberFormatEntry.entries,
         )
 
         if (config.showPrice) {
@@ -222,7 +220,6 @@ object SackDisplay {
                     config.priceSource = it
                     update(false)
                 },
-                universe = ItemPriceSource.entries,
             )
 
             addRenderableButton<PriceFormatEntry>(
@@ -233,7 +230,6 @@ object SackDisplay {
                     config.priceFormat = it
                     update(false)
                 },
-                universe = PriceFormatEntry.entries,
             )
 
             addString("§eTotal price: §6${format(totalPrice)}")
