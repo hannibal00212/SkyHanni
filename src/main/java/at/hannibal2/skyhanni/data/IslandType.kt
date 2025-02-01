@@ -76,7 +76,7 @@ enum class IslandType(private val nameFallback: String) {
 
         @HandleEvent(priority = HIGHEST)
         fun onRepoReload(event: RepositoryReloadEvent) {
-            val data = event.getConstant<IslandTypeJson>("IslandType")
+            val data = event.getConstant<IslandTypeJson>("misc/IslandType")
 
             val islandDataMap = data.islands.mapValues {
                 val island = it.value
