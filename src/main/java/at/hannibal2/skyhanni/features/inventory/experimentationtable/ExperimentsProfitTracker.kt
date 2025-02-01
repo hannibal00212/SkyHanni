@@ -216,7 +216,7 @@ object ExperimentsProfitTracker {
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!isEnabled()) return
 
-        if (ExperimentationTableApi.getCurrentExperiment() != null) {
+        if (ExperimentationTableApi.currentExperiment != null) {
             tracker.modify {
                 it.experimentsDone++
             }

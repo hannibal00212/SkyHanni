@@ -4,13 +4,13 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils.openInventoryName
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -23,22 +23,20 @@ import net.minecraft.entity.item.EntityArmorStand
 object ExperimentationTableApi {
 
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation
+    private val patternGroup = RepoPattern.group("enchanting.experiments")
 
-    val inTable get() = inventoriesPattern.matches(openInventoryName())
-
-    var openExperiment: Experiment? = null
-
+    private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
+    private val inTable get() = inventoriesPattern.matches(openInventoryName())
+    var currentExperiment: Experiment? = null
     val superpairInventory = InventoryDetector(
         openInventory = { name ->
-            openExperiment = superpairsPattern.matchMatcher(name) {
+            currentExperiment = superpairsPattern.matchMatcher(name) {
                 Experiment.entries.find { it.nameString == group("experiment") }
             }
         },
-    ) { name -> superpairsPattern.matches(name) }
+    ) { name -> inventoriesPattern.matches(name) }
 
-    private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
-    private val patternGroup = RepoPattern.group("enchanting.experiments")
-
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: Superpairs (Metaphysical)
      */
@@ -163,24 +161,28 @@ object ExperimentationTableApi {
         "guardianpet",
         "§[956d]Guardian.*",
     )
-
-    @Deprecated("outdated", ReplaceWith("this.openExperiment"))
-    fun getCurrentExperiment(): Experiment? = openExperiment
-
-    @HandleEvent
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND || !inTable) return
-
-        val entity = EntityUtils.getEntities<EntityArmorStand>().find {
-            it.wearingSkullTexture(EXPERIMENTATION_TABLE_SKULL)
-        } ?: return
-        val vec = entity.getLorenzVec()
-        if (storage?.tablePos != vec) storage?.tablePos = vec
-    }
+    // </editor-fold>
 
     fun inDistanceToTable(max: Double): Boolean {
         val vec = LorenzVec.getBlockBelowPlayer()
         return storage?.tablePos?.let { it.distance(vec) <= max } ?: false
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    fun onInventoryClosed(event: InventoryCloseEvent) {
+        currentExperiment = null
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (!inTable) {
+            currentExperiment = null
+            return
+        }
+
+        storage?.tablePos = EntityUtils.getEntities<EntityArmorStand>().find {
+            it.wearingSkullTexture(EXPERIMENTATION_TABLE_SKULL)
+        }?.getLorenzVec().takeIf { it != storage?.tablePos } ?: return
     }
 
     fun hasGuardianPet(): Boolean = petNamePattern.matches(PetApi.currentPet)

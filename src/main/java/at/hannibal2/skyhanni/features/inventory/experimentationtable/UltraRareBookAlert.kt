@@ -90,5 +90,5 @@ object UltraRareBookAlert {
     }
 
     private fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.ultraRareBookAlert && ExperimentationTableApi.getCurrentExperiment() != null
+        LorenzUtils.inSkyBlock && config.ultraRareBookAlert && ExperimentationTableApi.currentExperiment != null
 }
