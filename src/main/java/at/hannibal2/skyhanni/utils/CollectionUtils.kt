@@ -166,8 +166,10 @@ object CollectionUtils {
 
     fun <T> MutableList<T>.addAll(vararg elements: T) = addAll(elements)
 
+    // Do not use editCopy anymore, rather use Mutex
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) = toMutableMap().also { function(it) }.toMap()
 
+    // Do not use editCopy anymore, rather use Mutex
     fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit) = toMutableList().also { function(it) }.toList()
 
     fun <K, V> Map<K, V>.moveEntryToTop(matcher: (Map.Entry<K, V>) -> Boolean): Map<K, V> {
@@ -276,7 +278,6 @@ object CollectionUtils {
     fun <T> List<T?>.takeIfAllNotNull(): List<T>? = takeIf { null !in this } as? List<T>
 
     fun <T> Collection<T>.takeIfNotEmpty(): Collection<T>? = takeIf { it.isNotEmpty() }
-
 
     fun <T> List<T>.toPair(): Pair<T, T>? = if (size == 2) this[0] to this[1] else null
 
