@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.data.QuiverApi
 import at.hannibal2.skyhanni.data.QuiverApi.NONE_ARROW_TYPE
 import at.hannibal2.skyhanni.data.QuiverApi.asArrowPercentage
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.arrowConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
@@ -18,25 +18,24 @@ object ScoreboardElementQuiver : ScoreboardElement() {
         val currentArrow = QuiverApi.currentArrow ?: return "§cChange your Arrow once"
         if (currentArrow == NONE_ARROW_TYPE) return "No Arrows selected"
 
-        val amountString = (
-            if (arrowConfig.colorArrowAmount) {
-                percentageColor(
-                    QuiverApi.currentAmount.toLong(),
-                    QuiverApi.MAX_ARROW_AMOUNT.toLong(),
-                ).getChatColor()
-            } else ""
-            ) +
-            if (QuiverApi.wearingSkeletonMasterChestplate) "∞"
-            else {
-                when (arrowConfig.arrowAmountDisplay) {
-                    ArrowAmountDisplay.NUMBER -> QuiverApi.currentAmount.addSeparators()
-                    ArrowAmountDisplay.PERCENTAGE -> "${QuiverApi.currentAmount.asArrowPercentage()}%"
-                    else -> QuiverApi.currentAmount.addSeparators()
-                }
-            }
+        val colorPrefix = when (arrowConfig.colorArrowAmount) {
+            true -> percentageColor(QuiverApi.currentAmount.toLong(), QuiverApi.MAX_ARROW_AMOUNT.toLong()).getChatColor()
+            false -> ""
+        }
 
-        return if (displayConfig.displayNumbersFirst) "$amountString ${currentArrow.arrow}s"
-        else "Arrows: $amountString ${currentArrow.arrow.replace(" Arrow", "")}"
+        val amountDisplay = when {
+            QuiverApi.wearingSkeletonMasterChestplate -> "∞"
+            arrowConfig.arrowAmountDisplay == ArrowAmountDisplay.PERCENTAGE -> "${QuiverApi.currentAmount.asArrowPercentage()}%"
+            else -> QuiverApi.currentAmount.addSeparators()
+        }
+
+        val amountString = colorPrefix + amountDisplay
+
+        return CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay(
+            currentArrow.arrow,
+            amountString,
+            "§f",
+        )
     }
 
     override fun showWhen() = !(informationFilteringConfig.hideIrrelevantLines && !QuiverApi.hasBowInInventory())

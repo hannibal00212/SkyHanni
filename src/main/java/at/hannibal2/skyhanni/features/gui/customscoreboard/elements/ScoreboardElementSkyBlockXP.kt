@@ -1,18 +1,14 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
 import at.hannibal2.skyhanni.api.SkyBlockXPApi
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 
 object ScoreboardElementSkyBlockXP : ScoreboardElement() {
     override fun getDisplay() = buildList {
         val (level, xp) = SkyBlockXPApi.levelXPPair ?: return@buildList
-        if (CustomScoreboard.displayConfig.displayNumbersFirst) {
-            add("${SkyBlockXPApi.getLevelColor().getChatColor()}$level SB Level")
-            add("§b$xp§3/§b100 XP")
-        } else {
-            add("SB Level: ${SkyBlockXPApi.getLevelColor().getChatColor()}$level")
-            add("XP: §b$xp§3/§b100")
-        }
+        val color = SkyBlockXPApi.getLevelColor().getChatColor()
+        add(CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay("SB Level", level.toString(), color))
+        add(CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay("XP", "$xp§3/§b100", "§b"))
     }
 
     override fun showWhen() = SkyBlockXPApi.levelXPPair != null
