@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.rift.area.wyldwoods
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -26,15 +26,13 @@ object RiftLarva {
     private val LARVA_HOOK = "LARVA_HOOK".toInternalName()
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
         checkHand()
         if (!hasHookInHand) return
 
-        if (event.repeatSeconds(1)) {
-            findLarvas()
-        }
+        findLarvas()
     }
 
     private fun checkHand() {

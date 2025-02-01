@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -102,9 +103,12 @@ object VampireSlayerFeatures {
                 }
             }
         }
-        if (event.repeatSeconds(1)) {
-            entityList.editCopy { removeIf { it.isDead } }
-        }
+    }
+
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!isEnabled()) return
+        entityList.editCopy { removeIf { it.isDead } }
     }
 
     private fun List<String>.spawnedByCoop(stand: EntityArmorStand): Boolean = any {

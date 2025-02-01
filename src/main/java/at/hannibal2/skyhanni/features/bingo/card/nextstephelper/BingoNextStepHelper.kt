@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.CollectionApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SkillExperience
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.bingo.BingoApi
@@ -143,14 +144,17 @@ object BingoNextStepHelper {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
-        if (!LorenzUtils.isBingoProfile) return
-        if (!config.enabled) return
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!isEnabled()) return
 
-        if (event.repeatSeconds(1)) {
-            update()
-            updateIslandsVisited()
-        }
+        update()
+        updateIslandsVisited()
+    }
+
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
+        if (!isEnabled()) return
+
         if (event.isMod(5)) {
             updateCurrentSteps()
         }
@@ -160,8 +164,7 @@ object BingoNextStepHelper {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!LorenzUtils.isBingoProfile) return
-        if (!config.enabled) return
+        if (!isEnabled()) return
 
         for (currentStep in currentSteps) {
             if (currentStep is ObtainCrystalStep) {
@@ -262,9 +265,7 @@ object BingoNextStepHelper {
         for (goal in personalGoals) {
             val description = goal.description
             val bingoCardStep = readDescription(description.removeColor())
-            if (bingoCardStep == null) {
-//                 println("Warning: Could not find bingo steps for $description")
-            } else {
+            if (bingoCardStep != null) {
                 finalSteps.add(bingoCardStep)
             }
         }
@@ -469,4 +470,6 @@ object BingoNextStepHelper {
         }
         return this
     }
+
+    private fun isEnabled() = LorenzUtils.isBingoProfile && config.enabled
 }

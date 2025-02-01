@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.crimsonisle.SulphurSkitterBoxConfig
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
@@ -35,12 +36,15 @@ object SulphurSkitterBox {
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
-        if (event.repeatSeconds(1)) {
-            calculateSpongeLocations()
-        }
         if (event.isMod(5)) {
             calculateClosestSponge()
         }
+    }
+
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!isEnabled()) return
+        calculateSpongeLocations()
     }
 
     private fun calculateClosestSponge() {
