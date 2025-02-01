@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig
 import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.PurseApi
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.features.bingo.BingoApi
@@ -47,8 +46,6 @@ object CustomScoreboardUtils {
     internal fun getMotes() = getGroup(ScoreboardPattern.motesPattern, getSBLines(), "motes") ?: "0"
 
     internal fun getSoulflow() = TabWidget.SOULFLOW.matchMatcherFirstLine { group("amount") } ?: "0"
-
-    internal fun getPurseEarned() = getGroup(PurseApi.coinsPattern, getSBLines(), "earned")?.let { " §7(§e+$it§7)§6" }
 
     internal fun getBank() = TabWidget.BANK.matchMatcherFirstLine {
         group("amount") + (groupOrNull("personal")?.let { " §7/ §6$it" }.orEmpty())
