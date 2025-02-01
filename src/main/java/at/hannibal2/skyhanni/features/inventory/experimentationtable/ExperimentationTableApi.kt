@@ -34,7 +34,7 @@ object ExperimentationTableApi {
                 Experiment.entries.find { it.nameString == group("experiment") }
             }
         },
-    ) { name -> superpairsPattern.matches(name) }
+    ) { name -> inventoriesPattern.matches(name) }
 
     // <editor-fold desc="Patterns">
     /**
