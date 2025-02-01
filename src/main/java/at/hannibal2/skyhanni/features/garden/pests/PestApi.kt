@@ -135,10 +135,11 @@ object PestApi {
     /**
      * REGEX-TEST: §a§lPEST TRAP #3§r
      * REGEX-TEST: §9§lMOUSE TRAP #2§r
+     * REGEX-TEST: §9§lMOUSE TRAP #2
      */
-    private val pestTrapPattern by patternGroup.pattern(
+    val pestTrapPattern by patternGroup.pattern(
         "entity.pesttrap",
-        "(?:§.)+§l(?:PEST|MOUSE) TRAP(?: #\\d+)?(?:§.)+",
+        "(?:§.)+§l(?<type>PEST|MOUSE) TRAP(?: #(?<number>\\d+))?(?:§.)*",
     )
 
     private var gardenJoinTime = SimpleTimeMark.farPast()

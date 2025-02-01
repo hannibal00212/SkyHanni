@@ -108,7 +108,6 @@ object GardenCropMilestoneDisplay {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
-
         try {
             val item = event.itemStack
             val counter = GardenApi.readCounter(item) ?: return

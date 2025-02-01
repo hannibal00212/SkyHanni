@@ -17,6 +17,7 @@ enum class SprayType(val displayName: String) {
     companion object {
 
         fun getByNameOrNull(name: String) = entries.firstOrNull { it.displayName == name }
+        fun getByInternalName(internalName: NeuInternalName) = entries.firstOrNull { it.name == internalName.asString() }
         fun getByPestTypeOrAll(pestType: PestType?) = entries.filter {
             it == pestType?.spray
         }.takeIf {
